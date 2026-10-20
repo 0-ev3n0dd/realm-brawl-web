@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Realm Brawl · Rotation Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="rotations/rotations.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Ccircle cx=%2232%22 cy=%2232%22 r=%2226%22 fill=%22%23ffd23f%22/%3E%3C/svg%3E">
+</head>
+<body class="rot-body">
+<header id="rotTop">
+  <div class="rot-brand"><span class="t1">REALM</span><span class="t2">BRAWL</span><small>Rotation Preview</small></div>
+  <nav id="rotTabs" role="tablist" aria-label="Classes"></nav>
+</header>
+<main id="rotMain">
+  <section id="rotStage">
+    <div id="rotView">
+      <canvas id="game"></canvas>
+      <div id="rotFeed" aria-live="polite"></div>
+      <div id="rotSound"><button id="soundBtn" title="Game audio">🔇 Sound off</button><button id="restartBtn" title="Restart the run">↺ Restart</button></div>
+    </div>
+    <div id="rotDock">
+      <div id="rotViewToggle" role="tablist" aria-label="Rotation">
+        <button data-view="boss" role="tab">⚔ Boss Rotation</button>
+        <button data-view="mob" role="tab">🐺 Mobbing Rotation</button>
+      </div>
+      <div id="rotKeys">
+        <div class="k-title"><span id="kMode">Rotation</span><span id="kLoopLbl">loop ↻ repeats</span></div>
+        <div id="kSeq" class="k-seq"></div>
+        <div id="kUlt" class="k-seq k-ult"></div>
+      </div>
+      <div id="rotMeter">
+        <div class="m-big"><span id="mDps">0</span><small>DPS · last 5 s</small></div>
+        <div class="m-grid">
+          <div class="m-row"><span>Average</span><b id="mAvg">0</b></div>
+          <div class="m-row"><span>Optimizer</span><b id="mOpt">0</b></div>
+          <div class="m-row" id="mKillsRow"><span>Kills / min</span><b id="mKpm">0</b></div>
+          <div class="m-row"><span>Loops</span><b id="mLoops">0</b></div>
+          <div class="m-row"><span>Time</span><b id="mTime">0:00</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <aside id="rotSide">
+    <div id="sideHead"></div>
+    <div id="sideBody"></div>
+  </aside>
+</main>
+<script type="module" src="js/client/rotations.js"></script>
+</body>
+</html>

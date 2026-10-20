@@ -1,0 +1,81 @@
+/* Rotation preview page (rotations.html): dark shell around the live game canvas */
+:root { --bg: #0f1117; --panel: #171a23; --line: #262b38; --ink: #e9ecf4; --dim: #8b93a7; --acc: #ffd23f; --c: #ffd23f; --top: 64px; --side: 360px; }
+html, body.rot-body { background: var(--bg); color: var(--ink); user-select: none; }
+#rotTop { position: fixed; left: 0; right: 0; top: 0; height: var(--top); display: flex; align-items: center; gap: 18px; padding: 0 16px; background: linear-gradient(#141722, #10121a); border-bottom: 1px solid var(--line); z-index: 5; box-sizing: border-box; }
+.rot-brand { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.rot-brand .t1 { color: #ffd23f; font-size: 24px; letter-spacing: 1px; } .rot-brand .t2 { color: #ff6b4a; font-size: 24px; letter-spacing: 1px; }
+.rot-brand small { display: none; }
+@media (min-width: 1800px) { .rot-brand small { display: inline; } }
+.rot-brand .x { color: var(--dim); font-family: system-ui, sans-serif; font-size: 12px; margin-left: 8px; text-transform: uppercase; letter-spacing: 2px; }
+#rotTabs { display: flex; gap: 6px; overflow-x: auto; flex: 1; scrollbar-width: none; }
+.rot-tab { --c: #fff; display: flex; align-items: center; gap: 7px; padding: 4px 10px 4px 4px; border-radius: 12px; background: #1b1f2b; border: 1px solid var(--line); color: var(--ink); cursor: pointer; font: inherit; font-size: 15px; white-space: nowrap; transition: background .15s, border-color .15s, transform .1s; }
+.rot-tab canvas { width: 36px; height: 36px; border-radius: 9px; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c) 45%, #1b1f2b), #12141c 75%); }
+.rot-tab:hover { border-color: color-mix(in srgb, var(--c) 60%, var(--line)); }
+.rot-tab.sel { background: color-mix(in srgb, var(--c) 22%, #1b1f2b); border-color: var(--c); box-shadow: 0 0 0 1px var(--c) inset, 0 4px 18px color-mix(in srgb, var(--c) 25%, transparent); }
+.rot-tab:active { transform: translateY(1px); }
+#rotMain { position: fixed; top: var(--top); left: 0; right: 0; bottom: 0; display: flex; }
+#rotStage { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; background: #000; }
+#rotView { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+#rotDock { flex: none; display: flex; align-items: stretch; gap: 12px; padding: 10px 12px; background: linear-gradient(#141722, #0f1117); border-top: 1px solid var(--line); min-height: 128px; box-sizing: border-box; }
+#rotStage canvas#game { position: absolute; inset: 0; width: 100%; height: 100%; cursor: default; }
+#rotSide { width: var(--side); background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; }
+#rotViewToggle { flex: none; display: flex; flex-direction: column; justify-content: center; background: #171a23; border: 1px solid var(--line); border-radius: 12px; padding: 4px; gap: 4px; }
+#rotViewToggle button { font: inherit; font-size: 15px; color: var(--dim); background: transparent; border: 0; padding: 10px 16px; border-radius: 9px; cursor: pointer; text-align: left; white-space: nowrap; }
+#rotViewToggle button:hover { color: var(--ink); }
+#rotViewToggle button.sel { background: var(--c); color: #111; }
+#rotMeter { flex: none; width: 250px; display: flex; gap: 12px; align-items: center; background: #171a23; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-family: system-ui, sans-serif; font-size: 12px; box-sizing: border-box; }
+#rotMeter .m-grid { flex: 1; }
+#rotMeter .m-big { display: flex; flex-direction: column; align-items: flex-start; width: 92px; }
+#rotMeter .m-big span { font-family: 'Lilita One', sans-serif; font-size: 34px; line-height: 1; color: var(--c); font-variant-numeric: tabular-nums; }
+#rotMeter .m-big small { color: var(--dim); text-transform: uppercase; letter-spacing: 1px; font-size: 10px; }
+#rotMeter .m-row { display: flex; justify-content: space-between; color: var(--dim); padding: 2px 0; } #rotMeter .m-row b { color: var(--ink); font-variant-numeric: tabular-nums; }
+#rotFeed { position: absolute; left: 12px; top: 104px; width: 250px; display: flex; flex-direction: column; gap: 5px; z-index: 3; pointer-events: none; }
+.feed-item { background: rgba(12,14,20,.8); border-left: 3px solid var(--c); border-radius: 6px; padding: 5px 9px; font-size: 15px; animation: feedIn .25s ease-out; transition: opacity .6s; }
+.feed-item small { display: block; color: var(--dim); font-family: system-ui, sans-serif; font-size: 11px; }
+.feed-item.fin { border-left-color: #ff4fd8; background: rgba(60,12,50,.85); }
+.feed-item.ult { border-left-color: #ffd23f; background: rgba(60,48,8,.85); }
+.feed-item.old { opacity: .45; }
+@keyframes feedIn { from { transform: translateX(-16px); opacity: 0; } to { transform: none; opacity: 1; } }
+#rotKeys { flex: 1; min-width: 0; overflow-x: auto; background: #171a23; border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px 8px; scrollbar-width: thin; }
+.k-title { display: flex; justify-content: space-between; gap: 20px; color: var(--dim); font-family: system-ui, sans-serif; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.k-title #kMode { color: var(--c); }
+.k-seq { display: flex; align-items: flex-end; gap: 4px; flex-wrap: nowrap; }
+.k-unit { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 0 4px; border-radius: 9px; }
+.k-unit + .k-unit { border-left: 1px dashed #343a4b; padding-left: 8px; }
+.k-unit .k-caps { display: flex; gap: 4px; }
+.k-unit .k-name { font-family: system-ui, sans-serif; font-size: 10px; color: var(--dim); max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.k-unit.cur .k-name { color: var(--ink); }
+.cap { position: relative; min-width: 34px; height: 34px; padding: 0 6px; box-sizing: border-box; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(#2a3040, #1c2130); border: 1px solid #3a4256; border-bottom-width: 4px; font-size: 16px; color: var(--ink); transition: transform .08s, background .12s, border-color .12s; }
+.cap.sp { color: #ffd23f; } .cap.ult { color: #ff9a3c; } .cap.lmb { font-size: 11px; }
+.cap.next { border-color: var(--c); box-shadow: 0 0 0 1px color-mix(in srgb, var(--c) 50%, transparent); }
+.cap.on { background: var(--c); color: #111; border-color: color-mix(in srgb, var(--c) 60%, #000); transform: translateY(2px); border-bottom-width: 2px; box-shadow: 0 0 18px color-mix(in srgb, var(--c) 70%, transparent); }
+.cap.done { opacity: .55; }
+.cap .ch { position: absolute; top: -7px; right: -5px; width: 9px; height: 9px; border-radius: 50%; background: #ff4fd8; box-shadow: 0 0 6px #ff4fd8; }
+.k-ult { margin-top: 6px; padding-top: 6px; border-top: 1px solid #2a3040; }
+.k-ult .k-lbl { font-family: system-ui, sans-serif; font-size: 11px; color: #ff9a3c; margin-right: 6px; align-self: center; text-transform: uppercase; letter-spacing: 1px; }
+#rotKeys.in-ult .k-ult { background: rgba(255,154,60,.08); border-radius: 8px; }
+#rotSound { position: absolute; left: 12px; bottom: 14px; display: flex; gap: 6px; z-index: 3; }
+#rotSound button { font: inherit; font-size: 13px; color: var(--ink); background: rgba(12,14,20,.82); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; cursor: pointer; }
+/* side panel */
+#sideHead h2 { margin: 0 0 2px; font-family: 'Lilita One', sans-serif; font-weight: normal; font-size: 26px; color: var(--c); }
+#sideHead .sub { color: var(--dim); margin-bottom: 12px; }
+.sb-card { background: #1d212c; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+.sb-card h3 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--dim); font-weight: 600; }
+.sb-steps { counter-reset: st; margin: 0; padding: 0; list-style: none; }
+.sb-steps li { display: flex; align-items: center; gap: 8px; padding: 4px 0; border-bottom: 1px solid #232838; }
+.sb-steps li:last-child { border-bottom: 0; }
+.sb-steps .mini { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 5px; background: #2a3040; border: 1px solid #3a4256; font-weight: 700; font-size: 12px; box-sizing: border-box; }
+.sb-steps .nm { color: var(--ink); } .sb-steps .ds { color: var(--dim); font-size: 11px; }
+.sb-steps li.cur { background: color-mix(in srgb, var(--c) 10%, transparent); border-radius: 6px; }
+.sb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.sb-stats div { background: #161a24; border-radius: 8px; padding: 6px 8px; } .sb-stats b { display: block; font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; } .sb-stats span { color: var(--dim); font-size: 11px; }
+.sb-chain { display: flex; justify-content: space-between; padding: 2px 0; color: var(--dim); } .sb-chain b { color: var(--ink); font-weight: 600; }
+.sb-note { color: var(--dim); font-size: 11.5px; line-height: 1.45; }
+.sb-note code { color: var(--ink); }
+#rotLoading { position: absolute; inset: 0; text-align: center; display: grid; place-items: center; color: var(--dim); font-size: 18px; z-index: 2; pointer-events: none; }
+
+/* uniform fit below 1600x900 (client/rotations.js rotFit): the page is laid out at the design size and scaled as one */
+html.rot-fit { overflow: hidden; background: #07080c; }
+html.rot-fit body.rot-body { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; margin: 0; overflow: hidden; transform-origin: 0 0; }
+html.rot-fit #rotTop, html.rot-fit #rotMain { position: absolute; }
+.sb-play{margin:0;padding-left:16px}.sb-play li{margin:3px 0;line-height:1.35}
