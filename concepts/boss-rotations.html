@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="data:,">
+<title>Realm Brawl · CONCEPT · Boss rotations (Special cycle + real ultimate)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="samurai-burst.css">
+<link rel="stylesheet" href="samurai-burst2.css">
+<link rel="stylesheet" href="../rotations/rotations.css">
+</head>
+<body class="sb-body">
+<header id="cTop">
+  <div class="rot-brand"><span class="t1">REALM</span><span class="t2">BRAWL</span><small>Concept preview</small></div>
+  <div id="cTitle"><span id="cCls">Samurai</span> · <b>boss rotation</b> <span class="tag">CONCEPT · placeholder numbers · not in the game</span></div>
+  <nav id="clsTabs"></nav>
+  <nav id="cTabs"></nav>
+</header>
+<main id="cMain">
+  <section id="cStage">
+    <canvas id="game"></canvas>
+    <div id="widget"></div>
+  </section>
+  <aside id="cSide">
+    <div class="card"><h3 id="cName"></h3><div class="note" id="cBlurb"></div></div>
+    <div class="card"><h3>Controls</h3>
+      <div class="btns"><button id="bPlay">⏸ Pause</button><button id="bRestart">↺ Restart</button>
+        <label>Speed <select id="sSpeed"><option>0.5</option><option selected>1</option><option>2</option><option>4</option></select></label></div>
+      <div class="btns" id="routes"></div>
+      <div class="btns"><button id="bMode">▶ Play it yourself</button></div>
+      <div class="note" id="modeNote"></div>
+    </div>
+    <div class="card" id="rCard"><h3>Route <small id="rVar"></small></h3><div id="rKeys"></div></div>
+    <div class="card"><h3>DPS meter</h3>
+      <div class="meter"><div><b id="mDps">0</b><span>total (game + concept)</span></div><div><b id="mGame">0</b><span>game damage / s</span></div><div><b id="mBonus">0</b><span>concept bonus / s</span></div><div><b id="mTime">0:00</b><span>time</span></div></div>
+    </div>
+    <div class="card"><h3>Good vs sloppy <small>(headless, 3 min, same sim)</small></h3><table id="cmp"><tr><td>measuring…</td></tr></table></div>
+    <div class="card"><div class="note">The hero, its chains, its effects, the HUD and Grimtusk are the live game. The concept layer only adds PLACEHOLDER bonus damage (shown as small pink "+ concept" numbers) and one HUD widget. No balance changed. <a href="samurai-burst.html">Old concept (afterimages)</a></div></div>
+  </aside>
+</main>
+<script type="module" src="../js/concepts/samuraiburst2.js"></script>
+</body>
+</html>
