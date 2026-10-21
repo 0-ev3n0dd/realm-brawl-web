@@ -94,9 +94,9 @@ export class Weave {
 export const BANK = { counter_sheathe: 2, moonlit_guard: 2, twin_moons: 3, moment_of_death: 4, void_echo: 5, stillwater_execution: 6, wind_step: 1, petal_rain: 2, blossom_burst: 1, riposte_wave: 2 };
 export class DelayedCuts {
   static id = 'cuts'; static title = 'D · Delayed Cuts';
-  static blurb = 'Chain finishers bank Delayed Cuts (heavier chains bank more: Stillwater Execution 6, Void Echo 5, Moment of Death 4, Twin Moons 3, Moonlit Guard / Counter Sheathe 2). The boss Special chain (R→E→Q→F→R Void Sheath) is the cash-out: Void Draw releases the bank in 3 waves (20% each), the finisher releases the rest. Its finisher opens Resheathe: 6 s where chains bank double. Special ~18-20 s cooldown, so about 14 s banking per cycle. Opener: a held pre-pull draw banks 3, the pull opens with the Special, then the heaviest chains. One Perfect Cut (T) inside Resheathe releases the whole bank ×2.5; its 60 s cooldown lines up with every 3rd Special. CONCEPT numbers.';
+  static blurb = 'Chain finishers bank Delayed Cuts (heavier chains bank more: Stillwater Execution 6, Void Echo 5, Moment of Death 4, Twin Moons 3, Moonlit Guard / Counter Sheathe 2). The boss Special chain (R→E→Q→F→R Void Sheath) is the cash-out: Void Draw releases the bank in 3 waves (20% each), the finisher releases the rest. Its finisher opens Resheathe: 6 s where chains bank double. Special ~18-20 s cooldown, so about 14 s banking per cycle. Opener: a held pre-pull draw banks 3, the pull opens with the Special, then the heaviest chains. One Perfect Cut is the REAL ultimate: Blade of the Void (T) → its boss finisher route (Sheathe · Moonlit Guard · Moment of Death · Parry · Sheathe). When the real split lands, the whole bank releases on top, ×2.5 if the ultimate was cast inside Resheathe. The good route holds a full gauge for Resheathe. CONCEPT numbers.';
   static K = { per: 600, waves: 3, wave: 0.2, waveGap: 18, resh: 360, opcMul: 2.5, opcCd: 3600, prepull: 3 };
-  constructor() { this.bank = 0; this.bonus = 0; this.resh = 0; this.opc = 0; this.waves = []; this.hi = 0; this.n = 0; this.specials = 0; this.opcs = 0; this.base = 0; this.reshEnd = -1; this.reshChain = false; }
+  constructor() { this.bank = 0; this.bonus = 0; this.resh = 0; this.opc = 0; this.waves = []; this.hi = 0; this.n = 0; this.specials = 0; this.opcs = 0; this.base = 0; this.casts = 0; this.reshEnd = -1; this.reshChain = false; }
   prepull() { this.bank += DelayedCuts.K.prepull; return { fx: 'bank', add: DelayedCuts.K.prepull, draw: true }; }
   rel(n, mul = 1) { n = Math.min(this.bank, n); this.bank -= n; const b = Math.round(n * DelayedCuts.K.per * mul); this.bonus += b; return b; }
   chain(ch, d) {
@@ -110,20 +110,28 @@ export class DelayedCuts {
     const cd = (p.cds && p.cds.SP) || 0, used = cd > this.hi + 30; this.hi = cd;
     if (used) { this.specials++; this.base = this.bank; this.waves = Array.from({ length: K.waves }, (_, i) => d.sim.tick + i * K.waveGap); }
     if (this.waves.length && d.sim.tick >= this.waves[0]) { this.waves.shift(); const n = Math.max(this.bank ? 1 : 0, Math.round(this.base * K.wave)), b = this.rel(n); if (b) out = { bonus: b, fx: 'wave', cuts: n }; }
-    if (this.resh > 0) this.resh--; if (this.opc > 0) this.opc--;
+    if (this.resh > 0) this.resh--;
     return out;
   }
   inWindow() { return this.resh > 0 || this.reshChain; }
-  wantBurst(d) { return !this.opc && this.bank > 0 && (d && d.R.opc === 'asap' ? d.ticks > 600 : this.reshChain); }
-  burst() { if (this.opc) return false; const K = DelayedCuts.K, inR = this.inWindow(), n = this.bank; this.opc = K.opcCd; this.opcs++; this.last = { bonus: this.rel(n, inR ? K.opcMul : 1), fx: 'opc', cuts: n, inR }; this.reshChain = false; return true; }
-  widget() { return { kind: 'cuts', bank: this.bank, resh: this.resh / DelayedCuts.K.resh, opc: Math.ceil(this.opc / 60) }; }
+  /** the REAL ultimate: Blade of the Void (T) → its boss finisher route One Perfect Cut. When the real split lands, the concept
+   *  releases the whole bank on top (×2.5 if the ultimate was cast inside Resheathe). */
+  sim(ev, d) {
+    if (ev.pid !== d.player.id) return null;
+    if (ev.type === 'ult') { this.ultInR = this.inWindow(); this.casts++; return { fx: 'ultcast', inR: this.ultInR }; }
+    if (ev.type === 'samx' && ev.ph === 'split') { const K = DelayedCuts.K, n = this.bank, inR = !!this.ultInR; this.opcs++; this.reshChain = false; return { bonus: this.rel(n, inR ? K.opcMul : 1), fx: 'opc', cuts: n, inR }; }
+    return null;
+  }
+  wantUlt(d) { return d.R.opc === 'asap' || this.inWindow(); }
+  wantBurst() { return false; } burst() { return false; }
+  widget(d) { const p = d && d.player; return { kind: 'cuts', bank: this.bank, resh: this.resh / DelayedCuts.K.resh, ult: p ? Math.floor(p.ult) : 0, uw: !!(p && p.uw) }; }
 }
 export const CONCEPTS = { cuts: DelayedCuts, edge: BladeEdge, flow: Flow, weave: Weave };
 
 // autoplay routes per concept: good vs sloppy (drops = the chain's last key held back past its window; pauses = idle gaps)
 export const ROUTES = {
-  cuts: { good: { loop: [['R', 'E', 'Q', 'SP', 'R'], ['R', 'E', 'Q', 'F'], ['Q', 'F', 'Q', 'E'], ['R', 'E', 'Q'], ['Q', 'F', 'Q']], drop: 0, pause: 0, prepull: true, opc: 'window', desc: 'pre-pull draw, open on the Special (Void Sheath), then Stillwater Execution · Void Echo · Moment of Death · Twin Moons; One Perfect Cut only inside Resheathe' },
-    sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'E'], ['R', 'E', 'Q', 'SP', 'R'], ['Q', 'F', 'Q']], drop: 0.2, pause: 0.35, prepull: false, opc: 'asap', desc: 'no pre-pull, light chains, Special whenever, One Perfect Cut on cooldown (outside Resheathe)' } },
+  cuts: { good: { loop: [['R', 'E', 'Q', 'SP', 'R'], ['R', 'E', 'Q', 'F'], ['Q', 'F', 'Q', 'E'], ['R', 'E', 'Q'], ['Q', 'F', 'Q']], drop: 0, pause: 0, prepull: true, opc: 'window', desc: 'pre-pull draw, open on the Special (Void Sheath), then Stillwater Execution · Void Echo · Moment of Death · Twin Moons; real ultimate held for Resheathe → One Perfect Cut' },
+    sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'E'], ['R', 'E', 'Q', 'SP', 'R'], ['Q', 'F', 'Q']], drop: 0.2, pause: 0.35, prepull: false, opc: 'asap', desc: 'no pre-pull, light chains, Special whenever, real ultimate cast whenever the gauge is full' } },
   edge: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0, pause: 0, desc: 'Counter Sheathe · Petal Rain · Wind Step, empowering at 5 Edge' }, sloppy: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0.35, pause: 0.25, desc: 'same chains, ~35% dropped and idle gaps' } },
   flow: { good: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0, pause: 0, desc: 'short chains back to back, no gaps' }, sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0.2, pause: 0.45, desc: 'same chains with 3 s gaps between many of them' } },
   weave: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q'], ['R', 'E', 'Q']], drop: 0, pause: 0, desc: 'four different chains in turn (every pair weaves)' }, sloppy: { loop: [['R', 'E', 'Q']], drop: 0.25, pause: 0.2, desc: 'Moment of Death on repeat (nothing weaves) with drops' } },
@@ -136,7 +144,7 @@ export class Driver {
     this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
     this.player = addHero(this.sim, 'samurai', seed, { name: 'Hayate' });
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
-    this.bot = new RotBot('samurai', this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: false });
+    this.bot = new RotBot('samurai', this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: !!this.M.wantUlt });
     let a = 77 + seed; this.rng = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     this.ticks = 0; this.listeners = []; this.pre = this.R.prepull && this.M.prepull ? this.M.prepull() : null; this.dropping = null; this.idle = 0; this.manual = { queue: [], skill: null, attack: false, mx: 0, my: 0 }; this.lastCh = null;
   }
@@ -158,6 +166,7 @@ export class Driver {
         if (this.dropping > 0 && inp.skill) { inp.skill = undefined; if (sim.tick - this.dropping > 150) { this.dropping = null; this.bot.si = -1; this.bot.ui = this.bot.nextUi(); } }
         if (this.bot.si < 0 && this.dropping === -1) this.dropping = null;
       }
+      if (this.M.wantUlt) this.bot.useUlt = this.M.wantUlt(this);
       if (this.M.wantBurst(this)) this.burst();
     } else {
       const m = this.manual; if (m.skill) { if (m.queue.length < 3) m.queue.push({ k: m.skill, t: sim.tick }); m.skill = null; }
@@ -165,13 +174,14 @@ export class Driver {
       if (q0 && lh && lh.a === q0.k && lh.tick >= q0.t && lh !== m.lastH) { m.lastH = lh; m.queue.shift(); }
       while (m.queue[0] && sim.tick - m.queue[0].t > 78) m.queue.shift();
       const cur = m.queue[0] ? m.queue[0].k : undefined;
-      inp = { mx: m.mx, my: m.my, ax: t.x, ay: t.y, attack: m.attack && !cur, skill: cur };
+      inp = { mx: m.mx, my: m.my, ax: t.x, ay: t.y, attack: m.attack && !cur, skill: cur }; if (m.ult) { m.ult = false; inp.ult = true; inp.skill = undefined; }
       if (!m.mx && !m.my) { const dx = t.x - p.x, dy = t.y - p.y, dd = Math.hypot(dx, dy); if (dd > t.r + 70) { inp.mx = dx / dd; inp.my = dy / dd; } }
       if (m.burst) { m.burst = false; this.burst(); }
     }
     sim.setInput(p.id, inp); sim.step();
     for (const ev of sim.drainEvents()) {
       this.emit({ k: 'sim', ev });
+      const sr = this.M.sim && this.M.sim(ev, this); if (sr) this.emit({ k: 'bonus', r: sr });
       if (ev.pid !== p.id || ev.type !== 'chain') continue;
       const ch = chainOf(ev.id); if (!ch) continue;
       // a chain is scored once it can no longer grow: R→E (Moonlit Guard) followed by Q becomes R→E→Q (Moment of Death),
