@@ -21,3 +21,32 @@ html,body{margin:0;height:100%;background:#120c1c;color:#f4eefc;font-family:'Lil
 #hold{position:absolute;left:50%;top:150px;transform:translateX(-50%);background:rgba(20,12,32,.85);border:2px solid #ffd23f;border-radius:10px;padding:8px 12px}.hidden{display:none!important}
 #game,#over{position:absolute!important;left:0!important;top:0!important;width:100%!important;height:100%!important;z-index:0}
 #over{z-index:1}#cHud{z-index:2;top:84px}#callout{top:110px}#hold{top:190px}#cSide{position:relative;z-index:3}
+/* v2 design pass: one tidy HUD strip, one short line under it */
+#cHud{top:118px}.hud-row{gap:10px}.hud-row>div{background:rgba(18,10,30,.88);border:2px solid #3b2a5c;border-radius:12px;box-shadow:0 3px 0 #0b0612}
+.lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:#a99bc4}
+.slot{width:36px;height:36px;border:2px solid #3b2a5c;border-radius:9px;background:#120a1f;font-size:20px;transition:transform .15s}
+.slot.f{border-color:currentColor;background:#1d1230;box-shadow:inset 0 0 0 2px #120a1f,0 0 0 1px currentColor;transform:translateY(-1px)}
+#pat{min-width:84px;font-size:12px;letter-spacing:.5px}
+#sheath .bar{height:10px;width:160px;border:2px solid #3b2a5c;background:#120a1f}#sheath .bar i{background:linear-gradient(90deg,#c43d7a,#ff8fc0 60%,#ffe28a);transition:width .2s}
+#sheath.full .bar{border-color:#ffd23f;box-shadow:0 0 0 1px #ffd23f}#sheath .v{font-size:13px;width:38px;text-align:right}
+#cycle svg{width:40px;height:40px}#cycle .t{left:10px;top:18px;width:40px;font-size:12px}#cycle .build{stroke:#3b2a5c}#cycle .fg{stroke:#ff8fc0}
+#opc .pips i{width:12px;height:12px;background:#120a1f;border-color:#3b2a5c;transform:rotate(45deg);border-radius:2px}#opc .pips i.on{background:#ffe9f3;border-color:#fff;box-shadow:none}
+#callout{top:184px;font-size:15px;text-shadow:none;transition:opacity .25s,transform .25s;transform:translateY(-4px)}#callout.on{transform:none}
+#callout b{display:inline-block;background:rgba(18,10,30,.9);border:2px solid #3b2a5c;border-radius:9px 0 0 9px;padding:4px 10px;font-weight:normal}
+#callout span{display:inline-block;background:rgba(18,10,30,.75);border:2px solid #3b2a5c;border-left:0;border-radius:0 9px 9px 0;padding:4px 10px;color:#d9cdee;font-family:system-ui;font-size:12px}
+#hold{top:222px;border-color:#3b2a5c}#hold .bar{height:8px}
+/* v2.1 ink language: washi-paper strips, sumi brush fills, red hanko accents (matches the Samurai skill FX) */
+.hud-row>div{background:rgba(14,8,20,.9);border:2px solid #2a1c38}
+.lbl{color:#e9dcc4;font-family:'Noto Serif CJK JP','Yu Mincho',serif;letter-spacing:1.5px}
+.lbl::before{content:'';display:inline-block;width:7px;height:7px;background:#c8142c;margin-right:6px;vertical-align:1px;border-radius:1px}
+#sheath .bar{height:14px;width:170px;border:0;border-radius:0;background:#efe4d0;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 14' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C6 1 20 2 40 2.5 S120 1 150 2 S168 3 168 7 S160 12.5 130 12 S40 13 18 12 S1 11 2 7Z'/%3E%3C/svg%3E") center/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 170 14' preserveAspectRatio='none'%3E%3Cpath d='M2 7 C6 1 20 2 40 2.5 S120 1 150 2 S168 3 168 7 S160 12.5 130 12 S40 13 18 12 S1 11 2 7Z'/%3E%3C/svg%3E") center/100% 100% no-repeat}
+#sheath .bar i{background:linear-gradient(90deg,#0c070e 0%,#1d1220 82%,rgba(12,7,14,.55) 94%,rgba(12,7,14,0) 100%);transition:width .25s}
+#sheath.full .bar{box-shadow:none}#sheath.full .v{color:#ff4d6d}#sheath.full .v::after{content:' 満';font-family:serif;color:#c8142c}
+.slot{background:#efe4d0;border:0;border-radius:4px;color:#0c070e;box-shadow:inset 0 0 0 2px rgba(12,7,14,.15)}
+.slot.f{background:#efe4d0;box-shadow:inset 0 0 0 2px currentColor;transform:none}.slot.thrust{color:#c8142c}.slot.sweep{color:#2d5fa8}.slot.rise{color:#3f7d2c}
+#cycle .bg{stroke:#efe4d0;opacity:.15}#cycle .build{stroke:#efe4d0;opacity:.35}#cycle .fg{stroke:#ff4d6d;stroke-linecap:round}
+#opc .pips i{background:#efe4d0;border:0;opacity:.25}#opc .pips i.on{opacity:1;background:#c8142c}
+#callout b{background:#efe4d0;color:#0c070e!important;border:0;font-family:'Lilita One'}#callout span{background:rgba(14,8,20,.9);border:0}
+#pat{color:#e9dcc4}
+#bMode{background:#3a2860!important;color:#fff!important;border-color:#5a3f8e!important}#bMode.on{background:#efe4d0!important;color:#0c070e!important;border-color:#c8142c!important}

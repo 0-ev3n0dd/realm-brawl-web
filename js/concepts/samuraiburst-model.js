@@ -100,9 +100,16 @@ export class Driver {
       // the draw: once the 3 slots are full and the build phase is over, or at the end of the 20 s cycle
       if (!model.drawn && model.cycleT >= CONCEPT.build && (model.imgs.length >= CONCEPT.slots || model.cycleT >= CONCEPT.cycle - 1)) this.burst();
     } else {
-      const m = this.manual; inp = { mx: m.mx, my: m.my, ax: t.x, ay: t.y, attack: m.attack, skill: m.skill || undefined }; m.skill = null;
+      // typed keys queue up (max 3) and each is held as a buffered press until the sim takes it (1 s GCD / a swing), up to 1.3 s
+      const m = this.manual; m.queue = m.queue || []; if (m.skill) { if (m.queue.length < 3) m.queue.push({ k: m.skill, t: sim.tick }); m.skill = null; }
+      const lh = p.history[p.history.length - 1], q0 = m.queue[0];
+      if (q0 && lh && lh.a === q0.k && lh.tick >= q0.t && lh.tick >= (m.lastTaken || -1) + 1 && lh !== m.lastH) { m.lastH = lh; m.lastTaken = lh.tick; m.queue.shift(); }
+      while (m.queue[0] && sim.tick - m.queue[0].t > 78) m.queue.shift();
+      m.cur = m.queue[0] ? m.queue[0].k : null;
+      inp = { mx: m.mx, my: m.my, ax: t.x, ay: t.y, attack: m.attack && !m.cur, skill: m.cur || undefined };
+      if (!m.mx && !m.my) { const dx = t.x - p.x, dy = t.y - p.y, dd = Math.hypot(dx, dy); if (dd > t.r + 70) { inp.mx = dx / dd; inp.my = dy / dd; } } // (no WASD: step into melee range on your own)
       if (m.drawTap) { m.drawTap = false; if (!model.drawn) this.burst(); }
-      if (m.skill === null && this.pending && sim.tick - this.pending > 150) { this.pending = 0; model.drop(); this.emit({ k: 'drop' }); }
+      if (!m.cur && this.pending && sim.tick - this.pending > 150) { this.pending = 0; model.drop(); this.emit({ k: 'drop' }); }
     }
     if (inp.skill && this.pulled) { if (!this.pending) this.pending = sim.tick; }
     sim.setInput(p.id, inp);

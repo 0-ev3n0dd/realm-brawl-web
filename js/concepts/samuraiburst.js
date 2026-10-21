@@ -8,12 +8,46 @@ import { FX } from '../client/fx.js';
 import { HUD } from '../client/hud.js';
 import { Feel } from '../client/feel.js';
 import { smoothFollow, SMOOTH } from '../client/smooth.js';
+import { S as nsState, stroke, petals, glitter, burst as inkBurst, kanjiPop, slashLine, moment, splatter, crescent } from '../client/fxns.js';
 import { governor, applyQuality, drawHudLayer } from '../client/perf.js';
 import { Driver, ROUTES, CONCEPT, SYMBOL, NAMES, compareRoute } from './samuraiburst-model.js';
 
 const $ = (id) => document.getElementById(id), qs = new URLSearchParams(location.search);
 governor.hudLayer = false;
-const COL = { thrust: '#ff8a5c', sweep: '#7fd4ff', rise: '#b6ff7a', draw: '#ffd23f', opc: '#ffffff' };
+// afterimage silhouettes: Hayate's showcase still (assets/models/hayate-s.webp), alpha-thresholded (no glow / petal haze),
+// a dark type-tinted core and a bright 2 px rim in the type colour: crisp at any size
+const SIL = {}, SHINES = new Map();
+function buildSil(img) {
+  const W = 180, H = Math.round(W * img.height / img.width), base = document.createElement('canvas'); base.width = W; base.height = H; const g = base.getContext('2d'); g.drawImage(img, 0, 0, W, H);
+  const id = g.getImageData(0, 0, W, H), a = id.data; for (let i = 0; i < a.length; i += 4) { const on = a[i + 3] > 200; a[i] = a[i + 1] = a[i + 2] = 255; a[i + 3] = on ? 255 : 0; } g.putImageData(id, 0, 0);
+  for (const [type, col] of Object.entries(COL)) { if (!NAMES[type]) continue;
+    const c = document.createElement('canvas'); c.width = W + 8; c.height = H + 8; const x = c.getContext('2d');
+    for (const [dx, dy] of [[-2, 0], [2, 0], [0, -2], [0, 2], [-2, -2], [2, 2], [-2, 2], [2, -2]]) x.drawImage(base, 4 + dx, 4 + dy);
+    x.globalCompositeOperation = 'source-in'; x.fillStyle = col; x.fillRect(0, 0, c.width, c.height);
+    const core = document.createElement('canvas'); core.width = W; core.height = H; const cx = core.getContext('2d'); cx.drawImage(base, 0, 0); cx.globalCompositeOperation = 'source-in';
+    const gr = cx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(12,7,14,0.92)'); gr.addColorStop(0.75, 'rgba(12,7,14,0.8)'); gr.addColorStop(1, 'rgba(12,7,14,0.25)'); cx.fillStyle = gr; cx.fillRect(0, 0, W, H);
+    x.globalCompositeOperation = 'source-over'; x.drawImage(core, 4, 4); SIL[type] = c; }
+}
+function SHINE(S, band) {
+  const q = Math.round(band * 20), key = S.width + ':' + S.height + ':' + q; let c = SHINES.get(key); if (c) return c;
+  c = document.createElement('canvas'); c.width = S.width; c.height = S.height; const x = c.getContext('2d'); x.drawImage(S, 0, 0); x.globalCompositeOperation = 'source-in';
+  const y = (1 - q / 20) * S.height, g = x.createLinearGradient(0, y - 18, 0, y + 18); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,1)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height); SHINES.set(key, c); return c;
+}
+const shadeHex = (h, k) => { const n = parseInt(h.slice(1), 16); return `rgb(${(((n >> 16) & 255) * k) | 0},${(((n >> 8) & 255) * k) | 0},${((n & 255) * k) | 0})`; };
+/** an ink stroke: a dark stroke under a crisp white one */
+function inkLine(x, x0, y0, x1, y1, w, a) {
+  if (a <= 0) return; x.save(); x.globalAlpha = a; x.lineCap = 'round';
+  x.strokeStyle = '#140a22'; x.lineWidth = w * 1.9; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y1); x.stroke();
+  x.strokeStyle = '#ffffff'; x.lineWidth = w * 0.75; x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y1); x.stroke(); x.restore();
+}
+/** the draw's cut shapes: Cross-cut = an X + a level cut, Focused = three parallel diagonals + the draw, else one cut each */
+function pattern(id, n) {
+  if (id === 'cross') return [{ ang: -0.75, off: 0, len: 115 }, { ang: 0.75, off: 0, len: 115 }, { ang: 0.02, off: 0, len: 150 }, { ang: 0.02, off: 22, len: 170 }];
+  if (id === 'focused') return [{ ang: -0.6, off: -34, len: 110 }, { ang: -0.6, off: 0, len: 125 }, { ang: -0.6, off: 34, len: 110 }, { ang: 0.05, off: 0, len: 160 }];
+  return Array.from({ length: n + 1 }, (_, i) => ({ ang: -0.5 + i * 0.35, off: 0, len: 120 }));
+}
+const QUIET = new Set(['chain', 'samMoment', 'ultGain', 'fin', 'routeStep']);
+const COL = { thrust: '#ff4d6d', sweep: '#8fb8ff', rise: '#9fe08a', draw: '#ffd23f', opc: '#ffffff' };
 const fmt = (n) => (n >= 10000 ? (n / 1000).toFixed(1) + 'k' : Math.round(n).toLocaleString('en-US'));
 let state = { route: ROUTES[qs.get('route')] ? qs.get('route') : 'cross', play: qs.get('mode') === 'play', speed: 1, paused: false };
 let S = null;
@@ -27,7 +61,8 @@ class Session {
     r.resize(); this.oc = $('over'); this.ox = this.oc.getContext('2d');
     this.fx = new FX(); this.fx.localPid = this.p.id; this.hud = new HUD(); this.hud.showChains = false; this.hud.keyLabel = (id) => ({ skillQ: 'Q', skillE: 'E', skillR: 'R', skillF: 'G', special: 'F', ult: 'T', attack: 'LMB' }[id] || id);
     this.feel = new Feel(); this.acc = 0; this.last = performance.now(); this.running = true;
-    this.ghosts = []; this.nums = []; this.slashes = []; this.opcFx = null; this.call = null; this.slow = 1; this.slowT = 0; this.queue = [];
+    this.ghosts = []; this.cuts = []; this.streaks = []; this.opcFx = null; this.call = null; this.fx.cinematic = true; r.cinematic = true; // (concept view: the game's own numbers / banners / badges off, so nothing stacks on the boss)
+    this.slow = 1; this.slowT = 0; this.queue = [];
     r.cam.x = this.p.x + 80; r.cam.y = this.p.y;
     this.d.listeners.push((e) => this.on(e));
     this.onResize = () => r.resize(); addEventListener('resize', this.onResize);
@@ -35,47 +70,52 @@ class Session {
   }
   stop() { this.running = false; removeEventListener('resize', this.onResize); }
   on(e) {
-    if (e.k === 'sim') { const ev = e.ev; this.feel.handle(ev, this); this.fx.handle(ev, this.sim); return; }
-    if (e.k === 'img') this.snap(e.im, e.opener);
-    if (e.k === 'upg') { const g = this.ghosts.find((x) => x.im === e.im); if (g) g.flash = 1; }
-    if (e.k === 'img' && !e.im.full) this.say(e.opener ? 'Held draw released' : SYMBOL[e.im.type] + ' ' + NAMES[e.im.type], e.name, 0.8, COL[e.im.type], 28);
-    if (e.k === 'img' && e.im.full) this.say('Slots full', e.name + ' (no afterimage)', 0.7, '#c9bce0', 24);
-    if (e.k === 'drop') this.say('Chain dropped', 'tension build slowed, nothing lost', 0.9, '#ff6b6b', 28);
+    if (e.k === 'sim') { const ev = e.ev; if (QUIET.has(ev.type)) return; this.feel.handle(ev, this); this.fx.handle(ev, this.sim); return; } // (chain flourishes - kanji, seals, titles - stay off: the concept owns the big moments)
+    if (e.k === 'img' && !e.im.full) { this.addGhost(e.im); this.log(`${SYMBOL[e.im.type]} ${NAMES[e.im.type]}`, e.opener ? 'held draw · opener' : e.name, COL[e.im.type]); }
+    if (e.k === 'img' && e.im.full) this.log('slots full', e.name, '#8f80ad');
+    if (e.k === 'upg') { const g = this.ghosts.find((x) => x.im === e.im); if (g) g.pop = 1; this.log(`${SYMBOL[e.im.type]} ${NAMES[e.im.type]}`, e.name, COL[e.im.type]); }
+    if (e.k === 'drop') this.log('chain dropped', 'tension build slowed', '#ff6b6b');
     if (e.k === 'burst') this.burst(e.r);
   }
-  say(t, s, dur, col = '#ffd23f', size = 44) { this.call = { t, s, dur, life: dur, col, size }; }
-  /** a frozen afterimage: a radial cut-out of the live game canvas around the hero at the moment the chain lands */
-  snap(im, opener) {
-    const r = this.r, sc = r.worldToScreen(this.p.x, this.p.y - 30), R = 90 * r.cam.zoom, d = r.dpr;
-    const c = document.createElement('canvas'); c.width = c.height = Math.round(R * 2 * d); const g = c.getContext('2d');
-    g.drawImage(r.canvas, (sc.x - R) * d, (sc.y - R) * d, R * 2 * d, R * 2 * d, 0, 0, c.width, c.height);
-    g.globalCompositeOperation = 'source-atop'; g.fillStyle = COL[im.type]; g.globalAlpha = 0.35; g.fillRect(0, 0, c.width, c.height);
-    g.globalAlpha = 1; g.globalCompositeOperation = 'destination-in'; const gr = g.createRadialGradient(c.width / 2, c.height / 2, c.width * 0.12, c.width / 2, c.height / 2, c.width / 2); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(0.6, 'rgba(0,0,0,.8)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
-    const k = this.ghosts.length; const ang = -0.9 + k * 0.9; // (laid out in an arc behind the hero so all three read)
-    this.ghosts.push({ im, c, wx: this.p.x - 70 + Math.cos(ang) * -30, wy: this.p.y - 30 + Math.sin(ang) * 70, R: 90, born: performance.now(), flash: 1, opener });
+  /** one short HUD line at a time (never in the arena) */
+  log(t, s, col) { this.call = { t, s, col, life: 1.4 }; }
+  addGhost(im) { this.ghosts.push({ im, a: 0, pop: 1 }); }
+  /** the neat arc behind the hero (away from the boss) */
+  ghostPos(i, n) {
+    const p = this.p, b = this.d.boss, back = Math.atan2(p.y - b.y, p.x - b.x), k = n <= 1 ? 0 : i - (n - 1) / 2;
+    const a = back + k * 0.62; return { x: p.x + Math.cos(a) * 128, y: p.y + Math.sin(a) * 96 };
   }
   burst(res) {
-    const b = this.d.boss; this.slow = 0.35; this.slowT = 0.9;
-    this.say(res.pat.id === 'cross' ? 'CROSS-CUT DRAW' : res.pat.id === 'focused' ? 'FOCUSED TRIPLE DRAW' : 'DRAW', `${res.pat.name} ×${res.pat.mul} · sheath ${Math.round(res.tension)}%${res.full ? ' · CRIT' : ''} · CONCEPT ${fmt(res.total - (res.opc ? res.opc.dmg : 0))}`, 1.6);
-    let delay = 0;
-    for (const h of res.hits) {
-      const g = h.im ? this.ghosts.find((x) => x.im === h.im) : null;
-      this.queue.push({ at: delay, run: () => {
-        const from = g ? { x: g.wx, y: g.wy } : { x: this.p.x, y: this.p.y - 30 };
-        this.slashes.push({ from, to: { x: b.x, y: b.y - 30 }, col: COL[h.k] || COL.draw, life: 0.45, max: 0.45, w: h.k === 'draw' ? 14 : 9 });
-        this.nums.push({ x: b.x + (Math.random() - 0.5) * 80, y: b.y - 90, v: h.dmg, crit: h.crit, life: 1.3, col: COL[h.k] || COL.draw });
-        if (g) g.dead = true;
-      } });
-      delay += 0.16;
-    }
-    if (res.opc) this.queue.push({ at: delay + 0.35, run: () => this.opc(res.opc) });
+    const b = this.d.boss, fx = this.fx, bx = b.x, by = b.y - 34;
+    this.slow = 0.06; this.slowT = 0.42; this.pause = { life: 0.42, max: 0.42 }; // the sheathe pause
+    const lines = pattern(res.pat.id, Math.max(1, res.imgs.length));
+    lines.forEach((ln, i) => this.queue.push({ at: 0.42 + i * 0.09, run: () => {
+      // a sumi-e brush slash (the game's Samurai ink stroke), centred on the boss
+      const L = ln.len * 2, ox = -Math.sin(ln.ang) * ln.off, oy = Math.cos(ln.ang) * ln.off;
+      stroke(fx, bx + ox - Math.cos(ln.ang) * ln.len, by + oy - Math.sin(ln.ang) * ln.len, ln.ang, L, i === lines.length - 1 ? 30 : 22, { life: 0.75, speed: 0.08, red: i === lines.length - 1, v: i % 2 });
+      const g = this.ghosts[0];
+      if (g && i < res.imgs.length) { this.ghosts.shift(); const p = g.last || { x: this.p.x, y: this.p.y }; petals(fx, p.x, p.y - 40, 16, 26, 170); this.streaks.push({ from: p, life: 0.18, max: 0.18 }); }
+      if (i === lines.length - 1) { petals(fx, bx, by, 26, 60, 380); glitter(fx, bx, by - 20, 10, 140, ['#ffffff', '#ff9cc6', '#ffd0e0', '#ff4d6d'], { sp: 120 }); inkBurst(fx, bx, by, 150, '#ffffff', 0.25, 0.5, 2); splatter(fx, bx, by, 8, 70, '#0c070e', { sp: 300 }); fx.shake(0.25); }
+    } }));
+    const k = kanjiPop(fx, '斬', bx - 150, by - 70, 84, { life: 1.2, seal: res.pat.id === 'cross' ? '十' : res.pat.id === 'focused' ? '三' : '刀', sealCol: '#c8142c', rot: -0.06 }); k.mine = true;
+    const draw = res.total - (res.opc ? res.opc.dmg : 0);
+    this.queue.push({ at: 0.42 + lines.length * 0.09 + 0.05, run: () => { this.big = { v: draw, sub: `${res.pat.id === 'cross' ? 'Cross-cut' : res.pat.id === 'focused' ? 'Focused triple' : res.pat.name} ×${res.pat.mul}${res.full ? ' · crit' : ''}`, life: 1.5, max: 1.5, col: res.pat.id === 'cross' ? '#ffd23f' : '#fff3fa' }; } });
+    this.log(res.pat.id === 'cross' ? 'Cross-cut draw' : res.pat.id === 'focused' ? 'Focused draw' : 'Draw', `sheath ${Math.round(res.tension)}%${res.full ? ' · crit' : ''}`, '#ffd23f');
+    if (res.opc) this.queue.push({ at: 1.9, run: () => this.opc(res.opc) });
   }
   opc(o) {
-    const b = this.d.boss; this.slow = 0.2; this.slowT = 2.2;
-    const pts = o.imgs.map((i, k) => ({ x: b.x - 420 + k * (840 / Math.max(1, o.imgs.length - 1)), y: b.y - 40 + Math.sin(k * 1.7) * 60, type: i.type }));
-    this.opcFx = { pts, life: 2.4, max: 2.4 };
-    this.say('ONE PERFECT CUT', `${o.imgs.length} afterimages of the minute linked · CONCEPT ${fmt(o.dmg)}`, 2.4, '#ffffff', 60);
-    this.queue.push({ at: 1.1, run: () => this.nums.push({ x: b.x, y: b.y - 140, v: o.dmg, crit: true, life: 2, col: '#ffffff', big: true }) });
+    // One Perfect Cut: the game's grayscale time-stop moment, but ONE ink stroke across the dimmed screen + petals scattering
+    const b = this.d.boss, fx = this.fx, bx = b.x, by = b.y - 34;
+    this.slow = 0.2; this.slowT = 2.4;
+    moment(fx, true, { cls: 'sam', pid: this.p.id, x: bx, y: by, ang: 0, gray: 1, dim: 0.55, wash: 0.2, vig: '#000000', pal: 'gold', title: '', sub: '', kanji: '一', seal: '極', sealCol: '#c8142c', kanjiAt: 'focus', kanjiSize: 0.3, kox: -0.32, koy: -0.2, sox: 0.09, soy: 0.16,
+      kanjiStyle: { ink: '#0c070e' }, kanjiA: 0.9, screenPetals: 50, flash: 0.12, life: 2.2, pre: 0, tail: 0.9,
+      onClimax: () => {
+        stroke(fx, bx - 900, by + 120, -0.13, 1800, 34, { life: 1.6, speed: 0.22, red: true, v: 0 });
+        petals(fx, bx, by, 60, 260, 520); glitter(fx, bx, by - 30, 16, 300, ['#ffffff', '#ff9cc6', '#ffd0e0', '#ff4d6d'], { sp: 140 }); fx.shake(0.5);
+      } });
+    this.opcFx = { life: 2.4, max: 2.4 };
+    this.queue.push({ at: 0.9, run: () => { this.big = { v: o.dmg, sub: `One Perfect Cut · ${o.imgs.length} afterimages`, life: 2.2, max: 2.2, col: '#ffffff', huge: true }; } });
+    this.log('One Perfect Cut', `${o.imgs.length} afterimages of the minute`, '#ffffff');
   }
   frame(now) {
     if (!this.running) return;
@@ -89,39 +129,34 @@ class Session {
     const r = this.r, p = this.p, b = this.d.boss, alpha = this.acc / DT;
     let tx = p.x + (b.x - p.x) * 0.35, ty = p.y + (b.y - p.y) * 0.35 - 30; smoothFollow(r.cam, tx, ty, rdt, SMOOTH.cam * 0.8);
     r.time += dt; this.fx.update(dt);
+    { const st = nsState(this.fx); if (st.items.some((i) => (i.kind === 'kanji' || i.kind === 'sfx') && !i.mine)) st.items = st.items.filter((i) => !((i.kind === 'kanji' || i.kind === 'sfx') && !i.mine)); } // (the game's per-skill kanji pops / SFX words off: the concept keeps one kanji, on the draw)
     if (this.fx.banners.length > 1) this.fx.banners.splice(0, this.fx.banners.length - 1);
     r.draw(this.sim, p, alpha, this.fx, b);
     const ctx = r.ctx; ctx.setTransform(r.dpr, 0, 0, r.dpr, 0, 0);
-    drawHudLayer(r, (c, dd) => this.hud.draw(c, r.w, r.h, this.sim, p, this.fx, r.time, dd), dt);
+    const ch = p.comboHits; p.comboHits = 0; drawHudLayer(r, (c, dd) => this.hud.draw(c, r.w, r.h, this.sim, p, this.fx, r.time, dd), dt); p.comboHits = ch; // (no hit counter: one number at a time)
     if (governor.update(rdt * 1000) || this._gq === undefined) { this._gq = governor.level; applyQuality(r, this.fx); }
     this.overlay(rdt * (state.paused ? 0 : state.speed)); this.ui();
     requestAnimationFrame((t) => this.frame(t));
   }
   overlay(dt) {
-    const oc = this.oc, x = this.ox, r = this.r, d = r.dpr;
+    const oc = this.oc, x = this.ox, r = this.r, d = r.dpr, z = r.cam.zoom, T = performance.now() / 1000, b = this.d.boss;
     if (oc.width !== r.canvas.width || oc.height !== r.canvas.height) { oc.width = r.canvas.width; oc.height = r.canvas.height; }
-    x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, r.w, r.h); const z = r.cam.zoom, T = performance.now() / 1000;
-    this.ghosts = this.ghosts.filter((g) => !g.dead || (g.fade = (g.fade ?? 1) - dt * 4) > 0);
-    for (const g of this.ghosts) {
-      const s = r.worldToScreen(g.wx, g.wy), R = g.R * z; g.flash = Math.max(0, g.flash - dt * 2);
-      x.globalAlpha = (g.dead ? g.fade : 1) * (0.55 + 0.1 * Math.sin(T * 3 + g.born)); x.drawImage(g.c, s.x - R, s.y - R, R * 2, R * 2);
-      x.globalAlpha = 0.8; x.strokeStyle = COL[g.im.type]; x.lineWidth = 2 + g.flash * 4; x.beginPath(); x.ellipse(s.x, s.y + R * 0.55, R * 0.45, R * 0.14, 0, 0, Math.PI * 2); x.stroke();
-      x.globalAlpha = 1; x.fillStyle = COL[g.im.type]; x.font = `${Math.round(18 * z)}px 'Lilita One'`; x.textAlign = 'center'; x.fillText(SYMBOL[g.im.type], s.x, s.y - R * 0.75);
-    }
-    for (const sl of this.slashes) { sl.life -= dt; const a = r.worldToScreen(sl.from.x, sl.from.y), b = r.worldToScreen(sl.to.x, sl.to.y), k = sl.life / sl.max;
-      x.globalAlpha = Math.max(0, k); x.strokeStyle = sl.col; x.lineCap = 'round'; x.lineWidth = sl.w * z * (0.5 + k); x.shadowColor = sl.col; x.shadowBlur = 18; x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke(); x.shadowBlur = 0; }
-    this.slashes = this.slashes.filter((s) => s.life > 0);
-    if (this.opcFx) { const o = this.opcFx; o.life -= dt; const k = 1 - o.life / o.max;
-      x.globalAlpha = Math.min(0.75, k * 3) * Math.min(1, o.life * 2); x.fillStyle = '#05020a'; x.fillRect(0, 0, r.w, r.h);
-      const sp = o.pts.map((p) => r.worldToScreen(p.x, p.y)), n = Math.min(sp.length, Math.floor(k * 2.2 * sp.length) + 1);
-      for (let i = 0; i < n; i++) { x.globalAlpha = Math.min(1, o.life); x.fillStyle = COL[o.pts[i].type]; x.beginPath(); x.arc(sp[i].x, sp[i].y, 10 * z, 0, Math.PI * 2); x.fill(); }
-      if (k > 0.42 && sp.length) { x.globalAlpha = Math.min(1, o.life * 1.5); x.strokeStyle = '#fff'; x.shadowColor = '#ff5fa2'; x.shadowBlur = 30; x.lineWidth = 6 * z + (k < 0.5 ? 14 : 0);
-        const a = sp[0], e = sp[sp.length - 1], kk = Math.min(1, (k - 0.42) * 6); x.beginPath(); x.moveTo(a.x - 200, a.y + 40); x.lineTo(a.x - 200 + (e.x - a.x + 400) * kk, a.y + 40 + (e.y - a.y - 80) * kk); x.stroke(); x.shadowBlur = 0; }
-      if (o.life <= 0) this.opcFx = null; }
-    for (const nm of this.nums) { nm.life -= dt; nm.y -= dt * 40; const s = r.worldToScreen(nm.x, nm.y), sz = (nm.big ? 54 : nm.crit ? 30 : 24) * z;
-      x.globalAlpha = Math.min(1, nm.life * 2); x.font = `${Math.round(sz)}px 'Lilita One'`; x.textAlign = 'center'; x.lineWidth = 5; x.strokeStyle = '#1a0f2e'; const t = fmt(nm.v) + (nm.crit ? '!' : '');
-      x.strokeText(t, s.x, s.y); x.fillStyle = nm.col; x.fillText(t, s.x, s.y); x.font = `${Math.round(11 * z)}px system-ui`; x.fillStyle = '#ffd0e6'; x.fillText('CONCEPT', s.x, s.y + 14 * z); }
-    this.nums = this.nums.filter((n) => n.life > 0); x.globalAlpha = 1;
+    x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, r.w, r.h);
+    const bs = r.worldToScreen(b.x, b.y - 34);
+    if (this.pause) { const p = this.pause; p.life -= dt; x.fillStyle = `rgba(8,4,16,${0.3 * Math.sin(Math.PI * Math.max(0, p.life / p.max))})`; x.fillRect(0, 0, r.w, r.h); if (p.life <= 0) this.pause = null; }
+    if (this.opcFx) { this.opcFx.life -= dt; if (this.opcFx.life <= 0) this.opcFx = null; }
+    const n = this.ghosts.length;
+    this.ghosts.forEach((g, i) => { const wp = this.ghostPos(i, n); g.last = wp; const s = r.worldToScreen(wp.x, wp.y); g.pop = Math.max(0, g.pop - dt * 3); g.a = Math.min(1, g.a + dt * 5);
+      const S = SIL[g.im.type]; if (!S) return; const h = 104 * z * (1 + 0.12 * g.pop), w = h * S.width / S.height, face = b.x < wp.x ? -1 : 1;
+      x.save(); x.translate(s.x, s.y); x.scale(face, 1); x.globalAlpha = g.a * (0.8 + 0.07 * Math.sin(T * 4 + i * 2)); x.drawImage(S, -w / 2, -h * 0.92, w, h);
+      const band = ((T * 0.7 + i * 0.33) % 1.4) - 0.2; if (band > 0 && band < 1) { x.globalAlpha = 0.4 * g.a; x.globalCompositeOperation = 'lighter'; x.drawImage(SHINE(S, band), -w / 2, -h * 0.92, w, h); x.globalCompositeOperation = 'source-over'; }
+      x.restore(); });
+    for (const st of this.streaks) { st.life -= dt; const a = r.worldToScreen(st.from.x, st.from.y - 40), k = Math.max(0, st.life / st.max); inkLine(x, a.x, a.y, a.x + (bs.x - a.x) * (1 - k), a.y + (bs.y - a.y) * (1 - k), 3 * z, k); }
+    this.streaks = this.streaks.filter((s) => s.life > 0);
+    if (this.flash > 0) { this.flash -= dt; x.fillStyle = `rgba(255,255,255,${Math.max(0, this.flash) * 2})`; x.fillRect(0, 0, r.w, r.h); }
+    if (this.big) { const g = this.big; g.life -= dt; const k = 1 - g.life / g.max, pop = k < 0.12 ? 1 + (0.12 - k) * 3 : 1, a = Math.min(1, g.life * 3), sz = (g.huge ? 72 : 46) * z * pop, px = bs.x + (g.huge ? 0 : 140 * z), py = bs.y - (g.huge ? 120 : 64) * z - k * 14;
+      x.globalAlpha = a; x.textAlign = 'center'; x.lineJoin = 'round'; x.font = `${Math.round(sz)}px 'Lilita One'`; x.lineWidth = 8; x.strokeStyle = '#140a22'; x.strokeText(fmt(g.v), px, py); x.fillStyle = g.col; x.fillText(fmt(g.v), px, py);
+      x.font = `${Math.round(13 * z)}px 'Lilita One'`; x.lineWidth = 4; x.strokeText(g.sub.toUpperCase(), px, py + 20 * z); x.fillStyle = '#ffd0e6'; x.fillText(g.sub.toUpperCase(), px, py + 20 * z); x.globalAlpha = 1; if (g.life <= 0) this.big = null; }
   }
   ui() {
     const m = this.d.model, d = this.d, el = $('slots').querySelectorAll('.slot');
@@ -130,7 +165,7 @@ class Session {
     $('sheath').querySelector('i').style.width = m.tension + '%'; $('sheath').querySelector('.v').textContent = Math.round(m.tension) + '%'; $('sheath').classList.toggle('full', m.tension >= 100);
     $('cycle').querySelector('.fg').style.strokeDasharray = `${(m.cycleT / CONCEPT.cycle) * 169.6} 169.6`; $('cycle').querySelector('.t').textContent = (CONCEPT.cycle - m.cycleT).toFixed(1);
     $('opc').querySelectorAll('i').forEach((p, i) => p.classList.toggle('on', i < m.bursts % 3 || (m.bursts > 0 && m.bursts % 3 === 0 && this.opcFx)));
-    const c = this.call, co = $('callout'); if (c) { c.life -= 1 / 60; co.innerHTML = `<span style="color:${c.col};font-size:${c.size}px">${c.t}</span><small>${c.s}</small>`; co.classList.toggle('on', c.life > 0); if (c.life <= 0) this.call = null; } else co.classList.remove('on');
+    const c = this.call, co = $('callout'); if (c) { c.life -= 1 / 60; if (c._t !== c.t + c.s) { c._t = c.t + c.s; co.innerHTML = `<b style="color:${c.col}">${c.t}</b><span>${c.s}</span>`; } co.classList.toggle('on', c.life > 0); if (c.life <= 0) this.call = null; } else co.classList.remove('on');
     const secs = d.ticks / 60; $('mDps').textContent = fmt(d.dps); $('mGame').textContent = fmt(d.gameDealt / Math.max(1, secs)); $('mBurst').textContent = fmt(m.bonus / Math.max(1, secs)); $('mTime').textContent = `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, '0')}`;
     const hold = d.events.length && !d.pulled; $('hold').classList.toggle('hidden', !hold); if (hold) $('hold').querySelector('i').style.width = Math.round(100 * (d.auto ? 1 - d.prepull / 70 : Math.min(1, (d.hold || 0) / CONCEPT.opener.hold))) + '%';
     if (hold && !d.auto) $('hold').querySelector('.lbl').textContent = 'Pre-pull: HOLD F (draw) ≥1 s, release to pull with a free afterimage · or just attack';
@@ -146,13 +181,14 @@ function start() { if (S) S.stop(); S = new Session(); window.__sb = S; renderCo
 function renderControls() {
   $('routes').innerHTML = Object.entries(ROUTES).map(([id, r]) => `<button data-r="${id}" class="${id === state.route && !state.play ? 'on' : ''}" title="${r.desc}">${r.name}</button>`).join('');
   $('routes').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.route = b.dataset.r; state.play = false; start(); }));
-  $('bMode').classList.toggle('on', state.play); $('bMode').textContent = state.play ? '🤖 Back to autoplay' : '🎮 Play it yourself';
+  $('bMode').classList.toggle('on', state.play); $('bMode').textContent = state.play ? '◀ Back to autoplay' : '▶ Play it yourself';
   $('modeNote').innerHTML = state.play ? '<b>You play:</b> Q / E / R skills (1 s GCD), hold LMB or J for basics, WASD move, <b>F = draw</b> (once per 20 s cycle; hold F before the pull for the opener). Chains: E→R thrust, R→Q→E or R→E sweep, Q→Q or R→E→Q rising cut.' : `<b>Autoplay:</b> ${ROUTES[state.route].desc}.`;
 }
 $('bPlay').onclick = () => { state.paused = !state.paused; $('bPlay').textContent = state.paused ? '▶ Play' : '⏸ Pause'; };
 $('bRestart').onclick = () => start();
 $('sSpeed').onchange = (e) => { state.speed = +e.target.value; };
 $('bMode').onclick = () => { state.play = !state.play; start(); };
+{ const im = new Image(); im.onload = () => buildSil(im); im.src = '../assets/models/hayate-s.webp'; }
 start();
 // headless comparison of the three routes (same engine, no rendering), in small slices so the page stays smooth
 setTimeout(() => {
