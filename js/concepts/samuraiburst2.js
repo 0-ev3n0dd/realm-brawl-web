@@ -92,6 +92,10 @@ addEventListener('keydown', (e) => { if (!state.play) return; const k = e.key.to
 addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
 $('game').addEventListener('mousedown', () => { mouseDown = true; }); addEventListener('mouseup', () => { mouseDown = false; });
 
+const KL = { Q: 'Q', E: 'E', R: 'R', F: 'G', SP: 'F', B1: 'LMB', B2: 'LMB', B3: 'LMB' };
+const unitTxt = (u) => (u[0] === 'B1' ? 'LMB×3' : u.map((k) => KL[k] || k).join('→'));
+function routeText(R) { if (!R.loop || state.c !== 'cuts') return '';
+  return `<div class="rtxt">${R.prepull ? '<b>Pre-pull:</b> held draw · ' : ''}${R.opener && R.opener.length ? `<b>Opener:</b> ${R.opener.map(unitTxt).join(' · ')} · ` : ''}<b>Loop:</b> ${R.loop.map(unitTxt).join(' · ')}${R.opc === 'window' ? ` · <b>T</b> ${R.ultLate ? 'late' : 'early'} in each Resheathe` : ' · <b>T</b> when full'}${R.bankOnUlt ? ' · Special banks on ult cycles' : ''}</div>`; }
 const cmpCache = {};
 function start() { if (S) S.stop(); S = new Session(); window.__sb2 = S; render(); }
 function render() {
@@ -102,7 +106,7 @@ function render() {
   $('routes').innerHTML = ['good', 'sloppy'].map((r) => `<button data-r="${r}" class="${r === state.route && !state.play ? 'on' : ''}">${r === 'good' ? 'Good route' : 'Sloppy route'}</button>`).join('');
   $('routes').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.route = b.dataset.r; state.play = false; start(); }));
   $('bMode').textContent = state.play ? '◀ Back to autoplay' : '▶ Play it yourself'; $('bMode').classList.toggle('on', state.play);
-  $('modeNote').innerHTML = state.play ? `<b>You play:</b> Q / E / R (1 s GCD, presses queue), hold LMB or J for basics, WASD to move (otherwise you step in on your own)${state.c === 'edge' ? ', <b>F</b> = empower the next chain with your Edge' : state.c === 'cuts' ? ', <b>G</b> = Kesa Slash, <b>F</b> = Special (Void Draw), <b>T</b> = the real ultimate Blade of the Void; then R→E→Q→E→R = One Perfect Cut (releases the bank, ×2.5 if the ult was cast inside Resheathe). Boss Special chain: R→E→Q→F→R Void Sheath; Stillwater Execution R→E→Q→G, Void Echo Q→G→Q→E, Twin Moons Q→G→Q' : ''}. Chains: E→R Counter Sheathe, R→Q→E Petal Rain, Q→Q Wind Step, R→E Moonlit Guard, R→E→Q Moment of Death.` : `<b>Autoplay (${state.route}):</b> ${ROUTES[state.c][state.route].desc}.`;
+  $('modeNote').innerHTML = state.play ? `<b>You play:</b> Q / E / R (1 s GCD, presses queue), hold LMB or J for basics, WASD to move (otherwise you step in on your own)${state.c === 'edge' ? ', <b>F</b> = empower the next chain with your Edge' : state.c === 'cuts' ? ', <b>G</b> = Kesa Slash, <b>F</b> = Special (Void Draw), <b>T</b> = the real ultimate Blade of the Void; then R→E→Q→E→R = One Perfect Cut (releases the bank, ×2.5 if the ult was cast inside Resheathe). Boss Special chain: R→E→Q→F→R Void Sheath; Stillwater Execution R→E→Q→G, Void Echo Q→G→Q→E, Twin Moons Q→G→Q' : ''}. Chains: E→R Counter Sheathe, R→Q→E Petal Rain, Q→Q Wind Step, R→E Moonlit Guard, R→E→Q Moment of Death.` : `<b>Autoplay (${state.route}):</b> ${ROUTES[state.c][state.route].desc}.${routeText(ROUTES[state.c][state.route])}`;
   const c = state.c; if (!cmpCache[c]) { $('cmp').innerHTML = '<tr><td>measuring…</td></tr>'; setTimeout(() => { cmpCache[c] = ['good', 'sloppy'].map((r) => compare(c, r, 180)); if (state.c === c) showCmp(); window.__sb2Cmp = cmpCache; }, 400); } else showCmp();
 }
 function showCmp() { const [g, s] = cmpCache[state.c];
