@@ -15,7 +15,7 @@ const $ = (id) => document.getElementById(id), qs = new URLSearchParams(location
 governor.hudLayer = false;
 const fmt = (n) => (n >= 10000 ? (n / 1000).toFixed(1) + 'k' : Math.round(n).toLocaleString('en-US'));
 const GL = ['#ffffff', '#ff9cc6', '#ffd0e0', '#ff4d6d'];
-const state = { c: CONCEPTS[qs.get('c')] ? qs.get('c') : 'edge', route: 'good', play: qs.get('mode') === 'play', speed: 1, paused: false };
+const state = { c: CONCEPTS[qs.get('c')] ? qs.get('c') : 'cuts', route: 'good', play: qs.get('mode') === 'play', speed: 1, paused: false };
 let S = null;
 
 class Session {
@@ -45,6 +45,10 @@ class Session {
       else { crescent(fx, bx, by, 130, -2.2, { dir: 1, life: 0.6, w: 1.2, v: 2 }); glow(fx, bx, by, 120, '#bcd4ff', 0.35, 0.4); }
       num(r.bonus); }
     if (r.fx === 'grand') { slashLine(fx, bx, by, -0.35, 2200, { w: 18, life: 0.7 }); fxBurst(fx, bx, by, 170, '#ffffff', 0.3, 0.6, 2); petals(fx, bx, by, 30, 120, 420); fx.shake(0.4); num(r.bonus, true); }
+    if (r.fx === 'bank') { glitter(fx, bx, by, 4 + Math.min(10, r.add), 70, GL, { sp: 80 }); fx.text(bx - 70, by - 120, `+${r.add} cuts${r.dbl ? ' ×2' : ''}`, { size: r.dbl ? 18 : 15, color: r.dbl ? '#dfe8ff' : '#ff9cc6', vy: -30, life: 0.9, vx: 0 }); if (r.draw) ring(fx, p.x, p.y - 4, 50, '#dfe8ff', { enso: true, life: 0.7 }); }
+    if (r.fx === 'wave') { crescent(fx, bx, by, 100 + 10 * Math.random(), -0.6 + Math.random(), { dir: 1, life: 0.45, speed: 0.09, w: 1 }); num(r.bonus); }
+    if (r.fx === 'cashfin') { slashLine(fx, bx, by, -0.3, 1600, { w: 12, life: 0.55 }); petals(fx, bx, by, 14 + Math.min(20, r.cuts), 60, 320); ring(fx, p.x, p.y - 4, 56, '#dfe8ff', { enso: true, life: 0.8 }); num(r.bonus, true); }
+    if (r.fx === 'opc') { slashLine(fx, bx, by, -0.35, 2200, { w: r.inR ? 20 : 10, life: 0.75 }); if (r.inR) { fxBurst(fx, bx, by, 170, '#ffffff', 0.3, 0.6, 2); petals(fx, bx, by, 30, 120, 420); fx.shake(0.4); } num(r.bonus, true); }
     if (r.open) ring(fx, p.x, p.y - 4, 60, '#ff8fb0', { enso: true, life: 0.6 });
   }
   frame(now) {
@@ -70,17 +74,20 @@ class Session {
     const el = $('widget'), d = this.d, sig = JSON.stringify(w);
     if (sig !== this._sig) { this._sig = sig;
       if (w.kind === 'edge') el.innerHTML = `<div class="lbl">Blade Edge</div><div class="pips">${Array.from({ length: w.max }, (_, i) => `<i class="${i < (w.primed || w.edge) ? 'on' : ''}"></i>`).join('')}</div><div class="wstate">${w.primed ? `next chain empowered · +${w.primed * 45}% / step` : w.edge >= w.max ? 'full edge' : ''}</div>`;
+      if (w.kind === 'cuts') { const sp = d.player.cds && d.player.cds.SP > 0 ? Math.ceil(d.player.cds.SP / 60) : 0;
+        el.innerHTML = `<span class="cl">BANKED CUTS</span> <b class="cn">${w.bank}</b><span class="sep">·</span>${w.resh > 0 ? `<span class="rs">RESHEATHE ${(w.resh * 6).toFixed(1)}s ×2</span>` : sp ? `Special ${sp}s` : '<span class="rs">Special ready</span>'}<span class="sep">·</span>${w.opc ? `Perfect Cut ${w.opc}s` : '<span class="rs">Perfect Cut ready</span>'}`; }
       if (w.kind === 'flow') el.innerHTML = `<div class="lbl">Flow ${w.lvl}/5</div><div class="flowlv">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= w.lvl ? 'on' : ''}" style="height:${8 + i * 3.5}px"></i>`).join('')}</div><div class="wstate">${w.win > 0 ? 'echo window · finishers hit twice' : ''}</div>${w.win > 0 ? `<div class="wbar"><i style="width:${Math.round(w.win * 100)}%"></i></div>` : ''}`;
       if (w.kind === 'weave') { const M = d.M, left = Math.max(0, 20 - (d.sim.tick - M.t0) / 60);
         el.innerHTML = `<div class="lbl">Chain Weave · grand in ${left.toFixed(0)} s</div><div class="wv">${M.woven.length ? M.woven.slice(-3).map((x) => `<b>✦</b> ${x.name}`).join('<br>') : '<span style="color:#a99bc4">finish two different chains…</span>'}</div>`; }
     }
-    if (w.kind === 'weave' && (d.sim.tick % 30 === 0)) this._sig = null;
+    if ((w.kind === 'weave' || w.kind === 'cuts') && (d.sim.tick % 30 === 0)) this._sig = null;
+    $('widget').classList.toggle('near', w.kind === 'cuts');
     const secs = d.ticks / 60; $('mDps').textContent = fmt(d.dps); $('mGame').textContent = fmt(d.arena.dealt / Math.max(1, secs)); $('mBonus').textContent = fmt(d.bonus / Math.max(1, secs)); $('mTime').textContent = `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, '0')}`;
   }
   input() { const m = this.d.manual, k = keys; m.mx = (k.d ? 1 : 0) - (k.a ? 1 : 0); m.my = (k.s ? 1 : 0) - (k.w ? 1 : 0); m.attack = mouseDown || !!k.j; }
 }
 const keys = {}; let mouseDown = false;
-addEventListener('keydown', (e) => { if (!state.play) return; const k = e.key.toLowerCase(); if (['q', 'e', 'r'].includes(k) && !e.repeat) S.d.manual.skill = k.toUpperCase(); if (k === 'f' && !e.repeat) S.d.manual.burst = true; keys[k] = true; if (['q', 'e', 'r', 'f', 'w', 'a', 's', 'd', ' '].includes(k)) e.preventDefault(); });
+addEventListener('keydown', (e) => { if (!state.play) return; const k = e.key.toLowerCase(); if (['q', 'e', 'r'].includes(k) && !e.repeat) S.d.manual.skill = k.toUpperCase(); if (k === 'f' && !e.repeat) { if (state.c === 'cuts') S.d.manual.skill = 'SP'; else S.d.manual.burst = true; } if (k === 'g' && !e.repeat && state.c === 'cuts') S.d.manual.skill = 'F'; if (k === 't' && !e.repeat && state.c === 'cuts') S.d.manual.burst = true; keys[k] = true; if (['q', 'e', 'r', 'f', 'g', 't', 'w', 'a', 's', 'd', ' '].includes(k)) e.preventDefault(); });
 addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
 $('game').addEventListener('mousedown', () => { mouseDown = true; }); addEventListener('mouseup', () => { mouseDown = false; });
 
@@ -94,7 +101,7 @@ function render() {
   $('routes').innerHTML = ['good', 'sloppy'].map((r) => `<button data-r="${r}" class="${r === state.route && !state.play ? 'on' : ''}">${r === 'good' ? 'Good route' : 'Sloppy route'}</button>`).join('');
   $('routes').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.route = b.dataset.r; state.play = false; start(); }));
   $('bMode').textContent = state.play ? '◀ Back to autoplay' : '▶ Play it yourself'; $('bMode').classList.toggle('on', state.play);
-  $('modeNote').innerHTML = state.play ? `<b>You play:</b> Q / E / R (1 s GCD, presses queue), hold LMB or J for basics, WASD to move (otherwise you step in on your own)${state.c === 'edge' ? ', <b>F</b> = empower the next chain with your Edge' : ''}. Chains: E→R Counter Sheathe, R→Q→E Petal Rain, Q→Q Wind Step, R→E Moonlit Guard, R→E→Q Moment of Death.` : `<b>Autoplay (${state.route}):</b> ${ROUTES[state.c][state.route].desc}.`;
+  $('modeNote').innerHTML = state.play ? `<b>You play:</b> Q / E / R (1 s GCD, presses queue), hold LMB or J for basics, WASD to move (otherwise you step in on your own)${state.c === 'edge' ? ', <b>F</b> = empower the next chain with your Edge' : state.c === 'cuts' ? ', <b>G</b> = Kesa Slash, <b>F</b> = Special (Void Draw), <b>T</b> = One Perfect Cut (concept: releases the bank, ×2.5 inside Resheathe). Boss Special chain: R→E→Q→F→R Void Sheath; Stillwater Execution R→E→Q→G, Void Echo Q→G→Q→E, Twin Moons Q→G→Q' : ''}. Chains: E→R Counter Sheathe, R→Q→E Petal Rain, Q→Q Wind Step, R→E Moonlit Guard, R→E→Q Moment of Death.` : `<b>Autoplay (${state.route}):</b> ${ROUTES[state.c][state.route].desc}.`;
   const c = state.c; if (!cmpCache[c]) { $('cmp').innerHTML = '<tr><td>measuring…</td></tr>'; setTimeout(() => { cmpCache[c] = ['good', 'sloppy'].map((r) => compare(c, r, 180)); if (state.c === c) showCmp(); window.__sb2Cmp = cmpCache; }, 400); } else showCmp();
 }
 function showCmp() { const [g, s] = cmpCache[state.c];

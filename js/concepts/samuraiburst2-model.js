@@ -89,10 +89,41 @@ export class Weave {
   wantBurst() { return false; } burst() { return false; }
   widget() { return { kind: 'weave', woven: this.woven.map((w) => w.name), cycle: ((globalThis.__noop, 0)), prev: this.prev }; }
 }
-export const CONCEPTS = { edge: BladeEdge, flow: Flow, weave: Weave };
+// ------------------------------------------------------------------ D) Delayed Cuts (bank → Special cash-out → Resheathe → One Perfect Cut)
+/** placeholder cuts banked per boss chain finisher (heavier chains bank more) */
+export const BANK = { counter_sheathe: 2, moonlit_guard: 2, twin_moons: 3, moment_of_death: 4, void_echo: 5, stillwater_execution: 6, wind_step: 1, petal_rain: 2, blossom_burst: 1, riposte_wave: 2 };
+export class DelayedCuts {
+  static id = 'cuts'; static title = 'D · Delayed Cuts';
+  static blurb = 'Chain finishers bank Delayed Cuts (heavier chains bank more: Stillwater Execution 6, Void Echo 5, Moment of Death 4, Twin Moons 3, Moonlit Guard / Counter Sheathe 2). The boss Special chain (R→E→Q→F→R Void Sheath) is the cash-out: Void Draw releases the bank in 3 waves (20% each), the finisher releases the rest. Its finisher opens Resheathe: 6 s where chains bank double. Special ~18-20 s cooldown, so about 14 s banking per cycle. Opener: a held pre-pull draw banks 3, the pull opens with the Special, then the heaviest chains. One Perfect Cut (T) inside Resheathe releases the whole bank ×2.5; its 60 s cooldown lines up with every 3rd Special. CONCEPT numbers.';
+  static K = { per: 600, waves: 3, wave: 0.2, waveGap: 18, resh: 360, opcMul: 2.5, opcCd: 3600, prepull: 3 };
+  constructor() { this.bank = 0; this.bonus = 0; this.resh = 0; this.opc = 0; this.waves = []; this.hi = 0; this.n = 0; this.specials = 0; this.opcs = 0; this.base = 0; this.reshEnd = -1; this.reshChain = false; }
+  prepull() { this.bank += DelayedCuts.K.prepull; return { fx: 'bank', add: DelayedCuts.K.prepull, draw: true }; }
+  rel(n, mul = 1) { n = Math.min(this.bank, n); this.bank -= n; const b = Math.round(n * DelayedCuts.K.per * mul); this.bonus += b; return b; }
+  chain(ch, d) {
+    if (ch.seq.includes('SP')) { if (ch.kind !== 'boss') return null; this.waves = []; const n = this.bank, b = this.rel(n); this.resh = DelayedCuts.K.resh; this.reshEnd = d.sim.tick + DelayedCuts.K.resh; this.n++; return { bonus: b, fx: 'cashfin', cuts: n }; }
+    // a chain whose first press landed inside Resheathe banks double (start ≈ finish − 1 s GCD per extra step − the 1.2 s scoring wait)
+    const start = d.sim.tick - 72 - (ch.seq.length - 1) * 60, dbl = start <= this.reshEnd; this.reshChain = dbl;
+    const add = (BANK[ch.id] || 1) * (dbl ? 2 : 1); this.bank += add; return { fx: 'bank', add, dbl };
+  }
+  tick(d) {
+    const K = DelayedCuts.K, p = d.player; let out = null;
+    const cd = (p.cds && p.cds.SP) || 0, used = cd > this.hi + 30; this.hi = cd;
+    if (used) { this.specials++; this.base = this.bank; this.waves = Array.from({ length: K.waves }, (_, i) => d.sim.tick + i * K.waveGap); }
+    if (this.waves.length && d.sim.tick >= this.waves[0]) { this.waves.shift(); const n = Math.max(this.bank ? 1 : 0, Math.round(this.base * K.wave)), b = this.rel(n); if (b) out = { bonus: b, fx: 'wave', cuts: n }; }
+    if (this.resh > 0) this.resh--; if (this.opc > 0) this.opc--;
+    return out;
+  }
+  inWindow() { return this.resh > 0 || this.reshChain; }
+  wantBurst(d) { return !this.opc && this.bank > 0 && (d && d.R.opc === 'asap' ? d.ticks > 600 : this.reshChain); }
+  burst() { if (this.opc) return false; const K = DelayedCuts.K, inR = this.inWindow(), n = this.bank; this.opc = K.opcCd; this.opcs++; this.last = { bonus: this.rel(n, inR ? K.opcMul : 1), fx: 'opc', cuts: n, inR }; this.reshChain = false; return true; }
+  widget() { return { kind: 'cuts', bank: this.bank, resh: this.resh / DelayedCuts.K.resh, opc: Math.ceil(this.opc / 60) }; }
+}
+export const CONCEPTS = { cuts: DelayedCuts, edge: BladeEdge, flow: Flow, weave: Weave };
 
 // autoplay routes per concept: good vs sloppy (drops = the chain's last key held back past its window; pauses = idle gaps)
 export const ROUTES = {
+  cuts: { good: { loop: [['R', 'E', 'Q', 'SP', 'R'], ['R', 'E', 'Q', 'F'], ['Q', 'F', 'Q', 'E'], ['R', 'E', 'Q'], ['Q', 'F', 'Q']], drop: 0, pause: 0, prepull: true, opc: 'window', desc: 'pre-pull draw, open on the Special (Void Sheath), then Stillwater Execution · Void Echo · Moment of Death · Twin Moons; One Perfect Cut only inside Resheathe' },
+    sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'E'], ['R', 'E', 'Q', 'SP', 'R'], ['Q', 'F', 'Q']], drop: 0.2, pause: 0.35, prepull: false, opc: 'asap', desc: 'no pre-pull, light chains, Special whenever, One Perfect Cut on cooldown (outside Resheathe)' } },
   edge: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0, pause: 0, desc: 'Counter Sheathe · Petal Rain · Wind Step, empowering at 5 Edge' }, sloppy: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0.35, pause: 0.25, desc: 'same chains, ~35% dropped and idle gaps' } },
   flow: { good: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0, pause: 0, desc: 'short chains back to back, no gaps' }, sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0.2, pause: 0.45, desc: 'same chains with 3 s gaps between many of them' } },
   weave: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q'], ['R', 'E', 'Q']], drop: 0, pause: 0, desc: 'four different chains in turn (every pair weaves)' }, sloppy: { loop: [['R', 'E', 'Q']], drop: 0.25, pause: 0.2, desc: 'Moment of Death on repeat (nothing weaves) with drops' } },
@@ -107,7 +138,7 @@ export class Driver {
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
     this.bot = new RotBot('samurai', this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: false });
     let a = 77 + seed; this.rng = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-    this.ticks = 0; this.listeners = []; this.dropping = null; this.idle = 0; this.manual = { queue: [], skill: null, attack: false, mx: 0, my: 0 }; this.lastCh = null;
+    this.ticks = 0; this.listeners = []; this.pre = this.R.prepull && this.M.prepull ? this.M.prepull() : null; this.dropping = null; this.idle = 0; this.manual = { queue: [], skill: null, attack: false, mx: 0, my: 0 }; this.lastCh = null;
   }
   get boss() { return this.arena.boss; }
   get bonus() { return this.M.bonus; }
@@ -127,7 +158,7 @@ export class Driver {
         if (this.dropping > 0 && inp.skill) { inp.skill = undefined; if (sim.tick - this.dropping > 150) { this.dropping = null; this.bot.si = -1; this.bot.ui = this.bot.nextUi(); } }
         if (this.bot.si < 0 && this.dropping === -1) this.dropping = null;
       }
-      if (this.M.wantBurst()) this.burst();
+      if (this.M.wantBurst(this)) this.burst();
     } else {
       const m = this.manual; if (m.skill) { if (m.queue.length < 3) m.queue.push({ k: m.skill, t: sim.tick }); m.skill = null; }
       const lh = p.history[p.history.length - 1], q0 = m.queue[0];
@@ -150,11 +181,12 @@ export class Driver {
       else { if (P) this.score(P.ch); this.pend = { ch, tick: sim.tick }; }
     }
     if (this.pend && sim.tick - this.pend.tick > 72) { this.score(this.pend.ch); this.pend = null; }
+    if (this.pre && this.listeners.length) { this.emit({ k: 'bonus', r: this.pre }); this.pre = null; }
     const tr = this.M.tick(this); if (tr) this.emit({ k: 'bonus', r: tr });
     arena.after(); this.ticks++;
   }
   score(ch) { const r = this.M.chain(ch, this); if (r) this.emit({ k: 'bonus', r, ch }); }
-  burst() { if (this.M.burst()) this.emit({ k: 'bonus', r: { fx: 'prime', stacks: this.M.primed } }); }
+  burst() { if (this.M.burst()) this.emit({ k: 'bonus', r: this.M.last || { fx: 'prime', stacks: this.M.primed } }); }
 }
 
 export function compare(concept, route, secs = 180, seed = 1) {

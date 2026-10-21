@@ -7,3 +7,6 @@
 .flowlv{display:flex;gap:4px;align-items:flex-end;height:26px}.flowlv i{width:12px;background:#3b2a5c;border-radius:3px}.flowlv i.on{background:#ff8fb0}
 .wv{font-size:12px;color:#e9dcc4;line-height:1.5}.wv b{color:#ff8fb0;font-weight:normal}
 #cmp td small{color:#a99bc4}
+#widget.near{left:50%;transform:translateX(-50%);bottom:178px;min-width:0;white-space:nowrap;padding:3px 12px;font-size:12px;color:#e9dcc4;border-radius:10px;font-weight:800}
+#widget .cl{color:#ff9cc6;letter-spacing:1px;font-size:11px}#widget .cn{color:#fff3fa;font-size:14px}#widget .sep{color:#6b5a8a;margin:0 7px}
+#widget .rs{color:#dfe8ff;text-shadow:0 0 6px #9fb8ff}
