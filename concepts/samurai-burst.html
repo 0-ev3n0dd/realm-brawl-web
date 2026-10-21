@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Realm Brawl · CONCEPT · Samurai Burst (afterimages + sheath)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="samurai-burst.css">
+</head>
+<body class="sb-body">
+<header id="cTop">
+  <div class="rot-brand"><span class="t1">REALM</span><span class="t2">BRAWL</span><small>Concept preview</small></div>
+  <div id="cTitle">Samurai · <b>Afterimage Burst</b> <span class="tag">CONCEPT · placeholder numbers · not in the game</span></div>
+</header>
+<main id="cMain">
+  <section id="cStage">
+    <canvas id="game"></canvas>
+    <canvas id="over"></canvas>
+    <div id="cHud">
+      <div class="hud-row">
+        <div id="slots"><div class="lbl">Afterimages</div><div class="slot"></div><div class="slot"></div><div class="slot"></div><div id="pat"></div></div>
+        <div id="sheath"><div class="lbl">Sheath tension</div><div class="bar"><i></i></div><div class="v">0%</div></div>
+        <div id="cycle"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" class="bg"/><circle cx="32" cy="32" r="27" class="build"/><circle cx="32" cy="32" r="27" class="fg"/></svg><div class="t">0.0</div><div class="lbl">20 s cycle</div></div>
+        <div id="opc"><div class="lbl">One Perfect Cut</div><div class="pips"><i></i><i></i><i></i></div></div>
+      </div>
+      <div id="callout"></div>
+      <div id="hold" class="hidden"><div class="lbl">Pre-pull: holding the draw…</div><div class="bar"><i></i></div></div>
+    </div>
+  </section>
+  <aside id="cSide">
+    <div class="card"><h3>Controls</h3>
+      <div class="btns"><button id="bPlay">⏸ Pause</button><button id="bRestart">↺ Restart</button>
+        <label>Speed <select id="sSpeed"><option>0.5</option><option selected>1</option><option>2</option><option>4</option></select></label></div>
+      <div class="btns" id="routes"></div>
+      <div class="btns"><button id="bMode" class="ghost">🎮 Play it yourself</button></div>
+      <div class="note" id="modeNote"></div>
+    </div>
+    <div class="card"><h3>DPS meter</h3>
+      <div class="meter"><div><b id="mDps">0</b><span>concept DPS (game + burst)</span></div><div><b id="mGame">0</b><span>game damage / s</span></div><div><b id="mBurst">0</b><span>concept burst / s</span></div><div><b id="mTime">0:00</b><span>time</span></div></div>
+    </div>
+    <div class="card"><h3>Route comparison <small>(headless, 3 min, same sim)</small></h3><table id="cmp"><tr><td colspan="5">measuring…</td></tr></table></div>
+    <div class="card"><h3>The concept</h3><ol class="rules">
+      <li><b>Afterimages.</b> Every chain finished on time leaves a frozen afterimage (max 3), typed by its last key: <b>R</b> thrust ➤, <b>E</b> sweep ◠, <b>Q</b> rising cut ⤴. They fire in creation order at the burst.</li>
+      <li><b>Patterns.</b> 3 different = <b>Cross-cut</b> (×3.0). 3 the same = <b>Focused triple</b> (×2.4, but +45 tension a chain instead of +34).</li>
+      <li><b>Sheath tension.</b> Clean chains fill it; full = the draw crits (×1.6). A dropped chain only slows the build, it never wipes it.</li>
+      <li><b>20 s cycle.</b> ~14 s build (about 3 chains + basics on the 1 s GCD), then the <b>draw</b> cashes the afterimages + tension.</li>
+      <li><b>One Perfect Cut.</b> Every 3rd burst (60 s) links every afterimage of the minute into one line cut (×1.8 of their sum).</li>
+      <li><b>Opener.</b> Hold the draw before the pull; releasing on the pull places the first afterimage (+25 tension).</li>
+    </ol><div class="note">Real game: the Samurai, its chains (Counter Sheathe, Petal Rain, Wind Step, Moment of Death) and the boss are the live game engine. Concept: the afterimages, tension, draw and every number marked CONCEPT are placeholders for discussion. No balance changed.</div></div>
+  </aside>
+</main>
+<script type="module" src="../js/concepts/samuraiburst.js"></script>
+</body>
+</html>
