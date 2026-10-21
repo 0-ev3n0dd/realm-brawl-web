@@ -97,7 +97,7 @@ class Session {
       if (g && i < res.imgs.length) { this.ghosts.shift(); const p = g.last || { x: this.p.x, y: this.p.y }; petals(fx, p.x, p.y - 40, 16, 26, 170); this.streaks.push({ from: p, life: 0.18, max: 0.18 }); }
       if (i === lines.length - 1) { petals(fx, bx, by, 26, 60, 380); glitter(fx, bx, by - 20, 10, 140, ['#ffffff', '#ff9cc6', '#ffd0e0', '#ff4d6d'], { sp: 120 }); inkBurst(fx, bx, by, 150, '#ffffff', 0.25, 0.5, 2); splatter(fx, bx, by, 8, 70, '#0c070e', { sp: 300 }); fx.shake(0.25); }
     } }));
-    const k = kanjiPop(fx, '斬', bx - 150, by - 70, 84, { life: 1.2, seal: res.pat.id === 'cross' ? '十' : res.pat.id === 'focused' ? '三' : '刀', sealCol: '#c8142c', rot: -0.06 }); k.mine = true;
+    const k = kanjiPop(fx, '斬', bx - 175, by + 20, 80, { life: 1.2, seal: res.pat.id === 'cross' ? '十' : res.pat.id === 'focused' ? '三' : '刀', sealCol: '#c8142c', rot: -0.06 }); k.mine = true;
     const draw = res.total - (res.opc ? res.opc.dmg : 0);
     this.queue.push({ at: 0.42 + lines.length * 0.09 + 0.05, run: () => { this.big = { v: draw, sub: `${res.pat.id === 'cross' ? 'Cross-cut' : res.pat.id === 'focused' ? 'Focused triple' : res.pat.name} ×${res.pat.mul}${res.full ? ' · crit' : ''}`, life: 1.5, max: 1.5, col: res.pat.id === 'cross' ? '#ffd23f' : '#fff3fa' }; } });
     this.log(res.pat.id === 'cross' ? 'Cross-cut draw' : res.pat.id === 'focused' ? 'Focused draw' : 'Draw', `sheath ${Math.round(res.tension)}%${res.full ? ' · crit' : ''}`, '#ffd23f');
