@@ -1,3 +1,4 @@
+import { BR, BR_CLS, spChainOf } from '../sim/bossrot.js';
 // Rotations page, "how it plays" card (skill rework, 2026-10-20): the shared rules every guide must reflect.
 const CLS_NOTE = {
   dragoon: 'Exception: Lance Fall (the Jump) still leaps the hero with its i-frames, even vs bosses; every other skill and chain step runs on the shadow.',
@@ -13,9 +14,11 @@ export function playNotes(cls, C, rot = null) {
     '<b>No mobility key.</b> Dodge is your only movement skill.',
   ];
   if (CLS_NOTE[cls]) li.push(CLS_NOTE[cls]);
+  const B = BR_CLS[cls], spc = spChainOf(cls);
+  if (B && spc) li.push(`<b>Boss cycle (~20 s).</b> Near a boss every chain finisher banks <b>${B.unit}</b> (longer chains bank more, and banking fills the ult meter, so the opener fills your first ult). <b>${spc.name}</b> is the hinge: the Special releases the bank in waves, its finisher releases the rest and opens <b>${B.win}</b> (6 s, chains bank ×2). Cast the ultimate inside ${B.win}: when it ends the whole bank releases ×${BR.ultMul}.${B.hold ? ` With the ult ready, ${spc.name} banks instead of releasing, so the ultimate releases it all.` : ''} One ultimate per cycle.`);
   if (rot && rot.loop) { // the measured best route under these rules (tools/rotations/optimize.mjs)
     const u = (x) => x.labels.join(' ') + (x.chainName ? ' (' + x.chainName + ')' : '');
-    li.push('<b>Best boss route:</b> ' + (rot.opener && rot.opener.length ? 'open with ' + rot.opener.map(u).join(', ') + ', then ' : '') + 'loop ' + rot.loop.map(u).join(' → ') + ', basics between every press; ult when full → ' + rot.ult.labels.join(' ') + ' (' + rot.ult.routeName + ').');
+    li.push('<b>Best boss route:</b> ' + (rot.opener && rot.opener.length ? 'open with ' + rot.opener.map(u).join(', ') + ', then ' : '') + 'loop ' + rot.loop.map(u).join(' → ') + ', basics between every press; ' + (B ? `${spc.name} as soon as it is up, the ult inside ${B.win}` : 'ult when full') + ' → ' + rot.ult.labels.join(' ') + ' (' + rot.ult.routeName + ').');
   }
   return '<ul class="sb-play">' + li.map((x) => '<li>' + x + '</li>').join('') + '</ul>';
 }

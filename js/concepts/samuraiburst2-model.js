@@ -179,7 +179,7 @@ export const ROUTES = {
 export class Driver {
   constructor(concept, route = 'good', { seed = 1, auto = true, cls = 'samurai' } = {}) {
     this.cls = cls; this.cid = concept; this.M = concept === 'sig' ? new Signature(cls) : new CONCEPTS[concept](); this.R = typeof route === 'object' ? route : concept === 'sig' ? SIG_ROUTES[cls][route] : ROUTES[concept][route]; this.auto = auto;
-    this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
+    this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false }); this.sim.noBossRot = true; // (the concept layer replaces the game's boss cycle here)
     this.player = addHero(this.sim, cls, seed, cls === 'samurai' ? { name: 'Hayate' } : {});
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
     this.bot = new RotBot(cls, this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: !!this.M.wantUlt, opener: (this.R.opener || []).map((keys) => ({ keys, chain: null })) });

@@ -15,6 +15,7 @@ import { chiMeter, comboBadge, monkIcon } from './monkhud.js';
 import { bloodMeter, diveBadge, drgIcon } from './drghud.js';
 import { arcMeter, songBadge, arcIcon } from './archud.js'; // Grimoire Summoner + Bard
 import { specIcon } from './fxspec.js';
+import { BR, BR_CLS } from '../sim/bossrot.js';
 import { specInfo } from '../sim/specials.js';
 import { stateDef, statePrimed, stackN, STACKS } from '../sim/kit.js';
 import { INK, circle, rrect, star, heroColors } from './art.js';
@@ -178,6 +179,7 @@ export class HUD {
     else if (cls.inkRes || cls.tempoRes) { arcMeter(ctx, bx + bw * 0.1, h - 25, bw * 0.8, 18, p, cls, time, 1); if (this.hot) this.hot.push({ slot: cls.inkRes ? 'ink' : 'tempo', x: bx + bw * 0.1, y: h - 27, w: bw * 0.8, h: 22 }); } // Summoner Ink / Bard Tempo
     else if (cls.chiRes) { chiMeter(ctx, bx + bw * 0.1, h - 25, bw * 0.8, 18, p, cls, time, 1, true); if (this.hot) this.hot.push({ slot: 'chi', x: bx + bw * 0.1, y: h - 27, w: bw * 0.8, h: 22 }); } // Monk: Chi
     else pbar(ctx, bx + bw * 0.1, h - 22, bw * 0.8, 12, p.res / p.stats.maxRes, cls.resColor, null, null, 'resbar');
+    if (p.br && (p.br.bank > 0 || p.br.win > 0) && BR_CLS[p.cls]) this.brGauge(ctx, bx, h - 72, p, cls, time); // boss rotation bank + window (sim/bossrot.js)
     if (p.songs) songBadge(ctx, bx - 14, h - 39, p, time, 1, true); // Bard songs on you (any class in co-op)
     if (!cls.gloryRes && !cls.focusRes && !cls.chiRes && !cls.bloodRes && !cls.inkRes && !cls.tempoRes) txt(ctx, cls.resource, bx + bw * 0.1 - 8, h - 16, 12, cls.resColor, 'right', 3);
     if (cls.edge) edgeLine(ctx, bx + bw * 0.9 + 12, h - 16, p, cls, time, 13, 'left'); // (right of the pips, clear of the HP bar)
@@ -300,6 +302,15 @@ export class HUD {
   }
 
   /** Blade Dancer Initiative: one pip per point (no bar). */
+  /** boss rotation gauge: the banked units (named after the class mechanic) and the Special's window, left above the HP bar */
+  brGauge(ctx, x, y, p, cls, time) {
+    const S = p.br, D = BR_CLS[p.cls], w = 150, h = 10, k = Math.min(1, S.bank / BR.max), on = S.win > 0;
+    rrect(ctx, x, y, w, h, 5); ctx.fillStyle = INK; ctx.fill();
+    if (k > 0) { rrect(ctx, x + 1.5, y + 1.5, (w - 3) * k, h - 3, 3.5); ctx.fillStyle = on ? '#fff3c4' : cls.color || '#ffd23f'; ctx.fill(); }
+    if (on) { ctx.save(); ctx.globalAlpha = 0.45 + 0.3 * Math.sin(time * 9); rrect(ctx, x - 2, y - 2, w + 4, h + 4, 7); ctx.strokeStyle = '#fff3c4'; ctx.lineWidth = 2; ctx.stroke(); ctx.restore(); }
+    txt(ctx, `${D.unit.toUpperCase()} ${S.bank}`, x, y - 8, 11, cls.color || '#ffd23f', 'left', 3);
+    if (on) txt(ctx, `${D.win.toUpperCase()} ${(S.win / 60).toFixed(1)}s ×2`, x + w, y - 8, 11, '#fff3c4', 'right', 3);
+  }
   pips(ctx, x, y, w, h, p, cls, time) {
     const n = Math.round(p.stats.maxRes), have = Math.floor(p.res + 1e-6), gap = 3, pw = (w - gap * (n - 1)) / n;
     for (let i = 0; i < n; i++) {

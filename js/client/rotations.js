@@ -3,6 +3,7 @@
 // hero piloted by the same rotation bot the headless optimizer measured (rotations/rotbot.js) in the same arena
 // (rotations/arena.js). Data: /rotations/rotations.json (tools/rotations/optimize.mjs).
 //   rotations.html?cls=monk&view=mob    deep link;  window.__rot exposes the live session to tools (tools/rotations/media.mjs)
+import { BR_CLS } from '../sim/bossrot.js';
 import { Sim } from '../sim/sim.js';
 import { playNotes } from './playnotes.js';
 import { DT } from '../sim/constants.js';
@@ -181,7 +182,7 @@ const ui = {
       nm.textContent = fired.length ? fired.join(' → ') : (u.chainName || 'cast');
       g.append(caps, nm); seq.appendChild(g); this.caps.push(row); this.units.push(g);
     });
-    const ult = $('kUlt'); ult.innerHTML = `<span class="k-lbl">Ult full:</span>`; this.ultCaps = [];
+    const ult = $('kUlt'); ult.innerHTML = `<span class="k-lbl">${view === 'boss' && BR_CLS[cls] ? `Ult in ${esc(BR_CLS[cls].win)}:` : 'Ult full:'}</span>`; this.ultCaps = [];
     const tc = document.createElement('div'); tc.className = 'cap ult'; tc.textContent = label('T'); ult.appendChild(tc); this.ultCap = tc;
     rot.ult.seq.forEach((k, i) => { const c = document.createElement('div'); c.className = 'cap' + (i === rot.ult.seq.length - 1 ? ' sp' : ''); c.textContent = label(k); c.title = rot.ult.chainNames[i] || ''; ult.appendChild(c); this.ultCaps.push(c); });
     const rn = document.createElement('span'); rn.className = 'k-lbl'; rn.style.marginLeft = '8px'; rn.style.color = '#ff4fd8'; rn.textContent = '→ ' + rot.ult.routeName; ult.appendChild(rn);

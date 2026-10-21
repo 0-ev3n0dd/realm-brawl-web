@@ -3,6 +3,7 @@
 // ult WINDOW (10 s, free skills, faster cooldowns) with two 5-step finisher routes each, and the cinematic FINISHERS.
 // Pure sim code. Everything that changes enemies/HP (stacks, scheduled hits, finisher damage) runs only in the authoritative
 // sim (`!sim.predicting`); a predicting co-op client only times the actions and waits for the server's events.
+import { brUltEnd } from './bossrot.js';
 import { CLASSES, chainById } from './data/classes.js';
 import { sustainConsume } from './sustain.js';
 import { DT, secs } from './constants.js';
@@ -930,6 +931,7 @@ export function berserkFinale(sim, p) {
 export function endUltWindow(sim, p, finisher = null) {
   if (!p.uw) return;
   p.uw = null;
+  brUltEnd(sim, p); // boss rotation: the ult releases the bank
   const C = CLASSES[p.cls];
   if (!finisher && C.rageRes && p.rage > 0 && !sim.predicting) berserkFinale(sim, p); // no route finisher: Berserk ends with its own shockwave
   if (!finisher && C.lance) dragonWrath(sim, p); // Dragoon: no route finisher - Dragon's Wrath rips out every pin
