@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-21T05:47:29.194Z",
+ "generated": "2026-10-21T11:56:45.371Z",
  "method": "beam search (width 12, depth ≤ 7) over repeating chain loops, 60 s per candidate; the top 4 re-measured over 3 seeds × 90 s",
  "setup": {
   "level": 30,
@@ -35,7 +35,7 @@
   "Q": "skill 1",
   "E": "skill 2",
   "R": "skill 3",
-  "G": "skill 4",
+  "V": "skill 4",
   "F": "Special",
   "T": "ultimate",
   "LMB": "basic attack"
@@ -86,7 +86,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "reavers_return",
       "chainName": "Reaver's Return"
@@ -102,7 +102,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "headsmans_oath",
       "chainName": "Headsman's Oath"
@@ -155,7 +155,7 @@
       "unit": 2
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2
      },
@@ -179,7 +179,7 @@
       "chainName": "Warlord's Rally"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3,
       "chain": "reavers_return",
@@ -294,17 +294,39 @@
      }
     ],
     "old": {
+     "keys": [
+      [
+       "R",
+       "Q",
+       "E",
+       "F"
+      ],
+      [
+       "R",
+       "E",
+       "Q"
+      ],
+      [
+       "R",
+       "Q",
+       "E",
+       "F"
+      ],
+      [
+       "F"
+      ]
+     ],
      "loop": [
-      "R E Q F R",
-      "E",
-      "R Q E G",
-      "R E Q G"
+      "R Q E V",
+      "R E Q",
+      "R Q E V",
+      "V"
      ],
      "windows": {
-      "d180": 14356,
-      "d480": 9977,
-      "dMove": 9404,
-      "score": 11246
+      "d180": 6239,
+      "d480": 4303,
+      "dMove": 4609,
+      "score": 5050
      }
     },
     "gate": "all",
@@ -335,7 +357,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "reavers_return",
       "chainName": "Reaver's Return"
@@ -351,7 +373,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "reavers_return",
       "chainName": "Reaver's Return"
@@ -410,7 +432,7 @@
       "chainName": "Warlord's Rally"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "reavers_return",
@@ -436,7 +458,7 @@
       "chainName": "Warlord's Rally"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "reavers_return",
@@ -597,7 +619,7 @@
        "E"
       ],
       "labels": [
-       "G",
+       "V",
        "E",
        "Q",
        "F",
@@ -616,7 +638,7 @@
       "labels": [
        "Q",
        "E",
-       "G",
+       "V",
        "E"
       ],
       "chain": "hunters_mark",
@@ -647,7 +669,7 @@
     ],
     "steps": [
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -684,7 +706,7 @@
       "chainName": "Hunter's Mark"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "deadeye",
@@ -727,9 +749,9 @@
       "Q"
      ],
      "labels": [
-      "G",
+      "V",
       "E",
-      "G",
+      "V",
       "E",
       "Q"
      ],
@@ -816,7 +838,7 @@
       ],
       "labels": [
        "E",
-       "G",
+       "V",
        "R",
        "E"
       ],
@@ -825,17 +847,41 @@
      }
     ],
     "old": {
+     "keys": [
+      [
+       "B3",
+       "E"
+      ],
+      [
+       "R"
+      ],
+      [
+       "B3",
+       "E"
+      ],
+      [
+       "R"
+      ],
+      [
+       "Q",
+       "R",
+       "E",
+       "SP",
+       "R"
+      ]
+     ],
      "loop": [
-      "G E Q F E",
-      "Q E G E",
-      "Q E",
-      "R"
+      "LMB E",
+      "R",
+      "LMB E",
+      "R",
+      "Q R E F R"
      ],
      "windows": {
-      "d180": 9472,
-      "d480": 8019,
-      "dMove": 7429,
-      "score": 8307
+      "d180": 5659,
+      "d480": 4900,
+      "dMove": 4967,
+      "score": 5175
      }
     },
     "gate": "all",
@@ -901,7 +947,7 @@
       "labels": [
        "Q",
        "E",
-       "G",
+       "V",
        "E"
       ],
       "chain": "hunters_mark",
@@ -968,7 +1014,7 @@
       "chainName": "Hawkstorm"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3
      },
@@ -1123,7 +1169,7 @@
        "F"
       ],
       "labels": [
-       "G"
+       "V"
       ],
       "chain": null,
       "chainName": null
@@ -1201,7 +1247,7 @@
       "chainName": "Supernova"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "supernova",
@@ -1244,7 +1290,7 @@
      "labels": [
       "E",
       "R",
-      "G",
+      "V",
       "E",
       "R"
      ],
@@ -1329,25 +1375,65 @@
       ],
       "labels": [
        "Q",
-       "G"
+       "V"
       ],
       "chain": "blink_nova",
       "chainName": "Blink Nova"
      }
     ],
     "old": {
+     "keys": [
+      [
+       "E",
+       "R"
+      ],
+      [
+       "E"
+      ],
+      [
+       "E",
+       "R",
+       "E"
+      ],
+      [
+       "E",
+       "R",
+       "E",
+       "SP",
+       "E"
+      ],
+      [
+       "E",
+       "R",
+       "E"
+      ],
+      [
+       "E",
+       "R",
+       "E",
+       "SP",
+       "E"
+      ],
+      [
+       "E",
+       "R",
+       "E"
+      ]
+     ],
      "loop": [
+      "E R",
+      "E",
+      "E R E",
       "E R E F E",
       "E R E",
-      "G",
-      "E R E",
-      "Q"
+      "E R E F E",
+      "E R E"
      ],
      "windows": {
-      "d180": 10566,
-      "d480": 9175,
-      "dMove": 9291,
-      "score": 9677
+      "d180": 10072,
+      "d480": 9016,
+      "dMove": 8860,
+      "score": 9316
      }
     },
     "gate": "all",
@@ -1375,9 +1461,9 @@
        "Q"
       ],
       "labels": [
-       "G",
+       "V",
        "E",
-       "G",
+       "V",
        "Q"
       ],
       "chain": "ember_blink",
@@ -1391,9 +1477,9 @@
        "Q"
       ],
       "labels": [
-       "G",
+       "V",
        "E",
-       "G",
+       "V",
        "Q"
       ],
       "chain": "ember_blink",
@@ -1406,9 +1492,9 @@
        "F"
       ],
       "labels": [
-       "G",
+       "V",
        "E",
-       "G"
+       "V"
       ],
       "chain": "chrono_field",
       "chainName": "Chrono Field"
@@ -1420,7 +1506,7 @@
       ],
       "labels": [
        "Q",
-       "G"
+       "V"
       ],
       "chain": "blink_nova",
       "chainName": "Blink Nova"
@@ -1434,9 +1520,9 @@
       ],
       "labels": [
        "E",
-       "G",
+       "V",
        "R",
-       "G"
+       "V"
       ],
       "chain": "steam_burst",
       "chainName": "Steam Burst"
@@ -1457,7 +1543,7 @@
        "E"
       ],
       "labels": [
-       "G",
+       "V",
        "E"
       ],
       "chain": "shatter",
@@ -1466,7 +1552,7 @@
     ],
     "steps": [
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "chrono_field",
@@ -1480,7 +1566,7 @@
       "chainName": "Shatter"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "chrono_field",
@@ -1494,7 +1580,7 @@
       "chainName": "Ember Blink"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "blink_nova",
@@ -1508,7 +1594,7 @@
       "chainName": "Glacial Cascade"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "chrono_field",
@@ -1522,7 +1608,7 @@
       "chainName": "Ember Blink"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "blink_nova",
@@ -1536,7 +1622,7 @@
       "chainName": "Glacial Cascade"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "chrono_field",
@@ -1550,7 +1636,7 @@
       "chainName": "Ember Blink"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3,
       "chain": "blink_nova",
@@ -1564,7 +1650,7 @@
       "chainName": "Glacial Cascade"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 4,
       "chain": "chrono_field",
@@ -1576,7 +1662,7 @@
       "unit": 4
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 4,
       "chain": "steam_burst",
@@ -1588,7 +1674,7 @@
       "unit": 5
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 6
      },
@@ -1613,7 +1699,7 @@
      ],
      "labels": [
       "Q",
-      "G",
+      "V",
       "E",
       "Q",
       "R"
@@ -1713,7 +1799,7 @@
       ],
       "labels": [
        "Q",
-       "G",
+       "V",
        "Q",
        "F",
        "Q"
@@ -1728,7 +1814,7 @@
       ],
       "labels": [
        "Q",
-       "G"
+       "V"
       ],
       "chain": "final_verdict",
       "chainName": "Final Verdict"
@@ -1753,7 +1839,7 @@
       "unit": 0
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "final_verdict",
@@ -1786,7 +1872,7 @@
       "chainName": "Sanctified Judgment"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "final_verdict",
@@ -1821,7 +1907,7 @@
       "R",
       "E",
       "Q",
-      "G"
+      "V"
      ],
      "chains": [
       null,
@@ -1894,16 +1980,40 @@
     },
     "opener": [],
     "old": {
+     "keys": [
+      [
+       "B3",
+       "Q",
+       "F",
+       "R"
+      ],
+      [
+       "B3",
+       "Q",
+       "F",
+       "R"
+      ],
+      [
+       "B3",
+       "Q",
+       "F",
+       "R"
+      ],
+      [
+       "Q"
+      ]
+     ],
      "loop": [
-      "Q G Q F Q",
-      "Q G",
-      "LMB Q"
+      "LMB Q V R",
+      "LMB Q V R",
+      "LMB Q V R",
+      "Q"
      ],
      "windows": {
-      "d180": 9988,
-      "d480": 9462,
-      "dMove": 8712,
-      "score": 9387
+      "d180": 6968,
+      "d480": 7501,
+      "dMove": 6239,
+      "score": 6903
      }
     },
     "gate": "all",
@@ -1933,7 +2043,7 @@
       "labels": [
        "LMB",
        "Q",
-       "G",
+       "V",
        "R"
       ],
       "chain": "aegis_throw",
@@ -1949,7 +2059,7 @@
       "labels": [
        "LMB",
        "Q",
-       "G",
+       "V",
        "R"
       ],
       "chain": "aegis_throw",
@@ -1963,7 +2073,7 @@
       ],
       "labels": [
        "Q",
-       "G",
+       "V",
        "Q"
       ],
       "chain": "sanctified_judgment",
@@ -1979,7 +2089,7 @@
       "labels": [
        "LMB",
        "Q",
-       "G",
+       "V",
        "R"
       ],
       "chain": "aegis_throw",
@@ -2000,7 +2110,7 @@
       "chainName": "Guardian Angel"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "final_verdict",
@@ -2026,7 +2136,7 @@
       "chainName": "Guardian Angel"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "final_verdict",
@@ -2047,7 +2157,7 @@
       "chainName": "Guardian Angel"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "final_verdict",
@@ -2073,7 +2183,7 @@
       "chainName": "Righteous Fury"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3
      },
@@ -2206,7 +2316,7 @@
       ],
       "labels": [
        "R",
-       "G",
+       "V",
        "E",
        "F",
        "E"
@@ -2225,7 +2335,7 @@
        "Q",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "eviscerate",
       "chainName": "Eviscerate"
@@ -2239,7 +2349,7 @@
       "labels": [
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "crimson_flurry",
       "chainName": "Crimson Flurry"
@@ -2252,7 +2362,7 @@
       "unit": 0
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -2291,7 +2401,7 @@
       "chainName": "Shadow Execution"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1
      },
@@ -2308,7 +2418,7 @@
       "chainName": "Shadow Strike"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2
      }
@@ -2326,9 +2436,9 @@
      ],
      "labels": [
       "R",
-      "G",
+      "V",
       "E",
-      "G",
+      "V",
       "E"
      ],
      "chains": [
@@ -2426,23 +2536,36 @@
       "labels": [
        "R",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "death_blossom",
       "chainName": "Death Blossom"
      }
     ],
     "old": {
+     "keys": [
+      [
+       "R",
+       "F",
+       "E"
+      ],
+      [
+       "R",
+       "F",
+       "E",
+       "SP",
+       "E"
+      ]
+     ],
      "loop": [
-      "R G E F E",
-      "Q E Q G",
-      "E Q G"
+      "R V E",
+      "R V E F E"
      ],
      "windows": {
-      "d180": 13023,
-      "d480": 10337,
-      "dMove": 11995,
-      "score": 11785
+      "d180": 13052,
+      "d480": 9950,
+      "dMove": 11932,
+      "score": 11644
      }
     },
     "gate": "all",
@@ -2472,7 +2595,7 @@
       "labels": [
        "Q",
        "E",
-       "G",
+       "V",
        "E"
       ],
       "chain": "mirror_execution",
@@ -2505,7 +2628,7 @@
       "chainName": "Shadow Strike"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -2543,9 +2666,9 @@
      "labels": [
       "R",
       "Q",
-      "G",
+      "V",
       "Q",
-      "G"
+      "V"
      ],
      "chains": [
       null,
@@ -2647,7 +2770,7 @@
       ],
       "labels": [
        "Q",
-       "G",
+       "V",
        "Q",
        "E"
       ],
@@ -2665,7 +2788,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "riposte_wave",
       "chainName": "Riposte Wave"
@@ -2711,7 +2834,7 @@
       "unit": 1
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1
      },
@@ -2747,7 +2870,7 @@
       "chainName": "Petal Rain"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "riposte_wave",
@@ -2855,16 +2978,22 @@
     },
     "opener": [],
     "old": {
+     "keys": [
+      [
+       "R",
+       "E",
+       "Q",
+       "F"
+      ]
+     ],
      "loop": [
-      "R E Q F R",
-      "Q G Q E",
-      "R Q E G"
+      "R E Q V"
      ],
      "windows": {
-      "d180": 10503,
-      "d480": 8619,
-      "dMove": 8636,
-      "score": 9253
+      "d180": 4728,
+      "d480": 4152,
+      "dMove": 4083,
+      "score": 4321
      }
     },
     "gate": "all",
@@ -2895,7 +3024,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "riposte_wave",
       "chainName": "Riposte Wave"
@@ -2911,7 +3040,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "riposte_wave",
       "chainName": "Riposte Wave"
@@ -2927,7 +3056,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "riposte_wave",
       "chainName": "Riposte Wave"
@@ -2943,7 +3072,7 @@
        "R",
        "Q",
        "E",
-       "G"
+       "V"
       ],
       "chain": "riposte_wave",
       "chainName": "Riposte Wave"
@@ -2984,7 +3113,7 @@
       "chainName": "Petal Rain"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "riposte_wave",
@@ -3010,7 +3139,7 @@
       "chainName": "Petal Rain"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "riposte_wave",
@@ -3036,7 +3165,7 @@
       "chainName": "Petal Rain"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2,
       "chain": "riposte_wave",
@@ -3062,7 +3191,7 @@
       "chainName": "Petal Rain"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3,
       "chain": "riposte_wave",
@@ -3238,7 +3367,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "heaven_dragon_palm",
       "chainName": "Heaven Dragon Palm"
@@ -3315,7 +3444,7 @@
       "chainName": "Seven Seals"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3
      }
@@ -3424,17 +3553,25 @@
      }
     ],
     "old": {
+     "keys": [
+      [
+       "R",
+       "E",
+       "Q"
+      ],
+      [
+       "F"
+      ]
+     ],
      "loop": [
-      "R E Q F E",
-      "Q Q",
       "R E Q",
-      "R E Q G"
+      "V"
      ],
      "windows": {
-      "d180": 12085,
-      "d480": 10619,
-      "dMove": 9455,
-      "score": 10720
+      "d180": 6747,
+      "d480": 6509,
+      "dMove": 5637,
+      "score": 6298
      }
     },
     "gate": "all",
@@ -3460,7 +3597,7 @@
        "E"
       ],
       "labels": [
-       "G",
+       "V",
        "E"
       ],
       "chain": "dragon_sweep",
@@ -3553,7 +3690,7 @@
     ],
     "steps": [
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -3811,7 +3948,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "crimson_comet",
       "chainName": "Crimson Comet"
@@ -3835,7 +3972,7 @@
        "F"
       ],
       "labels": [
-       "G"
+       "V"
       ],
       "chain": null,
       "chainName": null
@@ -3903,7 +4040,7 @@
       "chainName": "Geirskogul"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "crimson_comet",
@@ -3931,7 +4068,7 @@
       "chainName": "Geirskogul"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3,
       "chain": "crimson_comet",
@@ -4032,18 +4169,31 @@
     },
     "opener": [],
     "old": {
+     "keys": [
+      [
+       "R",
+       "Q"
+      ],
+      [
+       "F"
+      ],
+      [
+       "R",
+       "E",
+       "Q",
+       "F"
+      ]
+     ],
      "loop": [
-      "R E Q F Q",
-      "R E Q G",
-      "R E Q",
-      "G",
-      "E"
+      "R Q",
+      "V",
+      "R E Q V"
      ],
      "windows": {
-      "d180": 12645,
-      "d480": 11027,
-      "dMove": 10624,
-      "score": 11432
+      "d180": 7707,
+      "d480": 7077,
+      "dMove": 6527,
+      "score": 7104
      }
     },
     "gate": "all",
@@ -4074,7 +4224,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "crimson_comet",
       "chainName": "Crimson Comet"
@@ -4122,7 +4272,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "crimson_comet",
       "chainName": "Crimson Comet"
@@ -4152,7 +4302,7 @@
        "R",
        "E",
        "Q",
-       "G"
+       "V"
       ],
       "chain": "crimson_comet",
       "chainName": "Crimson Comet"
@@ -4197,7 +4347,7 @@
       "chainName": "Geirskogul"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0,
       "chain": "crimson_comet",
@@ -4277,7 +4427,7 @@
       "chainName": "Geirskogul"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3,
       "chain": "crimson_comet",
@@ -4324,7 +4474,7 @@
       "chainName": "Geirskogul"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 5,
       "chain": "crimson_comet",
@@ -4479,7 +4629,7 @@
       ],
       "labels": [
        "E",
-       "G",
+       "V",
        "E",
        "F",
        "E"
@@ -4521,7 +4671,7 @@
       "labels": [
        "E",
        "R",
-       "G",
+       "V",
        "E"
       ],
       "chain": "wyrms_embrace",
@@ -4547,7 +4697,7 @@
       "chainName": "Storm Front"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -4609,7 +4759,7 @@
       "chainName": "Frozen Thunder"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 3
      },
@@ -4717,18 +4867,24 @@
     },
     "opener": [],
     "old": {
+     "keys": [
+      [
+       "E",
+       "R"
+      ],
+      [
+       "F"
+      ]
+     ],
      "loop": [
-      "E G E F E",
       "E R",
-      "E R",
-      "E R G E",
-      "R"
+      "V"
      ],
      "windows": {
-      "d180": 11191,
-      "d480": 9462,
-      "dMove": 8684,
-      "score": 9779
+      "d180": 4994,
+      "d480": 4410,
+      "dMove": 4323,
+      "score": 4575
      }
     },
     "gate": "all",
@@ -4767,7 +4923,7 @@
       ],
       "labels": [
        "Q",
-       "G"
+       "V"
       ],
       "chain": "elemental_rise",
       "chainName": "Elemental Rise"
@@ -4820,7 +4976,7 @@
       "chainName": "Wildfire"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 1,
       "chain": "elemental_rise",
@@ -4969,11 +5125,11 @@
        "F"
       ],
       "labels": [
-       "G",
+       "V",
        "E",
-       "G",
+       "V",
        "F",
-       "G"
+       "V"
       ],
       "chain": "requiem_finale",
       "chainName": "Requiem Finale"
@@ -5037,7 +5193,7 @@
     ],
     "steps": [
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -5047,7 +5203,7 @@
       "unit": 0
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -5057,7 +5213,7 @@
       "unit": 0
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 0
      },
@@ -5246,18 +5402,58 @@
      }
     ],
     "old": {
+     "keys": [
+      [
+       "E",
+       "Q",
+       "E",
+       "R"
+      ],
+      [
+       "F",
+       "E",
+       "F",
+       "SP",
+       "F"
+      ],
+      [
+       "Q"
+      ],
+      [
+       "E",
+       "Q",
+       "E",
+       "R"
+      ],
+      [
+       "E",
+       "Q",
+       "E",
+       "R"
+      ],
+      [
+       "F",
+       "Q"
+      ],
+      [
+       "Q",
+       "Q"
+      ]
+     ],
      "loop": [
-      "G E G F G",
-      "R E Q R",
       "E Q E R",
+      "V E V F V",
       "Q",
-      "R Q R"
+      "E Q E R",
+      "E Q E R",
+      "V Q",
+      "Q Q"
      ],
      "windows": {
-      "d180": 6224,
-      "d480": 5520,
-      "dMove": 5756,
-      "score": 5833
+      "d180": 5194,
+      "d480": 4560,
+      "dMove": 4663,
+      "score": 4806
      }
     },
     "gate": "all",
@@ -5317,7 +5513,7 @@
        "Q"
       ],
       "labels": [
-       "G",
+       "V",
        "Q"
       ],
       "chain": "sour_note",
@@ -5409,7 +5605,7 @@
       "chainName": "Rondo"
      },
      {
-      "key": "G",
+      "key": "V",
       "slot": "F",
       "unit": 2
      },

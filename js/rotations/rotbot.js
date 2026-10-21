@@ -1,15 +1,15 @@
 // Rotation bot: plays a fixed, repeating list of chain "units" (each a key sequence) in the real sim, and spends the
 // ultimate on the matching ult-window finisher route. Pure (no DOM): the headless optimizer (tools/rotations/optimize.mjs)
 // and the in-browser preview page (rotations.html) both drive the hero with this, so the page plays exactly what was measured.
-//   unit = { keys: ['R','E','Q'], chain: 'executioners_verdict' | null }   keys are sim slots: Q E R F(=G key) SP(=F key) B1..B3 (basic swings)
+//   unit = { keys: ['R','E','Q'], chain: 'executioners_verdict' | null }   keys are sim slots: Q E R F(=V key) SP(=F key) B1..B3 (basic swings)
 import { brActive, brUltReady } from '../sim/bossrot.js';
 import { CLASSES } from '../sim/data/classes.js';
 import { gcdBlocks } from '../sim/player.js';
 
 export const MELEE = new Set(['warrior', 'cleric', 'bladedancer', 'samurai', 'monk', 'dragoon']);
 const SELF_AIM = new Set(['sanctuary', 'ascension']);
-/** keyboard label of a sim slot (default binds: G = skill slot F, F = the Special, T = ult, LMB = basic) */
-export const KEY_LABEL = { Q: 'Q', E: 'E', R: 'R', F: 'G', SP: 'F', T: 'T', B1: 'LMB', B2: 'LMB', B3: 'LMB' };
+/** keyboard label of a sim slot (default binds: V = skill slot F, F = the Special, T = ult, LMB = basic) */
+export const KEY_LABEL = { Q: 'Q', E: 'E', R: 'R', F: 'V', SP: 'F', T: 'T', B1: 'LMB', B2: 'LMB', B3: 'LMB' };
 export const VALID_SLOTS = Object.keys(KEY_LABEL);
 
 const busy = (p) => !!(p.bufSkill || (p.wq && p.wq.length) || (p.action && p.action.kind === 'skill' && p.action.t < (p.action.cancel ?? p.action.dur) - 1));

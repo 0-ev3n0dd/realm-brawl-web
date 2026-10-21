@@ -46,7 +46,7 @@ export function tipVars(cls) {
 }
 export function fillTip(text, vars) { return String(text || '').replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m)); }
 
-const defaultKey = { basic: 'LMB', Q: 'Q', E: 'E', R: 'R', F: 'G', SP: 'F', dodge: 'SHIFT', ult: 'T' }; // (F = the Special; the old 4th skill moved to G)
+const defaultKey = { basic: 'LMB', Q: 'Q', E: 'E', R: 'R', F: 'V', SP: 'F', dodge: 'SHIFT', ult: 'T' }; // (F = the Special; the old 4th skill moved to G)
 const actionOf = { basic: 'attack', Q: 'skillQ', E: 'skillE', R: 'skillR', F: 'skillF', SP: 'special', dodge: 'dodge', ult: 'ult' };
 
 /** Chains a slot takes part in ('B3'/'BS' steps belong to the basic combo, 'F+' to F). */

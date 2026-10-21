@@ -102,7 +102,7 @@ function statusList(p) {
   return L;
 }
 
-const DEFAULT_KEY_LABELS = { attack: 'LMB', skillQ: 'Q', skillE: 'E', skillR: 'R', skillF: 'G', special: 'F', dodge: 'SHIFT', ult: 'T', combos: 'C', inventory: 'I', takeAll: 'Z', bigMap: ',' };
+const DEFAULT_KEY_LABELS = { attack: 'LMB', skillQ: 'Q', skillE: 'E', skillR: 'R', skillF: 'V', special: 'F', dodge: 'SHIFT', ult: 'T', combos: 'C', inventory: 'I', takeAll: 'Z', bigMap: ',' };
 
 // Full-screen red vignettes (hurt / low HP): the radial gradient is baked once per screen size into a half-resolution
 // plate and blitted with globalAlpha. A per-frame full-screen gradient was a large part of the trial bomb-burst fps

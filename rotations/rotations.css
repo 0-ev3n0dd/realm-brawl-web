@@ -79,3 +79,7 @@ html.rot-fit { overflow: hidden; background: #07080c; }
 html.rot-fit body.rot-body { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; margin: 0; overflow: hidden; transform-origin: 0 0; }
 html.rot-fit #rotTop, html.rot-fit #rotMain { position: absolute; }
 .sb-play{margin:0;padding-left:16px}.sb-play li{margin:3px 0;line-height:1.35}
+/* notation (2026-10-21): opener units (played once) + the Special hinge unit, inside the same key strip */
+.k-seq .k-phase { font-family: system-ui, sans-serif; font-size: 10px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; align-self: center; margin: 0 4px 14px; white-space: nowrap; }
+.k-unit.opener .cap { border-style: dashed; }
+.k-unit.hinge .k-name { color: #ffd23f; }

@@ -4,6 +4,7 @@
 // (rotations/arena.js). Data: /rotations/rotations.json (tools/rotations/optimize.mjs).
 //   rotations.html?cls=monk&view=mob    deep link;  window.__rot exposes the live session to tools (tools/rotations/media.mjs)
 import { BR_CLS } from '../sim/bossrot.js';
+import { notation, mkLabel } from '../rotations/notation.js';
 import { Sim } from '../sim/sim.js';
 import { playNotes } from './playnotes.js';
 import { DT } from '../sim/constants.js';
@@ -40,8 +41,7 @@ const $ = (id) => document.getElementById(id);
 const ORDER = ['warrior', 'ranger', 'mage', 'cleric', 'bladedancer', 'samurai', 'monk', 'dragoon', 'summoner', 'bard'];
 const qs = new URLSearchParams(location.search);
 const keybinds = new Keybinds(window.localStorage); // (read only: the keycaps follow the player's own bindings)
-const SLOT_ACTION = { Q: 'skillQ', E: 'skillE', R: 'skillR', F: 'skillF', SP: 'special', T: 'ult', B1: 'attack', B2: 'attack', B3: 'attack' };
-const label = (slot) => { const l = keybinds.label(SLOT_ACTION[slot] || slot) || slot; return /^B\d$/.test(slot) ? `${l}${slot === 'B3' ? '×3' : ''}` : l; };
+const label = mkLabel((id) => keybinds.label(id)); // (every chip / text label comes from the slot keys through the player's binds: rotations/notation.js)
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const pct = (a, b) => { const v = Math.round((a / b - 1) * 1000) / 10; return (v >= 0 ? '+' : '') + v + '%'; };
 const fmt = (n) => (n >= 10000 ? (n / 1000).toFixed(1) + 'k' : Math.round(n).toLocaleString('en-US'));
@@ -101,7 +101,7 @@ class Session {
     if (ev.type === 'chain') {
       const ch = this.C.chains.find((c) => c.id === ev.id), keys = ch ? ch.seq.map(label).join(' → ') : '';
       if (ev.fin || (ch && ch.sp)) this.lastFin = this.sim.tick; // (finishers + Special 5-steps: big title moments)
-      ui.feed(ev.name || ev.id, ev.fin ? `ult FINISHER · ${this.rot.ult.labels.join(' → ')}` : `chain · ${keys}`, ev.fin ? 'fin' : '');
+      ui.feed(ev.name || ev.id, ev.fin ? `ult FINISHER · ${this.rot.ult.seq.map(label).join(' → ')}` : `chain · ${keys}`, ev.fin ? 'fin' : '');
     }
     if (ev.type === 'ult') ui.feed(ev.name || 'Ultimate', `${label('T')} · ultimate → ${this.rot.ult.routeName} route`, 'ult');
   }
@@ -164,35 +164,38 @@ const ui = {
     $('rotFeed').innerHTML = '';
     $('mKillsRow').style.display = view === 'mob' ? '' : 'none';
     $('mOpt').textContent = fmt(rot.dps);
-    // keycap strip: one group per chain unit
+    // keycap strip: one group per chain unit, indexed like RotBot.loop (opener units once, then the loop)
+    const N = this.nota = notation(cls, view, rot, label);
     const seq = $('kSeq'); seq.innerHTML = ''; this.caps = []; this.units = [];
-    rot.loop.forEach((u, ui2) => {
-      const g = document.createElement('div'); g.className = 'k-unit';
+    N.units.forEach((u, ui2) => {
+      if (N.wrap && (ui2 === 0 || ui2 === N.wrap)) { const l = document.createElement('span'); l.className = 'k-lbl k-phase'; l.textContent = ui2 === 0 ? 'Open (once):' : 'Loop ↻:'; seq.appendChild(l); }
+      const g = document.createElement('div'); g.className = 'k-unit' + (u.phase === 'opener' ? ' opener' : '') + (u.sp ? ' hinge' : ''); g.dataset.phase = u.phase;
       const caps = document.createElement('div'); caps.className = 'k-caps';
       const row = [];
+      const li = ui2 - N.wrap, st = li >= 0 ? rot.steps.filter((q) => q.unit === li) : [];
       u.keys.forEach((k, si) => {
-        const st = rot.steps.find((s) => s.unit === ui2 && s.slot === k && rot.steps.filter((q) => q.unit === ui2).indexOf(s) === si) || rot.steps.filter((q) => q.unit === ui2)[si];
-        const c = document.createElement('div'); c.className = 'cap' + (k === 'SP' ? ' sp' : '') + (/^B/.test(k) ? ' lmb' : '');
-        c.innerHTML = esc(label(k)) + (st && st.chain ? '<i class="ch"></i>' : '');
-        c.title = st && st.chain ? `${label(k)} → ${st.chainName}` : label(k);
+        const c = document.createElement('div'); c.className = 'cap' + (k === 'SP' ? ' sp' : '') + (/^B/.test(k) ? ' lmb' : ''); c.dataset.slot = k;
+        const chn = st[si] && st[si].chain ? st[si].chainName : (si === u.keys.length - 1 && u.chainName ? u.chainName : null);
+        c.innerHTML = esc(u.labels[si]) + (chn ? '<i class="ch"></i>' : '');
+        c.title = chn ? `${u.labels[si]} → ${chn}` : u.labels[si];
         caps.appendChild(c); row.push(c);
       });
       const nm = document.createElement('div'); nm.className = 'k-name';
-      const fired = rot.steps.filter((s) => s.unit === ui2 && s.chainName).map((s) => s.chainName);
-      nm.textContent = fired.length ? fired.join(' → ') : (u.chainName || 'cast');
+      const fired = st.filter((x) => x.chainName).map((x) => x.chainName);
+      nm.textContent = (u.sp && N.win ? '★ ' : '') + (fired.length ? fired.join(' → ') : (u.chainName || 'cast')) + (u.sp && N.win ? ` → ${N.win}` : '');
       g.append(caps, nm); seq.appendChild(g); this.caps.push(row); this.units.push(g);
     });
-    const ult = $('kUlt'); ult.innerHTML = `<span class="k-lbl">${view === 'boss' && BR_CLS[cls] ? `Ult in ${esc(BR_CLS[cls].win)}:` : 'Ult full:'}</span>`; this.ultCaps = [];
-    const tc = document.createElement('div'); tc.className = 'cap ult'; tc.textContent = label('T'); ult.appendChild(tc); this.ultCap = tc;
-    rot.ult.seq.forEach((k, i) => { const c = document.createElement('div'); c.className = 'cap' + (i === rot.ult.seq.length - 1 ? ' sp' : ''); c.textContent = label(k); c.title = rot.ult.chainNames[i] || ''; ult.appendChild(c); this.ultCaps.push(c); });
-    const rn = document.createElement('span'); rn.className = 'k-lbl'; rn.style.marginLeft = '8px'; rn.style.color = '#ff4fd8'; rn.textContent = '→ ' + rot.ult.routeName; ult.appendChild(rn);
+    const ult = $('kUlt'); ult.innerHTML = `<span class="k-lbl">${esc(N.ult.lbl)}</span>`; this.ultCaps = [];
+    const tc = document.createElement('div'); tc.className = 'cap ult'; tc.dataset.slot = 'T'; tc.textContent = N.ult.label; ult.appendChild(tc); this.ultCap = tc;
+    N.ult.seq.forEach((k, i) => { const c = document.createElement('div'); c.className = 'cap' + (i === N.ult.seq.length - 1 ? ' sp' : ''); c.dataset.slot = k; c.textContent = N.ult.labels[i]; c.title = N.ult.chainNames[i] || ''; ult.appendChild(c); this.ultCaps.push(c); });
+    const rn = document.createElement('span'); rn.className = 'k-lbl'; rn.style.marginLeft = '8px'; rn.style.color = '#ff4fd8'; rn.textContent = '→ ' + N.ult.routeName; ult.appendChild(rn);
     this.side(cls, view, rot);
   },
   side(cls, view, rot) {
     const C = CLASSES[cls], other = data.classes[cls][view === 'boss' ? 'mob' : 'boss'];
     $('sideHead').innerHTML = `<h2>${esc(C.name)}</h2><div class="sub">${view === 'boss' ? 'Boss rotation · single target' : 'Mobbing rotation · 10-mob pack'} · ${esc(C.resource)}</div>`;
-    const steps = rot.steps.map((s, i) => `<li data-i="${i}"><span class="mini">${esc(label(s.slot))}</span><span class="nm">${esc(C.skills[s.slot] ? C.skills[s.slot].name : 'Basic attack')}</span>${s.chainName ? `<span class="ds">→ <b style="color:#ff9ef0">${esc(s.chainName)}</b></span>` : ''}</li>`).join('');
-    const ult = rot.ult.seq.map((k, i) => `<li><span class="mini">${esc(label(k))}</span><span class="nm">${esc(C.skills[k].name)}</span>${rot.ult.chainNames[i] ? `<span class="ds">→ <b style="color:#ff9ef0">${esc(rot.ult.chainNames[i])}</b></span>` : ''}</li>`).join('');
+    const N = this.nota, steps = rot.steps.map((s, i) => `<li data-i="${i}"><span class="mini">${esc(label(s.slot))}</span><span class="nm">${esc(C.skills[s.slot] ? C.skills[s.slot].name : 'Basic attack')}</span>${s.chainName ? `<span class="ds">→ <b style="color:#ff9ef0">${esc(s.chainName)}</b></span>` : ''}</li>`).join('');
+    const ult = N.ult.seq.map((k, i) => `<li><span class="mini">${esc(N.ult.labels[i])}</span><span class="nm">${esc(C.skills[k].name)}</span>${rot.ult.chainNames[i] ? `<span class="ds">→ <b style="color:#ff9ef0">${esc(rot.ult.chainNames[i])}</b></span>` : ''}</li>`).join('');
     const chains = Object.values(rot.chainsUsed).map((c) => `<div class="sb-chain"><span>${esc(c.name)}</span><b>${c.per90s.toFixed(1)}</b></div>`).join('');
     const vs = rot.baselineDps ? Math.round((rot.dps / rot.baselineDps - 1) * 100) : 0;
     $('sideBody').innerHTML = `
@@ -206,14 +209,14 @@ const ui = {
         <div><b>${fmt(rot.windows.d180)}</b><span>DPS, 3 min</span></div>
         <div><b>${fmt(rot.windows.d480)}</b><span>DPS, 8 min</span></div>
         <div><b>${fmt(rot.windows.dMove)}</b><span>DPS, moving every 4 s</span></div>
-        ${rot.old ? `<div><b>${pct(rot.windows.score, rot.old.windows.score)}</b><span>vs old order (${esc(rot.old.loop.join(' · '))}: ${fmt(rot.old.windows.score)})</span></div>` : ''}
-      </div>${rot.opener && rot.opener.length ? `<div class="sb-note">Opener (once): <code>${esc(rot.opener.map((u) => u.labels.join(' ')).join(' · '))}</code>${rot.opener[0].chainName ? ' → ' + esc(rot.opener[0].chainName) : ''}</div>` : '<div class="sb-note">No opener: start straight into the loop.</div>'}<div class="sb-note">Weave basic attacks (LMB) between every GCD; they never break a chain. Pop the ultimate (${esc(label('T'))}) the moment it fills; its route chains are off the GCD.</div></div>` : ''}
-      <div class="sb-card"><h3>How ${esc(C.name)} plays now</h3><div class="sb-note">${playNotes(cls, C, data.classes[cls].boss)}</div></div>
+        ${rot.old ? `<div><b>${pct(rot.windows.score, rot.old.windows.score)}</b><span>vs old order (${esc(rot.old.keys ? rot.old.keys.map((u) => u.map(label).join(' ')).join(' · ') : rot.old.loop.join(' · '))}: ${fmt(rot.old.windows.score)})</span></div>` : ''}
+      </div>${rot.opener && rot.opener.length ? `<div class="sb-note">Opener (once): <code>${esc(N.text.opener)}</code></div>` : '<div class="sb-note">No opener: start straight into the loop.</div>'}<div class="sb-note">Weave basic attacks (LMB) between every GCD; they never break a chain. ${N.win ? `Boss cycle: ${esc(N.spName)} (${esc(label('SP'))}) as soon as it is up opens ${esc(N.win)}; cast the ultimate (${esc(label('T'))}) inside it, once per cycle` : `Pop the ultimate (${esc(label('T'))}) the moment it fills`}; its route chains are off the GCD.</div></div>` : ''}
+      <div class="sb-card"><h3>How ${esc(C.name)} plays now</h3><div class="sb-note">${playNotes(cls, C, data.classes[cls].boss, label)}</div></div>
       <div class="sb-card"><h3>Loop (repeat) ↻</h3><ol class="sb-steps" id="sbSteps">${steps}</ol></div>
-      <div class="sb-card"><h3>Ultimate (${esc(label('T'))}) when full → ${esc(rot.ult.routeName)}</h3><ol class="sb-steps">${ult}</ol></div>
+      <div class="sb-card"><h3>Ultimate (${esc(N.ult.label)}) ${N.win ? `in ${esc(N.win)}` : 'when full'} → ${esc(rot.ult.routeName)}</h3><ol class="sb-steps">${ult}</ol></div>
       <div class="sb-card"><h3>Chains fired per 90 s</h3>${chains}</div>
       <div class="sb-card"><h3>Other view</h3><div class="sb-note">${other ? `${view === 'boss' ? 'Mobbing' : 'Boss'}: <code>${esc(other.loop.map((u) => u.keys.map(label).join(' ')).join('  ·  '))}</code> · ${fmt(other.dps)} DPS` : 'not measured yet'}</div></div>
-      <div class="sb-card"><h3>How this was found</h3><div class="sb-note">${esc(data.method)}. Level ${data.setup.level}, one gear tier for every class (tier ${data.setup.gear.tier}, rarity ${data.setup.gear.rarity}, +${data.setup.gear.up}, no set / exotic procs). ${view === 'boss' ? 'Target: Grimtusk pinned as a training boss (armour intact, no attacks, HP held at 60%).' : `Target: ${data.setup.mob.pack.length} mobs (wolves, imps, knights, golems, HP ×${data.setup.mob.hpMul}) that chase but never attack; each kill respawns 1 s later.`} The ult is cast whenever full and spent on the ${esc(rot.ult.routeName)} finisher route. Between chains the hero swings basics while skills cool down; a chain that uses the Special (F) is skipped while the Special is on cooldown. ${rot.gate === 'first' ? 'Each chain starts as soon as its first key is ready (later keys are pressed as they come off cooldown, inside the chain window).' : 'Each chain starts once every key in it is ready.'} Keys: G = 4th skill, F = Special, T = ultimate.</div></div>`;
+      <div class="sb-card"><h3>How this was found</h3><div class="sb-note">${esc(data.method)}. Level ${data.setup.level}, one gear tier for every class (tier ${data.setup.gear.tier}, rarity ${data.setup.gear.rarity}, +${data.setup.gear.up}, no set / exotic procs). ${view === 'boss' ? 'Target: Grimtusk pinned as a training boss (armour intact, no attacks, HP held at 60%).' : `Target: ${data.setup.mob.pack.length} mobs (wolves, imps, knights, golems, HP ×${data.setup.mob.hpMul}) that chase but never attack; each kill respawns 1 s later.`} ${N.win ? `The ult is cast inside ${esc(N.win)} (one per ~20 s Special cycle) and spent on the` : 'The ult is cast whenever full and spent on the'} ${esc(rot.ult.routeName)} finisher route. Between chains the hero swings basics while skills cool down; a chain that uses the Special (F) is skipped while the Special is on cooldown. ${rot.gate === 'first' ? 'Each chain starts as soon as its first key is ready (later keys are pressed as they come off cooldown, inside the chain window).' : 'Each chain starts once every key in it is ready.'} Keys (your binds): ${esc(label('F'))} = 4th skill, ${esc(label('SP'))} = Special, ${esc(label('T'))} = ultimate, ${esc(label('B1'))} = basic attack.</div></div>`;
     this.sideSteps = [...document.querySelectorAll('#sbSteps li')];
   },
   feed(name, sub, cls) {
@@ -251,7 +254,7 @@ const ui = {
     $('mDps').textContent = fmt(s.dps5);
     $('mAvg').textContent = fmt(s.arena.dps);
     $('mKpm').textContent = secs > 5 ? (s.arena.kills / (secs / 60)).toFixed(0) : '–';
-    $('mLoops').textContent = Math.floor(bot.units / s.rot.loop.length);
+    $('mLoops').textContent = Math.floor(Math.max(0, bot.units - bot.wrap) / s.rot.loop.length);
     $('mTime').textContent = `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, '0')}`;
   },
 };
@@ -269,7 +272,7 @@ function select(cls, view, force = false) {
   window.__rot.session = session;
 }
 
-window.__rot = { session: null, select: (c, v) => select(c, v), get data() { return data; }, audio };
+window.__rot = { session: null, get nota() { return ui.nota; }, select: (c, v) => select(c, v), get data() { return data; }, audio };
 ui.build();
 fetch('rotations/rotations.json', { cache: 'no-cache' }).then((r) => r.json()).then((j) => { data = j; select(cur.cls, cur.view, true); })
   .catch((e) => { console.error(e); $('rotView').insertAdjacentHTML('beforeend', `<div id="rotLoading">Could not load rotations.json (${esc(e.message)}). Run <code>node tools/rotations/optimize.mjs</code>.</div>`); });
