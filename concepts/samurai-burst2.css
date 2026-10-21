@@ -1,0 +1,9 @@
+#cTabs{display:flex;gap:6px;margin-left:auto}#cTabs button.on{background:#ff5fa2;border-color:#ffd0e6;color:#1a0f2e}
+#cHud,#over,#callout{display:none}
+#widget{position:absolute;left:16px;bottom:118px;z-index:2;background:rgba(18,10,30,.88);border:2px solid #3b2a5c;border-radius:12px;padding:8px 12px;min-width:190px;pointer-events:none;box-shadow:0 3px 0 #0b0612}
+#widget .lbl{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#a99bc4;margin-bottom:5px}
+.pips{display:flex;gap:5px}.pips i{width:22px;height:8px;border-radius:4px;background:#3b2a5c}.pips i.on{background:linear-gradient(90deg,#ff8fb0,#fff3fa);box-shadow:0 0 6px #ff8fb0}
+.wstate{font-size:12px;margin-top:5px;color:#ffd0e6;min-height:15px}.wbar{height:5px;background:#2a1c3c;border-radius:3px;margin-top:5px;overflow:hidden}.wbar i{display:block;height:100%;background:#ff8fb0}
+.flowlv{display:flex;gap:4px;align-items:flex-end;height:26px}.flowlv i{width:12px;background:#3b2a5c;border-radius:3px}.flowlv i.on{background:#ff8fb0}
+.wv{font-size:12px;color:#e9dcc4;line-height:1.5}.wv b{color:#ff8fb0;font-weight:normal}
+#cmp td small{color:#a99bc4}
