@@ -73,16 +73,23 @@ export class RotBot {
     }
     if (!host) this.inRoute = false;
     if (this.si < 0) {
+      // boss opener (rotations/bosscycle.js): the opener ends with the first ult. If the opener chains left the meter short,
+      // swing basics (real hit trickle) until it is full, at most 15 s - the optimizer picks openers that never need it.
+      if (this.cyc && this.useUlt && this.wrap && this.firstUlt == null && this.units >= this.wrap && !host) {
+        if (this.openWait == null) this.openWait = sim.tick;
+        if (p.ult < 100 && sim.tick - this.openWait < 900) { inp.attack = inRange; this.mode = 'fill'; this.openFill = sim.tick - this.openWait; if (inp.attack) this.pressed = { key: 'B1', tick: sim.tick, fill: true }; return inp; }
+      }
       // between units: the ultimate first when the meter is full
       if (this.useUlt && C.routes && p.ult >= 100 && !host && inRange && !busy(p) && (!this.cyc || this.cyc.ultOk(sim))) { // (boss: one ult per Special cycle, right after the Special chain)
         if (this.cyc) this.cyc.cast(sim);
+        if (this.firstUlt == null) { this.firstUlt = sim.tick; this.firstUltInOpener = this.units <= this.wrap; }
         inp.ult = true; this.ults++; this.inRoute = true; this.rLast = -1; this.rStepT = sim.tick + 30; this.mode = 'ult';
         this.pressed = { key: 'T', tick: sim.tick, ult: true };
         return inp;
       }
-      if (this.cyc && this.ui >= this.wrap && !(p.cds.SP > 0)) { const i = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP')); if (i >= 0) this.ui = i; } // (boss: the Special chain as soon as it is up - it is the cycle's hinge)
+      if (this.cyc && this.ui >= this.wrap && !(p.cds.SP > 0) && !host) { const i = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP')); if (i >= 0) this.ui = i; } // (boss: the Special chain as soon as it is up - it is the cycle's hinge)
       let u = this.loop[this.ui], guard = 0;
-      while (u.keys.includes('SP') && p.cds.SP > 0 && guard++ < this.loop.length) { this.ui = this.nextUi(); u = this.loop[this.ui]; } // (Special on cooldown: skip its unit)
+      while (u.keys.includes('SP') && (p.cds.SP > 0 || (this.cyc && host)) && guard++ < this.loop.length) { this.ui = this.nextUi(); u = this.loop[this.ui]; } // (Special on cooldown - or, boss cycle, the ult window still open: the Special chain would not form - skip its unit)
       const pre = this.gate === 'first' ? u.keys.slice(0, 1) : u.keys.includes('SP') ? u.keys.slice(0, u.keys.indexOf('SP') + 1) : u.keys;
       const keys = [...new Set(pre.filter((k) => !/^B/.test(k)))];
       const cost = keys.reduce((a, k) => a + (C.skills[k].cost || 0), 0);

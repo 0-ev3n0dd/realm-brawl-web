@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-22T01:33:31.971Z",
+ "generated": "2026-10-22T02:27:42.975Z",
  "method": "beam search (width 12, depth ≤ 7) over repeating chain loops, 60 s per candidate; the top 4 re-measured over 3 seeds × 90 s",
  "setup": {
   "level": 30,
@@ -67,6 +67,20 @@
      },
      {
       "keys": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "chain": "executioners_verdict",
+      "chainName": "Executioner's Verdict"
+     },
+     {
+      "keys": [
        "E"
       ],
       "labels": [
@@ -78,16 +92,36 @@
      {
       "keys": [
        "R",
-       "E",
        "Q"
       ],
       "labels": [
        "R",
-       "E",
        "Q"
       ],
-      "chain": "executioners_verdict",
-      "chainName": "Executioner's Verdict"
+      "chain": "seismic_arc",
+      "chainName": "Seismic Arc"
+     },
+     {
+      "keys": [
+       "E"
+      ],
+      "labels": [
+       "E"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
+       "F",
+       "Q"
+      ],
+      "labels": [
+       "V",
+       "Q"
+      ],
+      "chain": "rift_cleave",
+      "chainName": "Riftcleave"
      }
     ],
     "steps": [
@@ -99,16 +133,12 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "thunder_hurl",
-      "chainName": "Thunder Hurl"
+      "unit": 0
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "executioners_verdict",
-      "chainName": "Executioner's Verdict"
+      "unit": 0
      },
      {
       "key": "F",
@@ -118,37 +148,54 @@
      {
       "key": "R",
       "slot": "R",
-      "unit": 0,
-      "chain": "decree_of_ruin",
-      "chainName": "Decree of Ruin"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 1,
-      "chain": "thunder_hurl",
-      "chainName": "Thunder Hurl"
+      "unit": 0
      },
      {
       "key": "R",
       "slot": "R",
-      "unit": 2,
-      "chain": "titanfall",
-      "chainName": "Titanfall Execution"
+      "unit": 1
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 2,
-      "chain": "thunder_hurl",
-      "chainName": "Thunder Hurl"
+      "unit": 1
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 2,
-      "chain": "executioners_verdict",
-      "chainName": "Executioner's Verdict"
+      "unit": 1
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 2
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 3
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 3
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 4
+     },
+     {
+      "key": "V",
+      "slot": "F",
+      "unit": 5
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 5,
+      "chain": "thunder_hurl",
+      "chainName": "Thunder Hurl"
      }
     ],
     "ult": {
@@ -184,9 +231,9 @@
       "Titanfall Execution"
      ]
     },
-    "dps": 10714,
+    "dps": 11843,
     "kpm": 0,
-    "noUltDps": 4995,
+    "noUltDps": 4724,
     "baselineDps": 12730,
     "baselineKpm": 0,
     "ultsPer90s": 4,
@@ -194,7 +241,7 @@
     "chainsUsed": {
      "thunder_hurl": {
       "name": "Thunder Hurl",
-      "per90s": 15
+      "per90s": 12
      },
      "executioners_verdict": {
       "name": "Executioner's Verdict",
@@ -208,33 +255,87 @@
       "name": "Titanfall Execution",
       "per90s": 4
      },
-     "cyclone_cleave": {
-      "name": "Cyclone Cleave",
+     "reavers_return": {
+      "name": "Reaver's Return",
       "per90s": 4
+     },
+     "rift_cleave": {
+      "name": "Riftcleave",
+      "per90s": 4
+     },
+     "seismic_arc": {
+      "name": "Seismic Arc",
+      "per90s": 1
+     },
+     "warlords_rally": {
+      "name": "Warlord's Rally",
+      "per90s": 1
      }
     },
-    "evals": 701,
-    "runnersUp": [
+    "evals": 1559,
+    "runnersUp": [],
+    "windows": {
+     "d180": 13436,
+     "d480": 8930,
+     "dMove": 7899,
+     "score": 10088
+    },
+    "opener": [
      {
-      "loop": "REQSPR · E · REQ",
-      "dps": 7763
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "SP",
+       "R"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "F",
+       "R"
+      ],
+      "chain": "decree_of_ruin",
+      "chainName": "Decree of Ruin"
      },
      {
-      "loop": "REQSPR · E · REQF · REQ",
-      "dps": 7687
+      "keys": [
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "E",
+       "Q"
+      ],
+      "chain": "cyclone_cleave",
+      "chainName": "Cyclone Cleave"
      },
      {
-      "loop": "REQSPR · E · REQ · F · REQ",
-      "dps": 7687
+      "keys": [
+       "R",
+       "Q",
+       "E"
+      ],
+      "labels": [
+       "R",
+       "Q",
+       "E"
+      ],
+      "chain": "warlords_rally",
+      "chainName": "Warlord's Rally"
+     },
+     {
+      "keys": [
+       "E"
+      ],
+      "labels": [
+       "E"
+      ],
+      "chain": null,
+      "chainName": null
      }
     ],
-    "windows": {
-     "d180": 12398,
-     "d480": 8096,
-     "dMove": 7752,
-     "score": 9416
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -269,6 +370,18 @@
       "d480": 7056,
       "dMove": 6960,
       "score": 8225
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 5,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 13,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -280,10 +393,14 @@
       "ok": true
      },
      "s8": {
-      "sp": 20,
-      "ults": 20,
+      "sp": 21,
+      "ults": 21,
       "ok": true
-     }
+     },
+     "firstUlt": 13.4,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -572,6 +689,28 @@
      },
      {
       "keys": [
+       "R"
+      ],
+      "labels": [
+       "R"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
+       "B3",
+       "E"
+      ],
+      "labels": [
+       "LMB",
+       "E"
+      ],
+      "chain": "rapid_finale",
+      "chainName": "Rapid Finale"
+     },
+     {
+      "keys": [
        "Q",
        "E",
        "F",
@@ -597,18 +736,6 @@
       ],
       "chain": "hawkstorm",
       "chainName": "Hawkstorm"
-     },
-     {
-      "keys": [
-       "B3",
-       "E"
-      ],
-      "labels": [
-       "LMB",
-       "E"
-      ],
-      "chain": "rapid_finale",
-      "chainName": "Rapid Finale"
      }
     ],
     "steps": [
@@ -620,16 +747,12 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "hunters_mark",
-      "chainName": "Hunter's Mark"
+      "unit": 0
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "deadeye",
-      "chainName": "Deadeye"
+      "unit": 0
      },
      {
       "key": "F",
@@ -639,59 +762,52 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "deathmark_volley",
-      "chainName": "Deathmark Volley"
+      "unit": 0
      },
      {
-      "key": "Q",
-      "slot": "Q",
+      "key": "R",
+      "slot": "R",
       "unit": 1
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 1,
-      "chain": "hawkstorm",
-      "chainName": "Hawkstorm"
-     },
-     {
-      "key": "V",
-      "slot": "F",
-      "unit": 1
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 1,
-      "chain": "hunters_mark",
-      "chainName": "Hunter's Mark"
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 2,
-      "chain": "deadeye",
-      "chainName": "Deadeye"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 2,
-      "chain": "hawkstorm",
-      "chainName": "Hawkstorm"
      },
      {
       "key": "LMB",
       "slot": "B3",
+      "unit": 2
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 2
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
       "unit": 3
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 3,
-      "chain": "rapid_finale",
-      "chainName": "Rapid Finale"
+      "unit": 3
+     },
+     {
+      "key": "V",
+      "slot": "F",
+      "unit": 3
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 3
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 4
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 4
      }
     ],
     "ult": {
@@ -727,61 +843,135 @@
       "Heaven's Arrow"
      ]
     },
-    "dps": 5739,
+    "dps": 4811,
     "kpm": 0,
-    "noUltDps": 3604,
+    "noUltDps": 3607,
     "baselineDps": 4310,
     "baselineKpm": 0,
-    "ultsPer90s": 3.7,
+    "ultsPer90s": 3,
     "aborts": 0,
     "chainsUsed": {
      "hawkstorm": {
       "name": "Hawkstorm",
-      "per90s": 18.3
+      "per90s": 11
      },
      "hunters_mark": {
       "name": "Hunter's Mark",
-      "per90s": 16.7
+      "per90s": 10
+     },
+     "ricochet": {
+      "name": "Ricochet",
+      "per90s": 9.3
+     },
+     "skyline_scatter": {
+      "name": "Skyline Scatter",
+      "per90s": 8
      },
      "deadeye": {
       "name": "Deadeye",
-      "per90s": 10
-     },
-     "rapid_finale": {
-      "name": "Rapid Finale",
-      "per90s": 6.7
+      "per90s": 5.7
      },
      "deathmark_volley": {
       "name": "Deathmark Volley",
-      "per90s": 4.3
+      "per90s": 3.7
      },
      "heavens_arrow": {
       "name": "Heaven's Arrow",
-      "per90s": 2.7
+      "per90s": 1.3
+     },
+     "snare_web": {
+      "name": "Snare Web",
+      "per90s": 1
+     },
+     "snarestorm_execution": {
+      "name": "Snarestorm Execution",
+      "per90s": 1
      }
     },
-    "evals": 590,
-    "runnersUp": [
+    "evals": 2179,
+    "runnersUp": [],
+    "windows": {
+     "d180": 5531,
+     "d480": 5259,
+     "dMove": 4847,
+     "score": 5212
+    },
+    "opener": [
      {
-      "loop": "FEQSPE · QEFE · QE · B3E",
-      "dps": 5874
+      "keys": [
+       "F",
+       "E",
+       "Q",
+       "SP",
+       "E"
+      ],
+      "labels": [
+       "V",
+       "E",
+       "Q",
+       "F",
+       "E"
+      ],
+      "chain": "deathmark_volley",
+      "chainName": "Deathmark Volley"
      },
      {
-      "loop": "FEQSPE · B3E · QE · F",
-      "dps": 5504
+      "keys": [
+       "F",
+       "R"
+      ],
+      "labels": [
+       "V",
+       "R"
+      ],
+      "chain": "snare_web",
+      "chainName": "Snare Web"
      },
      {
-      "loop": "FEQSPE · B3E · QE · FEQ",
-      "dps": 4819
+      "keys": [
+       "B3",
+       "E"
+      ],
+      "labels": [
+       "LMB",
+       "E"
+      ],
+      "chain": "rapid_finale",
+      "chainName": "Rapid Finale"
+     },
+     {
+      "keys": [
+       "E",
+       "R",
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "E",
+       "R",
+       "E",
+       "Q"
+      ],
+      "chain": "skyline_scatter",
+      "chainName": "Skyline Scatter"
+     },
+     {
+      "keys": [
+       "E",
+       "R",
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "E",
+       "R",
+       "E",
+       "Q"
+      ],
+      "chain": "skyline_scatter",
+      "chainName": "Skyline Scatter"
      }
     ],
-    "windows": {
-     "d180": 5976,
-     "d480": 6296,
-     "dMove": 5904,
-     "score": 6059
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -818,6 +1008,18 @@
       "d480": 5088,
       "dMove": 5162,
       "score": 5439
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 4,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 12,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -829,10 +1031,14 @@
       "ok": true
      },
      "s8": {
-      "sp": 23,
-      "ults": 23,
+      "sp": 22,
+      "ults": 22,
       "ok": true
-     }
+     },
+     "firstUlt": 23.7,
+     "inOpener": true,
+     "fill": 8.2,
+     "fixed": false
     }
    },
    "mob": {
@@ -1088,32 +1294,10 @@
      },
      {
       "keys": [
-       "F",
-       "E"
-      ],
-      "labels": [
-       "V",
-       "E"
-      ],
-      "chain": "shatter",
-      "chainName": "Shatter"
-     },
-     {
-      "keys": [
        "R"
       ],
       "labels": [
        "R"
-      ],
-      "chain": null,
-      "chainName": null
-     },
-     {
-      "keys": [
-       "E"
-      ],
-      "labels": [
-       "E"
       ],
       "chain": null,
       "chainName": null
@@ -1138,16 +1322,12 @@
      {
       "key": "R",
       "slot": "R",
-      "unit": 0,
-      "chain": "cataclysm",
-      "chainName": "Cataclysm"
+      "unit": 0
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "supernova",
-      "chainName": "Supernova"
+      "unit": 0
      },
      {
       "key": "F",
@@ -1157,40 +1337,17 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "starfall_shatter",
-      "chainName": "Starfall Shatter"
+      "unit": 0
      },
      {
-      "key": "V",
-      "slot": "F",
+      "key": "R",
+      "slot": "R",
       "unit": 1
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 1,
-      "chain": "shatter",
-      "chainName": "Shatter"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 2,
-      "chain": "cataclysm",
-      "chainName": "Cataclysm"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 3,
-      "chain": "supernova",
-      "chainName": "Supernova"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 4
+      "unit": 2
      }
     ],
     "ult": {
@@ -1226,57 +1383,77 @@
       "Singularity"
      ]
     },
-    "dps": 5474,
+    "dps": 6639,
     "kpm": 0,
-    "noUltDps": 3860,
+    "noUltDps": 5678,
     "baselineDps": 6105,
     "baselineKpm": 0,
-    "ultsPer90s": 3,
+    "ultsPer90s": 2,
     "aborts": 0,
     "chainsUsed": {
-     "cataclysm": {
-      "name": "Cataclysm",
-      "per90s": 18
-     },
      "supernova": {
       "name": "Supernova",
-      "per90s": 17.7
+      "per90s": 23.7
      },
-     "shatter": {
-      "name": "Shatter",
-      "per90s": 16.3
+     "cataclysm": {
+      "name": "Cataclysm",
+      "per90s": 17.3
      },
      "starfall_shatter": {
       "name": "Starfall Shatter",
-      "per90s": 3.3
+      "per90s": 4
+     },
+     "shatter": {
+      "name": "Shatter",
+      "per90s": 0.7
      },
      "singularity": {
       "name": "Singularity",
-      "per90s": 1.7
+      "per90s": 0.7
      }
     },
-    "evals": 534,
-    "runnersUp": [
+    "evals": 1233,
+    "runnersUp": [],
+    "windows": {
+     "d180": 7291,
+     "d480": 6545,
+     "dMove": 6279,
+     "score": 6705
+    },
+    "opener": [
      {
-      "loop": "ERESPE · FE · R · E · E",
-      "dps": 6112
+      "keys": [
+       "E",
+       "R",
+       "E",
+       "SP",
+       "E"
+      ],
+      "labels": [
+       "E",
+       "R",
+       "E",
+       "F",
+       "E"
+      ],
+      "chain": "starfall_shatter",
+      "chainName": "Starfall Shatter"
      },
      {
-      "loop": "ERESPE · FE · R · E · R",
-      "dps": 5260
-     },
-     {
-      "loop": "ERESPE · ERE · FE · E",
-      "dps": 5212
+      "keys": [
+       "E",
+       "R",
+       "E"
+      ],
+      "labels": [
+       "E",
+       "R",
+       "E"
+      ],
+      "chain": "supernova",
+      "chainName": "Supernova"
      }
     ],
-    "windows": {
-     "d180": 6052,
-     "d480": 4929,
-     "dMove": 6112,
-     "score": 5698
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -1326,20 +1503,20 @@
       "E R E"
      ],
      "windows": {
-      "d180": 6905,
-      "d480": 6042,
-      "dMove": 6000,
-      "score": 6316
+      "d180": 6870,
+      "d480": 6069,
+      "dMove": 6218,
+      "score": 6385
      },
      "cycle": {
       "s3": {
-       "sp": 7,
-       "ults": 5,
+       "sp": 8,
+       "ults": 4,
        "ok": false
       },
       "s8": {
-       "sp": 15,
-       "ults": 13,
+       "sp": 20,
+       "ults": 12,
        "ok": false
       }
      }
@@ -1349,14 +1526,18 @@
     "cycle": {
      "s3": {
       "sp": 8,
-      "ults": 7,
-      "ok": true
+      "ults": 4,
+      "ok": false
      },
      "s8": {
-      "sp": 20,
-      "ults": 19,
+      "sp": 21,
+      "ults": 10,
       "ok": false
-     }
+     },
+     "firstUlt": 35,
+     "inOpener": false,
+     "fill": 15,
+     "fixed": false
     }
    },
    "mob": {
@@ -1752,29 +1933,33 @@
       ],
       "chain": null,
       "chainName": null
+     },
+     {
+      "keys": [
+       "R"
+      ],
+      "labels": [
+       "R"
+      ],
+      "chain": null,
+      "chainName": null
      }
     ],
     "steps": [
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "guardian_angel",
-      "chainName": "Guardian Angel"
+      "unit": 0
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 0,
-      "chain": "final_verdict",
-      "chainName": "Final Verdict"
+      "unit": 0
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "sanctified_judgment",
-      "chainName": "Sanctified Judgment"
+      "unit": 0
      },
      {
       "key": "F",
@@ -1784,9 +1969,7 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "hammer_of_dawn",
-      "chainName": "Hammer of Dawn"
+      "unit": 0
      },
      {
       "key": "LMB",
@@ -1796,23 +1979,17 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 1,
-      "chain": "righteous_fury",
-      "chainName": "Righteous Fury"
+      "unit": 1
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 1,
-      "chain": "final_verdict",
-      "chainName": "Final Verdict"
+      "unit": 1
      },
      {
       "key": "R",
       "slot": "R",
-      "unit": 1,
-      "chain": "aegis_throw",
-      "chainName": "Aegis Throw"
+      "unit": 1
      },
      {
       "key": "LMB",
@@ -1822,16 +1999,17 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 2,
-      "chain": "guardian_angel",
-      "chainName": "Guardian Angel"
+      "unit": 2
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 3,
-      "chain": "final_verdict",
-      "chainName": "Final Verdict"
+      "unit": 3
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 4
      }
     ],
     "ult": {
@@ -1867,9 +2045,9 @@
       "Heaven's Judgment"
      ]
     },
-    "dps": 7435,
+    "dps": 7546,
     "kpm": 0,
-    "noUltDps": 6336,
+    "noUltDps": 5653,
     "baselineDps": 4116,
     "baselineKpm": 0,
     "ultsPer90s": 4,
@@ -1877,51 +2055,115 @@
     "chainsUsed": {
      "final_verdict": {
       "name": "Final Verdict",
-      "per90s": 23
-     },
-     "righteous_fury": {
-      "name": "Righteous Fury",
-      "per90s": 8
+      "per90s": 22
      },
      "aegis_throw": {
       "name": "Aegis Throw",
-      "per90s": 8
-     },
-     "sanctified_judgment": {
-      "name": "Sanctified Judgment",
-      "per90s": 7
+      "per90s": 13
      },
      "guardian_angel": {
       "name": "Guardian Angel",
-      "per90s": 7
+      "per90s": 12.7
+     },
+     "sanctified_judgment": {
+      "name": "Sanctified Judgment",
+      "per90s": 5
      },
      "hammer_of_dawn": {
       "name": "Hammer of Dawn",
       "per90s": 4
+     },
+     "righteous_fury": {
+      "name": "Righteous Fury",
+      "per90s": 4
+     },
+     "bulwark": {
+      "name": "Bulwark",
+      "per90s": 1
+     },
+     "holy_nova": {
+      "name": "Holy Nova",
+      "per90s": 1
+     },
+     "absolution": {
+      "name": "Absolution",
+      "per90s": 1
      }
     },
-    "evals": 239,
-    "runnersUp": [
+    "evals": 1502,
+    "runnersUp": [],
+    "windows": {
+     "d180": 8230,
+     "d480": 7760,
+     "dMove": 6368,
+     "score": 7453
+    },
+    "opener": [
      {
-      "loop": "QFQSPQ · B3QFR · B3Q · F",
-      "dps": 7108
+      "keys": [
+       "Q",
+       "F",
+       "Q",
+       "SP",
+       "Q"
+      ],
+      "labels": [
+       "Q",
+       "V",
+       "Q",
+       "F",
+       "Q"
+      ],
+      "chain": "hammer_of_dawn",
+      "chainName": "Hammer of Dawn"
      },
      {
-      "loop": "QFQSPQ · B3QFR · B3Q · B3Q",
-      "dps": 7002
+      "keys": [
+       "Q",
+       "F",
+       "Q"
+      ],
+      "labels": [
+       "Q",
+       "V",
+       "Q"
+      ],
+      "chain": "sanctified_judgment",
+      "chainName": "Sanctified Judgment"
      },
      {
-      "loop": "QFQSPQ · B3QFR · Q · QF",
-      "dps": 6640
+      "keys": [
+       "B3",
+       "Q",
+       "F",
+       "R"
+      ],
+      "labels": [
+       "LMB",
+       "Q",
+       "V",
+       "R"
+      ],
+      "chain": "aegis_throw",
+      "chainName": "Aegis Throw"
+     },
+     {
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "V"
+      ],
+      "chain": "absolution",
+      "chainName": "Absolution"
      }
     ],
-    "windows": {
-     "d180": 8189,
-     "d480": 7832,
-     "dMove": 6784,
-     "score": 7602
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -1981,9 +2223,13 @@
      },
      "s8": {
       "sp": 21,
-      "ults": 20,
+      "ults": 21,
       "ok": true
-     }
+     },
+     "firstUlt": 18.7,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -2281,17 +2527,19 @@
      },
      {
       "keys": [
-       "R",
+       "E",
+       "Q",
        "F",
        "E"
       ],
       "labels": [
-       "R",
+       "E",
+       "Q",
        "V",
        "E"
       ],
-      "chain": "shadow_execution",
-      "chainName": "Shadow Execution"
+      "chain": "smoke_lotus",
+      "chainName": "Smoke Lotus"
      },
      {
       "keys": [
@@ -2321,15 +2569,17 @@
       "keys": [
        "E",
        "Q",
-       "F"
+       "F",
+       "E"
       ],
       "labels": [
        "E",
        "Q",
-       "V"
+       "V",
+       "E"
       ],
-      "chain": "crimson_flurry",
-      "chainName": "Crimson Flurry"
+      "chain": "smoke_lotus",
+      "chainName": "Smoke Lotus"
      },
      {
       "keys": [
@@ -2373,23 +2623,24 @@
       "unit": 0
      },
      {
-      "key": "R",
-      "slot": "R",
+      "key": "E",
+      "slot": "E",
+      "unit": 1
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
       "unit": 1
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 1,
-      "chain": "marked_for_death",
-      "chainName": "Marked for Death"
+      "unit": 1
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 1,
-      "chain": "shadow_execution",
-      "chainName": "Shadow Execution"
+      "unit": 1
      },
      {
       "key": "R",
@@ -2399,16 +2650,12 @@
      {
       "key": "V",
       "slot": "F",
-      "unit": 2,
-      "chain": "marked_for_death",
-      "chainName": "Marked for Death"
+      "unit": 2
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 2,
-      "chain": "shadow_execution",
-      "chainName": "Shadow Execution"
+      "unit": 2
      },
      {
       "key": "V",
@@ -2423,11 +2670,20 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 4
+      "unit": 4,
+      "chain": "marked_for_death",
+      "chainName": "Marked for Death"
      },
      {
       "key": "V",
       "slot": "F",
+      "unit": 4,
+      "chain": "shadow_execution",
+      "chainName": "Shadow Execution"
+     },
+     {
+      "key": "E",
+      "slot": "E",
       "unit": 4
      },
      {
@@ -2481,66 +2737,121 @@
       "Crescent Execution"
      ]
     },
-    "dps": 7694,
+    "dps": 9375,
     "kpm": 0,
-    "noUltDps": 6298,
+    "noUltDps": 5803,
     "baselineDps": 2852,
     "baselineKpm": 0,
-    "ultsPer90s": 3,
+    "ultsPer90s": 4,
     "aborts": 0,
     "chainsUsed": {
      "marked_for_death": {
       "name": "Marked for Death",
-      "per90s": 24.3
+      "per90s": 15
      },
-     "shadow_execution": {
-      "name": "Shadow Execution",
-      "per90s": 22.3
+     "smoke_lotus": {
+      "name": "Smoke Lotus",
+      "per90s": 13
      },
      "crimson_flurry": {
       "name": "Crimson Flurry",
-      "per90s": 4
+      "per90s": 11
+     },
+     "shadow_execution": {
+      "name": "Shadow Execution",
+      "per90s": 10
      },
      "shadow_heartseeker": {
       "name": "Shadow Heartseeker",
-      "per90s": 3
+      "per90s": 4
      },
      "crescent_execution": {
       "name": "Crescent Execution",
-      "per90s": 1.3
+      "per90s": 4
+     },
+     "shadow_strike": {
+      "name": "Shadow Strike",
+      "per90s": 2
+     },
+     "eviscerate": {
+      "name": "Eviscerate",
+      "per90s": 2
      }
     },
-    "evals": 618,
-    "runnersUp": [
-     {
-      "loop": "RFESPE · RFE · RFE · F · EQF · RFE · Q",
-      "dps": 8835
-     },
-     {
-      "loop": "RFESPE · RFE · RFE · F · EQF · RF · RFE",
-      "dps": 8641
-     },
-     {
-      "loop": "RFESPE · RF · E · RFE · F · EQF",
-      "dps": 7362
-     }
-    ],
+    "evals": 1460,
+    "runnersUp": [],
     "windows": {
-     "d180": 9662,
-     "d480": 7955,
-     "dMove": 9190,
-     "score": 8935
+     "d180": 10275,
+     "d480": 8731,
+     "dMove": 9771,
+     "score": 9592
     },
     "opener": [
      {
       "keys": [
+       "R",
+       "F",
+       "E",
+       "SP",
        "E"
       ],
       "labels": [
+       "R",
+       "V",
+       "E",
+       "F",
        "E"
       ],
-      "chain": null,
-      "chainName": null
+      "chain": "shadow_heartseeker",
+      "chainName": "Shadow Heartseeker"
+     },
+     {
+      "keys": [
+       "Q",
+       "E",
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "Q",
+       "E",
+       "Q",
+       "V"
+      ],
+      "chain": "eviscerate",
+      "chainName": "Eviscerate"
+     },
+     {
+      "keys": [
+       "E",
+       "Q",
+       "F",
+       "E"
+      ],
+      "labels": [
+       "E",
+       "Q",
+       "V",
+       "E"
+      ],
+      "chain": "smoke_lotus",
+      "chainName": "Smoke Lotus"
+     },
+     {
+      "keys": [
+       "Q",
+       "E",
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "Q",
+       "E",
+       "Q",
+       "V"
+      ],
+      "chain": "eviscerate",
+      "chainName": "Eviscerate"
      }
     ],
     "old": {
@@ -2563,25 +2874,41 @@
       "R V E F E"
      ],
      "windows": {
-      "d180": 8217,
-      "d480": 6453,
-      "dMove": 7499,
-      "score": 7390
+      "d180": 7590,
+      "d480": 6321,
+      "dMove": 6737,
+      "score": 6882
+     },
+     "cycle": {
+      "s3": {
+       "sp": 6,
+       "ults": 6,
+       "ok": false
+      },
+      "s8": {
+       "sp": 17,
+       "ults": 17,
+       "ok": false
+      }
      }
     },
     "gate": "all",
     "otherGate": null,
     "cycle": {
      "s3": {
-      "sp": 7,
-      "ults": 7,
+      "sp": 8,
+      "ults": 8,
       "ok": true
      },
      "s8": {
-      "sp": 21,
-      "ults": 21,
+      "sp": 22,
+      "ults": 22,
       "ok": true
-     }
+     },
+     "firstUlt": 18,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -2764,35 +3091,33 @@
      },
      {
       "keys": [
-       "Q"
+       "R",
+       "E",
+       "Q",
+       "F"
       ],
       "labels": [
-       "Q"
+       "R",
+       "E",
+       "Q",
+       "V"
       ],
-      "chain": null,
-      "chainName": null
+      "chain": "stillwater_execution",
+      "chainName": "Stillwater Execution"
      },
      {
       "keys": [
-       "E",
-       "R"
-      ],
-      "labels": [
-       "E",
-       "R"
-      ],
-      "chain": "counter_sheathe",
-      "chainName": "Counter Sheathe"
-     },
-     {
-      "keys": [
+       "R",
+       "Q",
        "E"
       ],
       "labels": [
+       "R",
+       "Q",
        "E"
       ],
-      "chain": null,
-      "chainName": null
+      "chain": "petal_rain",
+      "chainName": "Petal Rain"
      }
     ],
     "steps": [
@@ -2804,16 +3129,12 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "moonlit_guard",
-      "chainName": "Moonlit Guard"
+      "unit": 0
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "moment_of_death",
-      "chainName": "Moment of Death"
+      "unit": 0
      },
      {
       "key": "F",
@@ -2823,37 +3144,42 @@
      {
       "key": "R",
       "slot": "R",
-      "unit": 0,
-      "chain": "void_sheath",
-      "chainName": "Void Sheath"
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 1,
-      "chain": "moment_of_death",
-      "chainName": "Moment of Death"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 2,
-      "chain": "petal_rain",
-      "chainName": "Petal Rain"
+      "unit": 0
      },
      {
       "key": "R",
       "slot": "R",
-      "unit": 2,
-      "chain": "counter_sheathe",
-      "chainName": "Counter Sheathe"
+      "unit": 1
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 3,
-      "chain": "moonlit_guard",
-      "chainName": "Moonlit Guard"
+      "unit": 1
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 1
+     },
+     {
+      "key": "V",
+      "slot": "F",
+      "unit": 1
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 2
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 2
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 2
      }
     ],
     "ult": {
@@ -2889,9 +3215,9 @@
       "One Perfect Cut"
      ]
     },
-    "dps": 8556,
+    "dps": 7491,
     "kpm": 0,
-    "noUltDps": 3634,
+    "noUltDps": 4259,
     "baselineDps": 8308,
     "baselineKpm": 0,
     "ultsPer90s": 4,
@@ -2899,51 +3225,107 @@
     "chainsUsed": {
      "moonlit_guard": {
       "name": "Moonlit Guard",
-      "per90s": 16
+      "per90s": 15.3
      },
      "moment_of_death": {
       "name": "Moment of Death",
-      "per90s": 13
+      "per90s": 15.3
      },
-     "counter_sheathe": {
-      "name": "Counter Sheathe",
-      "per90s": 8
+     "stillwater_execution": {
+      "name": "Stillwater Execution",
+      "per90s": 10.3
+     },
+     "blossom_burst": {
+      "name": "Blossom Burst",
+      "per90s": 9.7
+     },
+     "petal_rain": {
+      "name": "Petal Rain",
+      "per90s": 6.7
      },
      "void_sheath": {
       "name": "Void Sheath",
       "per90s": 4
      },
-     "petal_rain": {
-      "name": "Petal Rain",
-      "per90s": 4
+     "counter_sheathe": {
+      "name": "Counter Sheathe",
+      "per90s": 3.3
      },
      "one_perfect_cut": {
       "name": "One Perfect Cut",
-      "per90s": 4
+      "per90s": 0.7
      }
     },
-    "evals": 589,
-    "runnersUp": [
+    "evals": 225,
+    "runnersUp": [],
+    "windows": {
+     "d180": 7831,
+     "d480": 6869,
+     "dMove": 6946,
+     "score": 7215
+    },
+    "opener": [
      {
-      "loop": "REQSPR · Q · ER · E",
-      "dps": 7782
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "SP",
+       "R"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "F",
+       "R"
+      ],
+      "chain": "void_sheath",
+      "chainName": "Void Sheath"
      },
      {
-      "loop": "REQSPR · Q · ER",
-      "dps": 7237
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "V"
+      ],
+      "chain": "stillwater_execution",
+      "chainName": "Stillwater Execution"
      },
      {
-      "loop": "REQSPR · RQEF · RQE · RQE · RQE",
-      "dps": 6908
+      "keys": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "chain": "moment_of_death",
+      "chainName": "Moment of Death"
+     },
+     {
+      "keys": [
+       "E",
+       "R"
+      ],
+      "labels": [
+       "E",
+       "R"
+      ],
+      "chain": "counter_sheathe",
+      "chainName": "Counter Sheathe"
      }
     ],
-    "windows": {
-     "d180": 8856,
-     "d480": 7980,
-     "dMove": 7197,
-     "score": 8011
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -2961,6 +3343,18 @@
       "d480": 6194,
       "dMove": 5888,
       "score": 6337
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 4,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 11,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -2972,10 +3366,14 @@
       "ok": true
      },
      "s8": {
-      "sp": 22,
+      "sp": 21,
       "ults": 21,
       "ok": true
-     }
+     },
+     "firstUlt": 11.6,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": true
     }
    },
    "mob": {
@@ -3300,6 +3698,40 @@
      {
       "keys": [
        "R",
+       "Q",
+       "E"
+      ],
+      "labels": [
+       "R",
+       "Q",
+       "E"
+      ],
+      "chain": "hundred_hands",
+      "chainName": "Hundred Hands Rush"
+     },
+     {
+      "keys": [
+       "Q"
+      ],
+      "labels": [
+       "Q"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
+       "E"
+      ],
+      "labels": [
+       "E"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
+       "R",
        "E",
        "Q",
        "F"
@@ -3326,63 +3758,13 @@
       ],
       "chain": "seven_seals",
       "chainName": "Seven Seals"
-     },
-     {
-      "keys": [
-       "Q"
-      ],
-      "labels": [
-       "Q"
-      ],
-      "chain": null,
-      "chainName": null
-     },
-     {
-      "keys": [
-       "R",
-       "Q",
-       "E"
-      ],
-      "labels": [
-       "R",
-       "Q",
-       "E"
-      ],
-      "chain": "hundred_hands",
-      "chainName": "Hundred Hands Rush"
-     },
-     {
-      "keys": [
-       "E"
-      ],
-      "labels": [
-       "E"
-      ],
-      "chain": null,
-      "chainName": null
-     },
-     {
-      "keys": [
-       "R",
-       "E",
-       "Q"
-      ],
-      "labels": [
-       "R",
-       "E",
-       "Q"
-      ],
-      "chain": "seven_seals",
-      "chainName": "Seven Seals"
      }
     ],
     "steps": [
      {
       "key": "R",
       "slot": "R",
-      "unit": 0,
-      "chain": "nerve_strike",
-      "chainName": "Nerve Strike"
+      "unit": 0
      },
      {
       "key": "E",
@@ -3392,9 +3774,7 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 0,
-      "chain": "seven_seals",
-      "chainName": "Seven Seals"
+      "unit": 0
      },
      {
       "key": "F",
@@ -3404,13 +3784,16 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 0,
-      "chain": "soaring_crane_dragon",
-      "chainName": "Soaring Crane Dragon"
+      "unit": 0
      },
      {
       "key": "R",
       "slot": "R",
+      "unit": 1
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
       "unit": 1
      },
      {
@@ -3421,85 +3804,51 @@
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 1,
+      "unit": 2
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 3
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 4
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 4
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 4,
       "chain": "seven_seals",
       "chainName": "Seven Seals"
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 1,
-      "chain": "heaven_dragon_palm",
-      "chainName": "Heaven Dragon Palm"
+      "unit": 4
      },
      {
       "key": "R",
       "slot": "R",
-      "unit": 2,
-      "chain": "nerve_strike",
-      "chainName": "Nerve Strike"
+      "unit": 5
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 2
+      "unit": 5
      },
      {
       "key": "Q",
       "slot": "Q",
-      "unit": 2,
-      "chain": "seven_seals",
-      "chainName": "Seven Seals"
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 3,
-      "chain": "rapid_strikes",
-      "chainName": "Rapid Strikes"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 4
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 4
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 4,
+      "unit": 5,
       "chain": "hundred_hands",
       "chainName": "Hundred Hands Rush"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 5,
-      "chain": "cyclone_kick",
-      "chainName": "Cyclone Kick"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 6,
-      "chain": "rising_dragon",
-      "chainName": "Rising Dragon"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 6
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 6,
-      "chain": "seven_seals",
-      "chainName": "Seven Seals"
      }
     ],
     "ult": {
@@ -3535,69 +3884,111 @@
       "Heaven-Splitting Palm"
      ]
     },
-    "dps": 9629,
+    "dps": 9160,
     "kpm": 0,
-    "noUltDps": 5012,
+    "noUltDps": 4837,
     "baselineDps": 10648,
     "baselineKpm": 0,
-    "ultsPer90s": 4,
+    "ultsPer90s": 4.3,
     "aborts": 0,
     "chainsUsed": {
      "seven_seals": {
       "name": "Seven Seals",
-      "per90s": 19
-     },
-     "heaven_dragon_palm": {
-      "name": "Heaven Dragon Palm",
-      "per90s": 7
-     },
-     "nerve_strike": {
-      "name": "Nerve Strike",
-      "per90s": 7
-     },
-     "soaring_crane_dragon": {
-      "name": "Soaring Crane Dragon",
-      "per90s": 4
-     },
-     "rapid_strikes": {
-      "name": "Rapid Strikes",
-      "per90s": 4
+      "per90s": 13
      },
      "hundred_hands": {
       "name": "Hundred Hands Rush",
+      "per90s": 8
+     },
+     "heaven_dragon_palm": {
+      "name": "Heaven Dragon Palm",
+      "per90s": 5
+     },
+     "nerve_strike": {
+      "name": "Nerve Strike",
+      "per90s": 5
+     },
+     "soaring_crane_dragon": {
+      "name": "Soaring Crane Dragon",
+      "per90s": 4.7
+     },
+     "hundred_fists": {
+      "name": "Hundred Fists",
       "per90s": 4
      },
      "cyclone_kick": {
       "name": "Cyclone Kick",
-      "per90s": 4
-     },
-     "rising_dragon": {
-      "name": "Rising Dragon",
-      "per90s": 4
+      "per90s": 1
      }
     },
-    "evals": 659,
-    "runnersUp": [
+    "evals": 2556,
+    "runnersUp": [],
+    "windows": {
+     "d180": 9921,
+     "d480": 8900,
+     "dMove": 8672,
+     "score": 9165
+    },
+    "opener": [
      {
-      "loop": "REQSPE · REQF · REQ · Q · RQE · E · REQ",
-      "dps": 8997
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "SP",
+       "E"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "F",
+       "E"
+      ],
+      "chain": "soaring_crane_dragon",
+      "chainName": "Soaring Crane Dragon"
      },
      {
-      "loop": "REQSPE · REQF · REQ · Q · RQE · E · RQE",
-      "dps": 8864
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "V"
+      ],
+      "chain": "heaven_dragon_palm",
+      "chainName": "Heaven Dragon Palm"
      },
      {
-      "loop": "REQSPE · REQF · REQ · Q · RQE · QEE · QQ",
-      "dps": 8560
+      "keys": [
+       "R"
+      ],
+      "labels": [
+       "R"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
+       "Q",
+       "E",
+       "E"
+      ],
+      "labels": [
+       "Q",
+       "E",
+       "E"
+      ],
+      "chain": "cyclone_kick",
+      "chainName": "Cyclone Kick"
      }
     ],
-    "windows": {
-     "d180": 10136,
-     "d480": 9173,
-     "dMove": 8938,
-     "score": 9416
-    },
-    "opener": [],
     "old": {
      "keys": [
       [
@@ -3618,21 +4009,37 @@
       "d480": 8424,
       "dMove": 7593,
       "score": 8445
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 5,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 13,
+       "ok": false
+      }
      }
     },
     "gate": "all",
     "otherGate": null,
     "cycle": {
      "s3": {
-      "sp": 8,
-      "ults": 8,
+      "sp": 9,
+      "ults": 9,
       "ok": true
      },
      "s8": {
-      "sp": 21,
-      "ults": 21,
+      "sp": 23,
+      "ults": 23,
       "ok": true
-     }
+     },
+     "firstUlt": 10.9,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -3985,16 +4392,6 @@
      },
      {
       "keys": [
-       "F"
-      ],
-      "labels": [
-       "V"
-      ],
-      "chain": null,
-      "chainName": null
-     },
-     {
-      "keys": [
        "R",
        "Q",
        "E"
@@ -4011,17 +4408,27 @@
       "keys": [
        "Q",
        "E",
-       "E",
-       "Q"
+       "E"
       ],
       "labels": [
        "Q",
        "E",
-       "E",
-       "Q"
+       "E"
       ],
-      "chain": "wyrmfire_volley",
-      "chainName": "Wyrmfire Volley"
+      "chain": "tempest_spin",
+      "chainName": "Tempest Spin"
+     },
+     {
+      "keys": [
+       "Q",
+       "F"
+      ],
+      "labels": [
+       "Q",
+       "V"
+      ],
+      "chain": "impale_rush",
+      "chainName": "Impale Rush"
      }
     ],
     "steps": [
@@ -4051,18 +4458,19 @@
       "unit": 0
      },
      {
-      "key": "V",
-      "slot": "F",
-      "unit": 1,
-      "chain": "spineshatter",
-      "chainName": "Spineshatter"
-     },
-     {
       "key": "R",
       "slot": "R",
-      "unit": 2,
-      "chain": "impale_rush",
-      "chainName": "Impale Rush"
+      "unit": 1
+     },
+     {
+      "key": "Q",
+      "slot": "Q",
+      "unit": 1
+     },
+     {
+      "key": "E",
+      "slot": "E",
+      "unit": 1
      },
      {
       "key": "Q",
@@ -4075,29 +4483,18 @@
       "unit": 2
      },
      {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 3,
-      "chain": "spineshatter",
-      "chainName": "Spineshatter"
-     },
-     {
       "key": "E",
       "slot": "E",
-      "unit": 3,
-      "chain": "high_jump",
-      "chainName": "High Jump"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 3,
-      "chain": "nosedive_barrage",
-      "chainName": "Nosedive Barrage"
+      "unit": 2
      },
      {
       "key": "Q",
       "slot": "Q",
+      "unit": 3
+     },
+     {
+      "key": "V",
+      "slot": "F",
       "unit": 3
      }
     ],
@@ -4134,18 +4531,14 @@
       "Nidhogg's Fall"
      ]
     },
-    "dps": 12312,
+    "dps": 11859,
     "kpm": 0,
-    "noUltDps": 5022,
+    "noUltDps": 4514,
     "baselineDps": 10649,
     "baselineKpm": 0,
     "ultsPer90s": 4,
     "aborts": 0,
     "chainsUsed": {
-     "impale_rush": {
-      "name": "Impale Rush",
-      "per90s": 10
-     },
      "high_jump": {
       "name": "High Jump",
       "per90s": 8
@@ -4162,17 +4555,21 @@
       "name": "Tempest Spin",
       "per90s": 7
      },
-     "wyrmfire_volley": {
-      "name": "Wyrmfire Volley",
-      "per90s": 7
-     },
      "dragon_dive": {
       "name": "Dragon Dive",
-      "per90s": 5
+      "per90s": 6
      },
      "geirskogul": {
       "name": "Geirskogul",
-      "per90s": 5
+      "per90s": 6
+     },
+     "wyrmfire_volley": {
+      "name": "Wyrmfire Volley",
+      "per90s": 6
+     },
+     "impale_rush": {
+      "name": "Impale Rush",
+      "per90s": 6
      },
      "dragonfang_lance": {
       "name": "Dragonfang Lance",
@@ -4187,28 +4584,33 @@
       "per90s": 1
      }
     },
-    "evals": 533,
-    "runnersUp": [
-     {
-      "loop": "REQSPQ · RQE · QEEQ · F",
-      "dps": 11015
-     },
-     {
-      "loop": "REQSPQ · RQE · QEEQ · F · F",
-      "dps": 10884
-     },
-     {
-      "loop": "REQSPQ · RQE · QEEQ",
-      "dps": 10161
-     }
-    ],
+    "evals": 1489,
+    "runnersUp": [],
     "windows": {
-     "d180": 12897,
-     "d480": 11275,
-     "dMove": 10762,
-     "score": 11645
+     "d180": 12404,
+     "d480": 10863,
+     "dMove": 11405,
+     "score": 11557
     },
     "opener": [
+     {
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "SP",
+       "Q"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "F",
+       "Q"
+      ],
+      "chain": "dragonfang_lance",
+      "chainName": "Dragonfang Lance"
+     },
      {
       "keys": [
        "R",
@@ -4224,6 +4626,30 @@
       ],
       "chain": "crimson_comet",
       "chainName": "Crimson Comet"
+     },
+     {
+      "keys": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q"
+      ],
+      "chain": "geirskogul",
+      "chainName": "Geirskogul"
+     },
+     {
+      "keys": [
+       "Q"
+      ],
+      "labels": [
+       "Q"
+      ],
+      "chain": null,
+      "chainName": null
      }
     ],
     "old": {
@@ -4252,6 +4678,18 @@
       "d480": 8167,
       "dMove": 8094,
       "score": 8530
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 4,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 11,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -4263,10 +4701,14 @@
       "ok": true
      },
      "s8": {
-      "sp": 21,
-      "ults": 21,
+      "sp": 22,
+      "ults": 22,
       "ok": true
-     }
+     },
+     "firstUlt": 13,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -4709,6 +5151,32 @@
      },
      {
       "keys": [
+       "R",
+       "F",
+       "R",
+       "E"
+      ],
+      "labels": [
+       "R",
+       "V",
+       "R",
+       "E"
+      ],
+      "chain": "thunderhead",
+      "chainName": "Thunderhead"
+     },
+     {
+      "keys": [
+       "R"
+      ],
+      "labels": [
+       "R"
+      ],
+      "chain": null,
+      "chainName": null
+     },
+     {
+      "keys": [
        "R"
       ],
       "labels": [
@@ -4726,18 +5194,6 @@
       ],
       "chain": null,
       "chainName": null
-     },
-     {
-      "keys": [
-       "R",
-       "E"
-      ],
-      "labels": [
-       "R",
-       "E"
-      ],
-      "chain": "storm_front",
-      "chainName": "Storm Front"
      }
     ],
     "steps": [
@@ -4779,26 +5235,41 @@
      {
       "key": "R",
       "slot": "R",
-      "unit": 2,
-      "chain": "frozen_thunder",
-      "chainName": "Frozen Thunder"
+      "unit": 2
      },
      {
       "key": "V",
       "slot": "F",
-      "unit": 3,
-      "chain": "frozen_thunder",
-      "chainName": "Frozen Thunder"
+      "unit": 2
      },
      {
       "key": "R",
       "slot": "R",
-      "unit": 4
+      "unit": 2
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 4
+      "unit": 2
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 3
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 4,
+      "chain": "storm_front",
+      "chainName": "Storm Front"
+     },
+     {
+      "key": "V",
+      "slot": "F",
+      "unit": 5,
+      "chain": "frozen_thunder",
+      "chainName": "Frozen Thunder"
      }
     ],
     "ult": {
@@ -4834,76 +5305,125 @@
       "The Final Chapter"
      ]
     },
-    "dps": 8130,
+    "dps": 7882,
     "kpm": 0,
-    "noUltDps": 4122,
+    "noUltDps": 4079,
     "baselineDps": 6981,
     "baselineKpm": 0,
-    "ultsPer90s": 3.3,
+    "ultsPer90s": 3.7,
     "aborts": 0,
     "chainsUsed": {
      "frozen_thunder": {
       "name": "Frozen Thunder",
-      "per90s": 21
-     },
-     "storm_front": {
-      "name": "Storm Front",
-      "per90s": 8.7
+      "per90s": 14.3
      },
      "thunderhead": {
       "name": "Thunderhead",
-      "per90s": 8
+      "per90s": 10.3
      },
      "glacier_coil": {
       "name": "Glacier Coil",
-      "per90s": 5.7
+      "per90s": 5.3
+     },
+     "storm_front": {
+      "name": "Storm Front",
+      "per90s": 5.3
      },
      "kraken_page": {
       "name": "Kraken Page",
-      "per90s": 3.3
+      "per90s": 4
      },
-     "wyrms_embrace": {
-      "name": "Wyrm's Embrace",
-      "per90s": 2.3
+     "elemental_rise": {
+      "name": "Elemental Rise",
+      "per90s": 2
+     },
+     "living_inferno": {
+      "name": "Living Inferno",
+      "per90s": 1.7
+     },
+     "firestorm_flight": {
+      "name": "Firestorm Flight",
+      "per90s": 0.7
      },
      "final_chapter": {
       "name": "The Final Chapter",
       "per90s": 0.3
      }
     },
-    "evals": 659,
-    "runnersUp": [
-     {
-      "loop": "EFESPE · RE · R · F · RE",
-      "dps": 7494
-     },
-     {
-      "loop": "EFESPE · RE · RFRE · R · RFRE",
-      "dps": 7351
-     },
-     {
-      "loop": "EFESPE · RE · RFRE · R · RFRE · RE · RFRE",
-      "dps": 7351
-     }
-    ],
+    "evals": 1473,
+    "runnersUp": [],
     "windows": {
-     "d180": 9070,
-     "d480": 7462,
-     "dMove": 7506,
-     "score": 8013
+     "d180": 8955,
+     "d480": 7080,
+     "dMove": 7499,
+     "score": 7845
     },
     "opener": [
      {
       "keys": [
        "E",
-       "R"
+       "F",
+       "E",
+       "SP",
+       "E"
       ],
       "labels": [
        "E",
+       "V",
+       "E",
+       "F",
+       "E"
+      ],
+      "chain": "kraken_page",
+      "chainName": "Kraken Page"
+     },
+     {
+      "keys": [
+       "R",
+       "F",
+       "R",
+       "E"
+      ],
+      "labels": [
+       "R",
+       "V",
+       "R",
+       "E"
+      ],
+      "chain": "thunderhead",
+      "chainName": "Thunderhead"
+     },
+     {
+      "keys": [
+       "Q",
+       "F",
+       "Q",
        "R"
       ],
-      "chain": "frozen_thunder",
-      "chainName": "Frozen Thunder"
+      "labels": [
+       "Q",
+       "V",
+       "Q",
+       "R"
+      ],
+      "chain": "living_inferno",
+      "chainName": "Living Inferno"
+     },
+     {
+      "keys": [
+       "Q",
+       "F",
+       "Q",
+       "R"
+      ],
+      "labels": [
+       "Q",
+       "V",
+       "Q",
+       "R"
+      ],
+      "chain": "living_inferno",
+      "chainName": "Living Inferno"
      }
     ],
     "old": {
@@ -4925,6 +5445,18 @@
       "d480": 6293,
       "dMove": 5756,
       "score": 6415
+     },
+     "cycle": {
+      "s3": {
+       "sp": 0,
+       "ults": 4,
+       "ok": false
+      },
+      "s8": {
+       "sp": 0,
+       "ults": 12,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -4932,14 +5464,18 @@
     "cycle": {
      "s3": {
       "sp": 9,
-      "ults": 8,
+      "ults": 9,
       "ok": true
      },
      "s8": {
       "sp": 23,
-      "ults": 22,
+      "ults": 23,
       "ok": true
-     }
+     },
+     "firstUlt": 14,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
@@ -5176,16 +5712,6 @@
      },
      {
       "keys": [
-       "Q"
-      ],
-      "labels": [
-       "Q"
-      ],
-      "chain": null,
-      "chainName": null
-     },
-     {
-      "keys": [
        "E",
        "Q",
        "E",
@@ -5228,35 +5754,15 @@
      },
      {
       "keys": [
-       "E",
-       "Q",
-       "E",
-       "R"
+       "F",
+       "Q"
       ],
       "labels": [
-       "E",
-       "Q",
-       "E",
-       "R"
+       "V",
+       "Q"
       ],
-      "chain": "rondo",
-      "chainName": "Rondo"
-     },
-     {
-      "keys": [
-       "R",
-       "E",
-       "Q",
-       "R"
-      ],
-      "labels": [
-       "R",
-       "E",
-       "Q",
-       "R"
-      ],
-      "chain": "ballad_of_heroes",
-      "chainName": "Ballad of Heroes"
+      "chain": "sour_note",
+      "chainName": "Sour Note"
      }
     ],
     "steps": [
@@ -5286,6 +5792,11 @@
       "unit": 0
      },
      {
+      "key": "E",
+      "slot": "E",
+      "unit": 1
+     },
+     {
       "key": "Q",
       "slot": "Q",
       "unit": 1
@@ -5293,9 +5804,12 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 2,
-      "chain": "sour_note",
-      "chainName": "Sour Note"
+      "unit": 1
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 1
      },
      {
       "key": "Q",
@@ -5305,12 +5819,7 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 2
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 2
+      "unit": 3
      },
      {
       "key": "Q",
@@ -5320,76 +5829,22 @@
      {
       "key": "E",
       "slot": "E",
-      "unit": 4,
-      "chain": "power_chord",
-      "chainName": "Power Chord"
+      "unit": 3
+     },
+     {
+      "key": "R",
+      "slot": "R",
+      "unit": 3
+     },
+     {
+      "key": "V",
+      "slot": "F",
+      "unit": 4
      },
      {
       "key": "Q",
       "slot": "Q",
       "unit": 4
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 4
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 4
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 5
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 5,
-      "chain": "quickstep",
-      "chainName": "Quickstep"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 5,
-      "chain": "fortissimo",
-      "chainName": "Fortissimo"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 5,
-      "chain": "rondo",
-      "chainName": "Rondo"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 6,
-      "chain": "soft_refrain",
-      "chainName": "Soft Refrain"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 6,
-      "chain": "quickstep",
-      "chainName": "Quickstep"
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 6
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 6,
-      "chain": "rondo",
-      "chainName": "Rondo"
      }
     ],
     "ult": {
@@ -5425,25 +5880,21 @@
       "Death Knell"
      ]
     },
-    "dps": 4391,
+    "dps": 3926,
     "kpm": 0,
-    "noUltDps": 2478,
+    "noUltDps": 2551,
     "baselineDps": 2697,
     "baselineKpm": 0,
-    "ultsPer90s": 4,
+    "ultsPer90s": 3.7,
     "aborts": 0,
     "chainsUsed": {
      "quickstep": {
       "name": "Quickstep",
-      "per90s": 10
+      "per90s": 9.3
      },
      "rondo": {
       "name": "Rondo",
       "per90s": 9
-     },
-     "soft_refrain": {
-      "name": "Soft Refrain",
-      "per90s": 7
      },
      "anthem_of_valor": {
       "name": "Anthem of Valor",
@@ -5451,64 +5902,117 @@
      },
      "sour_note": {
       "name": "Sour Note",
-      "per90s": 4.3
-     },
-     "requiem_finale": {
-      "name": "Requiem Finale",
       "per90s": 4
      },
      "discord_ballad": {
       "name": "Discord Ballad",
       "per90s": 4
      },
+     "requiem_finale": {
+      "name": "Requiem Finale",
+      "per90s": 3.7
+     },
      "power_chord": {
       "name": "Power Chord",
-      "per90s": 3
+      "per90s": 3.3
      },
      "fortissimo": {
       "name": "Fortissimo",
-      "per90s": 3
+      "per90s": 2.7
+     },
+     "soft_refrain": {
+      "name": "Soft Refrain",
+      "per90s": 2
      },
      "ballad_of_heroes": {
       "name": "Ballad of Heroes",
-      "per90s": 3
+      "per90s": 2
      }
     },
-    "evals": 702,
-    "runnersUp": [
-     {
-      "loop": "FEFSPF · Q · EQER · Q · EQER · EQER · REQR",
-      "dps": 4952
-     },
-     {
-      "loop": "FEFSPF · EQER · QEQ · E · REQR · FQ · REQR",
-      "dps": 4773
-     },
-     {
-      "loop": "FEFSPF · EQER · QEQ · E · REQR · QQ · REQR",
-      "dps": 4617
-     }
-    ],
+    "evals": 2193,
+    "runnersUp": [],
     "windows": {
-     "d180": 5510,
-     "d480": 5012,
-     "dMove": 4974,
-     "score": 5165
+     "d180": 4279,
+     "d480": 4896,
+     "dMove": 4860,
+     "score": 4678
     },
     "opener": [
      {
       "keys": [
-       "Q",
+       "F",
        "E",
+       "F",
+       "SP",
+       "F"
+      ],
+      "labels": [
+       "V",
+       "E",
+       "V",
+       "F",
+       "V"
+      ],
+      "chain": "requiem_finale",
+      "chainName": "Requiem Finale"
+     },
+     {
+      "keys": [
+       "F",
        "Q"
       ],
       "labels": [
-       "Q",
-       "E",
+       "V",
        "Q"
       ],
-      "chain": "anthem_of_valor",
-      "chainName": "Anthem of Valor"
+      "chain": "sour_note",
+      "chainName": "Sour Note"
+     },
+     {
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "R"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "R"
+      ],
+      "chain": "ballad_of_heroes",
+      "chainName": "Ballad of Heroes"
+     },
+     {
+      "keys": [
+       "R",
+       "E",
+       "Q",
+       "R"
+      ],
+      "labels": [
+       "R",
+       "E",
+       "Q",
+       "R"
+      ],
+      "chain": "ballad_of_heroes",
+      "chainName": "Ballad of Heroes"
+     },
+     {
+      "keys": [
+       "F",
+       "E",
+       "F"
+      ],
+      "labels": [
+       "V",
+       "E",
+       "V"
+      ],
+      "chain": "discord_ballad",
+      "chainName": "Discord Ballad"
      }
     ],
     "old": {
@@ -5560,10 +6064,22 @@
       "Q Q"
      ],
      "windows": {
-      "d180": 4130,
-      "d480": 3893,
-      "dMove": 3728,
-      "score": 3917
+      "d180": 4611,
+      "d480": 4631,
+      "dMove": 4700,
+      "score": 4647
+     },
+     "cycle": {
+      "s3": {
+       "sp": 8,
+       "ults": 7,
+       "ok": false
+      },
+      "s8": {
+       "sp": 20,
+       "ults": 19,
+       "ok": false
+      }
      }
     },
     "gate": "all",
@@ -5575,10 +6091,14 @@
       "ok": true
      },
      "s8": {
-      "sp": 23,
-      "ults": 23,
+      "sp": 22,
+      "ults": 21,
       "ok": true
-     }
+     },
+     "firstUlt": 20.6,
+     "inOpener": true,
+     "fill": 0,
+     "fixed": false
     }
    },
    "mob": {
