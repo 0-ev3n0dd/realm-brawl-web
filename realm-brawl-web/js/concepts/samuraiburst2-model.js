@@ -7,6 +7,7 @@ import { CLASSES } from '../sim/data/classes.js';
 import { RotBot } from '../rotations/rotbot.js';
 import { Arena, addHero } from '../rotations/arena.js';
 import { SIG_ROUTES } from './sig-routes.js';
+import { VoidMark, HoldBot } from './sammark-model.js';
 
 const SAM = CLASSES.samurai;
 export const chainOf = (id, cls = 'samurai') => CLASSES[cls].chains.find((c) => c.id === id);
@@ -163,11 +164,19 @@ export class Signature extends DelayedCuts {
 }
 export function blurbFor(cls) { const C = CLASSES[cls], S = SIG[cls], sp = C.chains.find((c) => c.kind === 'boss' && c.seq.includes('SP')), rt = (C.routes || []).find((r) => r.route === 'boss');
   return `${C.name}: chain finishers bank ${S.unit} (concept bank named after the real mechanic: ${S.mech}); heavier chains bank more. The boss Special chain ${sp.name} is the hinge on a 20 s cycle: it cashes out the bank (3 waves + finisher) and opens ${S.win}: 6 s where chains bank double. Banked ${S.unit} also build ult meter (+3 each, pre-pull +30) so the opener fills the gauge; the REAL ultimate ${C.ult.name} is cast inside ${S.win} every cycle and when it ends (${rt ? rt.name : 'its finisher'}) the whole bank releases on top, ×2.5 inside the window. If the optimizer prefers it, the Special banks instead of cashing out on ult cycles. CONCEPT numbers.`; }
-export const CONCEPTS = { cuts: DelayedCuts, edge: BladeEdge, flow: Flow, weave: Weave };
+export const CONCEPTS = { cuts: DelayedCuts, edge: BladeEdge, flow: Flow, weave: Weave, mark: VoidMark };
 
 // autoplay routes per concept: good vs sloppy (drops = the chain's last key held back past its window; pauses = idle gaps)
+// E · Void Sheath Mark: the live v2026.1022.2120 Samurai boss route and bot (Special on cooldown, ult when full); sloppy = both held 2 s
+const LIVE_SAM = { opener: [{ keys: ['R', 'E', 'Q', 'SP', 'R'], chain: 'void_sheath' }, { keys: ['E', 'Q', 'F', 'Q', 'E'], chain: null }],
+  loop: [{ keys: ['R', 'E', 'Q', 'SP', 'R'], chain: 'void_sheath' }, { keys: ['Q'], chain: null }, { keys: ['E', 'R'], chain: 'counter_sheathe' }, { keys: ['R', 'Q', 'E'], chain: 'petal_rain' }] };
 export const ROUTES = {
-  // good = beam-searched (tools/rotations/optimize.mjs --concept cuts, 3 min + 8 min): the Special banks on ult cycles so the ultimate releases the big bank
+  // optimized = beam-searched under the concept (tools/rotations/concept-mark.mjs, 3 + 8 min, 3 seeds), same live bot policy
+  mark: { optimized: { opener: [LIVE_SAM.opener[0], { keys: ['E', 'Q', 'F', 'Q', 'Q'], chain: null }], loop: [LIVE_SAM.loop[0], LIVE_SAM.loop[1], LIVE_SAM.loop[2], { keys: ['R'], chain: null }, { keys: ['R', 'Q', 'E', 'F'], chain: 'riposte_wave' }],
+      live: true, drop: 0, pause: 0, desc: 'optimized under the concept: Void Sheath the moment it is back, the ultimate the moment the meter is full (live bot policy)' },
+    good: { ...LIVE_SAM, live: true, drop: 0, pause: 0, desc: 'live route (v2026.1022.2120): Void Sheath the moment it is back, the ultimate the moment the meter is full' },
+    sloppy: { ...LIVE_SAM, live: true, drop: 0, pause: 0, spHold: 2, ultHold: 2, desc: 'same route, Special and ultimate each held 2 s after they are ready' } },
+  // optimized = beam-searched (tools/rotations/optimize.mjs --concept cuts, 3 min + 8 min): the Special banks on ult cycles so the ultimate releases the big bank
   cuts: { good: { loop: [['R', 'E', 'Q', 'SP', 'R'], ['R', 'E', 'Q', 'F'], ['R', 'Q', 'E']], opener: [], drop: 0, pause: 0, prepull: true, opc: 'window', spFirst: true, ultLate: false, bankOnUlt: true, desc: 'optimized (beam search): pre-pull draw, open on Void Sheath, then Stillwater Execution · Petal Rain until the Special is back; on ult cycles Void Sheath banks instead of cashing out and the real ultimate (cast early in Resheathe) releases the big bank' },
     sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'E'], ['R', 'E', 'Q', 'SP', 'R'], ['Q', 'F', 'Q']], drop: 0.2, pause: 0.35, prepull: false, opc: 'asap', desc: 'no pre-pull, light chains, Special whenever, real ultimate cast whenever the gauge is full' } },
   edge: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0, pause: 0, desc: 'Counter Sheathe · Petal Rain · Wind Step, empowering at 5 Edge' }, sloppy: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0.35, pause: 0.25, desc: 'same chains, ~35% dropped and idle gaps' } },
@@ -182,7 +191,9 @@ export class Driver {
     this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
     this.player = addHero(this.sim, cls, seed, cls === 'samurai' ? { name: 'Hayate' } : {});
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
-    this.bot = new RotBot(cls, this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { cycle: false, useUlt: !!this.M.wantUlt, opener: (this.R.opener || []).map((keys) => ({ keys, chain: null })) });
+    const U = (x) => (Array.isArray(x) ? { keys: x, chain: null } : x);
+    this.bot = this.R.live ? new HoldBot(cls, this.R.loop.map(U), 'boss', { openUlt: true, useUlt: true, opener: (this.R.opener || []).map(U), spHold: (this.R.spHold || 0) * 60, ultHold: (this.R.ultHold || 0) * 60 })
+      : new RotBot(cls, this.R.loop.map(U), 'boss', { cycle: false, useUlt: !!this.M.wantUlt, opener: (this.R.opener || []).map(U) });
     let a = 77 + seed; this.rng = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     this.ticks = 0; this.listeners = []; this.pre = this.R.prepull && this.M.prepull ? this.M.prepull(this) : null; this.dropping = null; this.idle = 0; this.manual = { queue: [], skill: null, attack: false, mx: 0, my: 0 }; this.lastCh = null;
   }

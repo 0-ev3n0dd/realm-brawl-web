@@ -61,6 +61,9 @@ class Session {
     if (r.fx === 'ultcast') { if (r.inR) ring(fx, p.x, p.y - 4, 64, '#dfe8ff', { enso: true, life: 0.7 }); }
     if (r.fx === 'opc') { slashLine(fx, bx, by, -0.35, 2200, { w: r.inR ? 20 : 10, life: 0.75 }); if (r.inR) { fxBurst(fx, bx, by, 170, '#ffffff', 0.3, 0.6, 2); petals(fx, bx, by, 30, 120, 420); fx.shake(0.4); } num(r.bonus, true); }
     if (r.open) ring(fx, p.x, p.y - 4, 60, '#ff8fb0', { enso: true, life: 0.6 });
+    // E · Void Sheath Mark (ink + blossom): the ensō brushes onto the boss; a marked One Perfect Cut splits twice
+    if (r.fx === 'mark') { ring(fx, bx, by + 10, b.r + 40, '#1a1024', { enso: true, life: 1.0 }); ring(fx, bx, by + 10, b.r + 52, '#ff9cc6', { enso: true, life: 0.8 }); petals(fx, bx, by, 12, 40, 220); fx.text(bx - 40, by - 130, 'VOID MARK', { size: 16, color: '#ffd0e0', vy: -24, life: 1.1, vx: 0 }); }
+    if (r.fx === 'markcash') { this.queue.push({ at: 0.18, run: () => { slashLine(fx, bx, by, 0.35, 2200, { w: 16, life: 0.7 }); petals(fx, bx, by, 24 + Math.min(20, r.cuts * 2), 120, 420); ring(fx, bx, by + 10, b.r + 60, '#ffffff', { enso: true, life: 0.6 }); fx.shake(0.3); fx.text(bx - 60, by - 200, `cuts ×2 (${r.cuts})`, { size: 18, color: '#ffffff', vy: -30, life: 1.2, vx: 0 }); num(r.bonus, true); } }); }
   }
   frame(now) {
     if (!this.running) return;
@@ -71,6 +74,7 @@ class Session {
     smoothFollow(r.cam, p.x + (b.x - p.x) * 0.35, p.y + (b.y - p.y) * 0.35 - 30, rdt, SMOOTH.cam * 0.8);
     // A) the sword glow: a soft glow at the blade, brighter with every Edge
     const w = this.d.M.widget(this.d);
+    if (w.kind === 'mark' && w.mark > 0 && dt > 0 && (this.gl = (this.gl + 1) % 20) === 0) ring(this.fx, b.x, b.y - 24, b.r + 36, w.mark < 0.25 ? '#ff4d6d' : '#ff9cc6', { enso: true, life: 0.45 }); // (the mark lingers on the boss: an ink-and-blossom ensō, red as it fades)
     if (w.kind === 'edge' && (w.edge || w.primed) && dt > 0 && (this.gl = (this.gl + 1) % 3) === 0) { const st = w.primed || w.edge, ang = Math.atan2(b.y - p.y, b.x - p.x);
       glow(this.fx, p.x + Math.cos(ang) * 30, p.y - 22 + Math.sin(ang) * 14, 26 + st * 9, w.primed ? '#fff3fa' : '#ff8fb0', 0.14, 0.25 + st * 0.11); }
     r.time += dt; this.fx.update(dt);
@@ -87,18 +91,20 @@ class Session {
       if (w.kind === 'edge') el.innerHTML = `<div class="lbl">Blade Edge</div><div class="pips">${Array.from({ length: w.max }, (_, i) => `<i class="${i < (w.primed || w.edge) ? 'on' : ''}"></i>`).join('')}</div><div class="wstate">${w.primed ? `next chain empowered · +${w.primed * 45}% / step` : w.edge >= w.max ? 'full edge' : ''}</div>`;
       if (w.kind === 'cuts') { const sp = d.player.cds && d.player.cds.SP > 0 ? Math.ceil(d.player.cds.SP / 60) : 0;
         el.innerHTML = `<span class="cl">${w.unit}</span> <b class="cn">${w.bank}</b><span class="sep">·</span>${w.resh > 0 ? `<span class="rs">${w.win} ${(w.resh * 6).toFixed(1)}s ×2</span>` : sp ? `Special ${sp}s` : '<span class="rs">Special ready</span>'}<span class="sep">·</span>${w.uw ? `<span class="rs">${w.ultName}</span>` : w.ult >= 100 ? (d.R.opc === 'window' && !d.M.inWindow(d) && d.auto ? `ULT READY · cast in ${w.win.toLowerCase()}` : '<span class="rs">ULT READY (T)</span>') : `Ult ${w.ult}%`}`; }
+      if (w.kind === 'mark') { const sp = d.player.cds && d.player.cds.SP > 0 ? Math.ceil(d.player.cds.SP / 60) : 0;
+        el.innerHTML = `<span class="cl">VOID MARK</span> <b class="cn">${w.mark > 0 ? w.left.toFixed(1) + 's' : '—'}</b><span class="sep">·</span>${sp ? `Special ${sp}s` : '<span class="rs">Special ready</span>'}<span class="sep">·</span>${w.uw ? '<span class="rs">VOID BLADE → One Perfect Cut' + (w.mark > 0 ? ' ×2 cuts' : '') + '</span>' : `ult ${w.ult}%`}`; }
       if (w.kind === 'flow') el.innerHTML = `<div class="lbl">Flow ${w.lvl}/5</div><div class="flowlv">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= w.lvl ? 'on' : ''}" style="height:${8 + i * 3.5}px"></i>`).join('')}</div><div class="wstate">${w.win > 0 ? 'echo window · finishers hit twice' : ''}</div>${w.win > 0 ? `<div class="wbar"><i style="width:${Math.round(w.win * 100)}%"></i></div>` : ''}`;
       if (w.kind === 'weave') { const M = d.M, left = Math.max(0, 20 - (d.sim.tick - M.t0) / 60);
         el.innerHTML = `<div class="lbl">Chain Weave · grand in ${left.toFixed(0)} s</div><div class="wv">${M.woven.length ? M.woven.slice(-3).map((x) => `<b>✦</b> ${x.name}`).join('<br>') : '<span style="color:#a99bc4">finish two different chains…</span>'}</div>`; }
     }
-    if ((w.kind === 'weave' || w.kind === 'cuts') && (d.sim.tick % 30 === 0)) this._sig = null;
-    $('widget').classList.toggle('near', w.kind === 'cuts');
+    if ((w.kind === 'weave' || w.kind === 'cuts' || w.kind === 'mark') && (d.sim.tick % 30 === 0)) this._sig = null;
+    $('widget').classList.toggle('near', w.kind === 'cuts' || w.kind === 'mark');
     const secs = d.ticks / 60; $('mDps').textContent = fmt(d.dps); $('mGame').textContent = fmt(d.arena.dealt / Math.max(1, secs)); $('mBonus').textContent = fmt(d.bonus / Math.max(1, secs)); $('mTime').textContent = `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, '0')}`;
   }
   input() { const m = this.d.manual, k = keys; m.mx = (k.d ? 1 : 0) - (k.a ? 1 : 0); m.my = (k.s ? 1 : 0) - (k.w ? 1 : 0); m.attack = mouseDown || !!k.j; }
 }
 const keys = {}; let mouseDown = false;
-addEventListener('keydown', (e) => { if (!state.play) return; const k = e.key.toLowerCase(); if (['q', 'e', 'r'].includes(k) && !e.repeat) S.d.manual.skill = k.toUpperCase(); if (k === 'f' && !e.repeat) { if ((state.c === 'cuts' || state.c === 'sig')) S.d.manual.skill = 'SP'; else S.d.manual.burst = true; } if (k === 'g' && !e.repeat && (state.c === 'cuts' || state.c === 'sig')) S.d.manual.skill = 'F'; if (k === 't' && !e.repeat && (state.c === 'cuts' || state.c === 'sig')) S.d.manual.ult = true; keys[k] = true; if (['q', 'e', 'r', 'f', 'g', 't', 'w', 'a', 's', 'd', ' '].includes(k)) e.preventDefault(); });
+addEventListener('keydown', (e) => { if (!state.play) return; const k = e.key.toLowerCase(); if (['q', 'e', 'r'].includes(k) && !e.repeat) S.d.manual.skill = k.toUpperCase(); if (k === 'f' && !e.repeat) { if ((state.c === 'cuts' || state.c === 'sig' || state.c === 'mark')) S.d.manual.skill = 'SP'; else S.d.manual.burst = true; } if ((state.c === 'mark' ? k === 'v' : k === 'g') && !e.repeat && (state.c === 'cuts' || state.c === 'sig' || state.c === 'mark')) S.d.manual.skill = 'F'; if (k === 't' && !e.repeat && (state.c === 'cuts' || state.c === 'sig' || state.c === 'mark')) S.d.manual.ult = true; keys[k] = true; if (['q', 'e', 'r', 'f', 'g', 'v', 't', 'w', 'a', 's', 'd', ' '].includes(k)) e.preventDefault(); });
 addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
 $('game').addEventListener('mousedown', () => { mouseDown = true; }); addEventListener('mouseup', () => { mouseDown = false; });
 
@@ -108,13 +114,16 @@ const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
 const routesFor = () => (state.c === 'sig' ? SIG_ROUTES[state.cls] : ROUTES[state.c]);
 /** key-chip strip, same markup / CSS as the in-game rotations page (rotations.html: .k-seq / .k-unit / .cap) */
 function chainName(cls, keys) { const c = CLASSES[cls].chains.find((q) => !q.route && q.seq.join() === keys.join()); return c ? c.name : keys[0] === 'B1' ? 'Basic string' : CLASSES[cls].skills[keys[0]] ? CLASSES[cls].skills[keys[0]].name : 'cast'; }
-const capHtml = (k, extra = '') => `<div class="cap${k === 'SP' ? ' sp' : ''}${/^B/.test(k) ? ' lmb' : ''}${extra}">${esc(KL[k] || k)}</div>`;
-const unitHtml = (cls, keys) => `<div class="k-unit"><div class="k-caps">${keys.map((k) => capHtml(k)).join('')}</div><div class="k-name">${esc(chainName(cls, keys))}</div></div>`;
+const KLV = { ...KL, F: 'V' }; // (in-game default binds: skill 4 = V, Special = F, ult = T; the mark concept shows those)
+const kl = (k) => (state.c === 'mark' ? KLV : KL)[k] || k;
+const capHtml = (k, extra = '') => `<div class="cap${k === 'SP' ? ' sp' : ''}${/^B/.test(k) ? ' lmb' : ''}${extra}">${esc(kl(k))}</div>`;
+const unitHtml = (cls, u) => { const keys = Array.isArray(u) ? u : u.keys; return unitHtml0(cls, keys); };
+const unitHtml0 = (cls, keys) => `<div class="k-unit"><div class="k-caps">${keys.map((k) => capHtml(k)).join('')}</div><div class="k-name">${esc(chainName(cls, keys))}</div></div>`;
 function routeKeys(R) {
-  const el = $('rKeys'), card = $('rCard'); if (!R || !R.loop || (state.c !== 'cuts' && state.c !== 'sig')) { card.style.display = 'none'; return; } card.style.display = '';
+  const el = $('rKeys'), card = $('rCard'); if (!R || !R.loop || (state.c !== 'cuts' && state.c !== 'sig' && state.c !== 'mark')) { card.style.display = 'none'; return; } card.style.display = '';
   const cls = state.cls, C = CLASSES[cls], rt = (C.routes || []).find((r) => r.route === 'boss'), win = state.c === 'sig' ? SIG[cls].win : 'Resheathe';
   const row = (lbl, html) => `<div class="k-seq k-row"><span class="k-lbl">${lbl}</span>${html}</div>`;
-  $('rVar').textContent = R.bankOnUlt ? '· Special banks on ult cycles' : R.opc === 'window' ? '· Special cashes out every cycle' : '· sloppy';
+  $('rVar').textContent = state.c === 'mark' ? (R.spHold || R.ultHold ? `· Special +${R.spHold || 0} s, ult +${R.ultHold || 0} s late` : '· live route v2026.1022.2120, both on cooldown') : R.bankOnUlt ? '· Special banks on ult cycles' : R.opc === 'window' ? '· Special cashes out every cycle' : '· sloppy';
   el.innerHTML = row('Opener', `${R.prepull ? `<div class="k-unit"><div class="k-caps"><div class="cap">hold</div></div><div class="k-name">pre-pull ${state.c === 'sig' ? 'charge' : 'draw'}</div></div>` : ''}${(R.opener || []).map((u) => unitHtml(cls, u)).join('')}${R.spFirst ? unitHtml(cls, R.loop[0]) : ''}`)
     + row('Loop ↻', R.loop.map((u) => unitHtml(cls, u)).join(''))
     + `<div class="k-seq k-ult"><span class="k-lbl">${R.opc === 'window' ? `Ult in ${esc(win)}${R.ultLate ? ' (late)' : ''}:` : 'Ult when full:'}</span>${capHtml('T', ' ult')}${rt ? rt.seq.map((k, i) => capHtml(k, i === rt.seq.length - 1 ? ' sp' : '')).join('') + `<span class="k-lbl" style="margin-left:8px;color:#ff4fd8">→ ${esc(rt.name)}</span>` : ''}</div>`;
@@ -133,9 +142,12 @@ function render() {
   $('routes').querySelectorAll('button').forEach((b) => (b.onclick = () => { state.route = b.dataset.r; state.play = false; start(); }));
   $('bMode').textContent = state.play ? '◀ Back to autoplay' : '▶ Play it yourself'; $('bMode').classList.toggle('on', state.play);
   $('modeNote').innerHTML = state.play ? `<b>You play:</b> Q / E / R (1 s GCD, presses queue), hold LMB or J for basics, WASD to move (otherwise you step in on your own)${state.c === 'edge' ? ', <b>F</b> = empower the next chain with your Edge' : state.c === 'cuts' ? ', <b>G</b> = Kesa Slash, <b>F</b> = Special (Void Draw), <b>T</b> = the real ultimate Blade of the Void; then R→E→Q→E→R = One Perfect Cut (releases the bank, ×2.5 if the ult was cast inside Resheathe). Boss Special chain: R→E→Q→F→R Void Sheath; Stillwater Execution R→E→Q→G, Void Echo Q→G→Q→E, Twin Moons Q→G→Q' : ''}. Chains: E→R Counter Sheathe, R→Q→E Petal Rain, Q→Q Wind Step, R→E Moonlit Guard, R→E→Q Moment of Death.` : `<b>Autoplay (${state.route}):</b> ${routesFor()[state.route].desc}.`; routeKeys(state.play ? routesFor().good : routesFor()[state.route]);
-  const c = state.c + ':' + state.cls, cc = state.c, ccls = state.cls; if (!cmpCache[c]) { $('cmp').innerHTML = '<tr><td>measuring…</td></tr>'; setTimeout(() => { cmpCache[c] = ['good', 'sloppy'].map((r) => compare(cc, r, 180, 1, ccls)); if (state.c + ':' + state.cls === c) showCmp(); window.__sb2Cmp = cmpCache; }, 400); } else showCmp();
+  const c = state.c + ':' + state.cls, cc = state.c, ccls = state.cls; if (!cmpCache[c]) { $('cmp').innerHTML = '<tr><td>measuring…</td></tr>'; setTimeout(() => { cmpCache[c] = cc === 'mark' ? [...MARK_HOLDS.map(([n, h]) => ({ ...compare(cc, { ...ROUTES.mark.good, ...h }, 180, 1, ccls), route: n })), { ...compare(cc, ROUTES.mark.optimized, 180, 1, ccls), route: 'optimizer route (R E Q F R | E Q V Q Q; loop R E Q F R · Q · E R · R)' }] : ['good', 'sloppy'].map((r) => compare(cc, r, 180, 1, ccls)); if (state.c + ':' + state.cls === c) showCmp(); window.__sb2Cmp = cmpCache; }, 400); } else showCmp();
 }
-function showCmp() { const [g, s] = cmpCache[state.c + ':' + state.cls];
+const MARK_HOLDS = [['on cooldown', {}], ['Special +1 s', { spHold: 1 }], ['Special +2 s', { spHold: 2 }], ['Special +4 s', { spHold: 4 }], ['ult +1 s', { ultHold: 1 }], ['ult +2 s', { ultHold: 2 }], ['ult +4 s', { ultHold: 4 }]];
+function showCmp() { if (state.c === 'mark') { const L = cmpCache[state.c + ':' + state.cls], g = L[0];
+    $('cmp').innerHTML = `<tr><th>Play</th><th>DPS</th><th>game</th><th>mark</th></tr>` + L.map((x) => `<tr class="${x === g ? 'best' : ''}"><td>${esc(x.route)}</td><td>${fmt(x.dps)}</td><td>${fmt(x.game)}</td><td>${fmt(x.bonus)}</td></tr>`).join('') + `<tr><td colspan="4" class="note">Concept route; only the Special / the ultimate held after they are ready (last row: optimizer-best route, which beats live but no longer punishes a held Special). Seed 1, 3 min. "mark" = the second Delayed Cuts cash-out of marked One Perfect Cuts (CONCEPT).</td></tr>`; return; }
+  const [g, s] = cmpCache[state.c + ':' + state.cls];
   $('cmp').innerHTML = `<tr><th>Route</th><th>DPS</th><th>game</th><th>concept</th></tr>` + [g, s].map((x) => `<tr class="${x === g ? 'best' : ''}"><td>${x.route === 'good' ? 'Good' : 'Sloppy'}</td><td>${fmt(x.dps)}</td><td>${fmt(x.game)}</td><td>${fmt(x.bonus)}</td></tr>`).join('') + `<tr><td colspan="4" class="note">Good beats sloppy by ${Math.round((g.dps / s.dps - 1) * 100)}% (concept share: ${Math.round((g.bonus / g.dps) * 100)}% of good DPS). CONCEPT numbers.</td></tr>`; }
 $('bPlay').onclick = () => { state.paused = !state.paused; $('bPlay').textContent = state.paused ? '▶ Play' : '⏸ Pause'; };
 $('bRestart').onclick = () => start(); $('sSpeed').onchange = (e) => { state.speed = +e.target.value; };
