@@ -87,10 +87,26 @@ export class RotBot {
         return inp;
       }
       if (this.cyc && this.ui >= this.wrap && !(p.cds.SP > 0) && !(this.openUlt && host)) { const i = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP')); if (i >= 0) this.ui = i; } // (boss: the Special chain as soon as it is up - it is the cycle's hinge)
+      // openUlt (Samurai route flag): the Special fires the moment it is back. The Void Sheath unit starts early by the keys that lead into
+      // the Special (~1 s each), and no filler unit starts that would still be running when the Special comes back (basics wait instead).
+      let spLead = 0;
+      if (this.openUlt && this.ui >= this.wrap && !p.eclipse) {
+        const spi = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP'));
+        if (spi >= 0) {
+          const lead = this.loop[spi].keys.indexOf('SP') * 60, uwLeft = p.uw ? p.uw.t : 0, wait = Math.max(p.cds.SP, uwLeft) - lead; // (the Special itself lands after the ult window)
+          const cur = this.loop[this.ui];
+          if (wait <= 0) { this.ui = spi; spLead = lead; }
+          else if (!cur.keys.includes('SP') && cur.keys.length * 60 > wait) { // this filler would still run when the Special is back: a shorter one, else basics
+            const j = this.loop.findIndex((q, k) => k >= this.wrap && !q.keys.includes('SP') && q.keys.length * 60 <= wait);
+            if (j >= 0) this.ui = j;
+            else { inp.attack = inRange; this.mode = 'fill'; if (inp.attack) this.pressed = this.pressed && this.pressed.fill ? this.pressed : { key: 'B1', tick: sim.tick, fill: true }; return inp; }
+          }
+        }
+      }
       let u = this.loop[this.ui], guard = 0;
-      while (u.keys.includes('SP') && (p.cds.SP > 0 || (this.openUlt && host)) && guard++ < this.loop.length) { this.ui = this.nextUi(); u = this.loop[this.ui]; } // (Special on cooldown: skip its unit)
+      while (u.keys.includes('SP') && (p.cds.SP > spLead || (this.openUlt && host && !spLead)) && guard++ < this.loop.length) { this.ui = this.nextUi(); u = this.loop[this.ui]; } // (Special on cooldown: skip its unit)
       const pre = this.gate === 'first' ? u.keys.slice(0, 1) : u.keys.includes('SP') ? u.keys.slice(0, u.keys.indexOf('SP') + 1) : u.keys;
-      const keys = [...new Set(pre.filter((k) => !/^B/.test(k)))];
+      const keys = [...new Set(pre.filter((k) => !/^B/.test(k) && !(spLead && k === 'SP')))];
       const cost = keys.reduce((a, k) => a + (C.skills[k].cost || 0), 0);
       const free = p.aura > 0 || p.eclipse || p.uw;
       const ready = keys.every((k) => p.cds[k] <= 0) && (free || p.res >= Math.min(cost, p.stats.maxRes * 0.95));
