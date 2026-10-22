@@ -49,7 +49,7 @@ export function packMe(p) {
     ul: r1(p.ult || 0), ur: p.ultRot ? p.ultRot.ids.slice() : [], ul2: p.ultLast || 0, bu: p.bufUlt || 0, rg: p.rage || 0, au: p.aura || 0, cl: p.eclipse ? [p.eclipse.t, p.eclipse.ext, p.eclipse.vc || 0, ...packRoute(p.eclipse.rt)] : 0,
     sl: p.stealth || 0, ss: p.stealthSrc || 0, gc: p.gcd || 0, eg: p.edge || 0, et: p.edgeT || 0, cr: p.critRun || 0, // Blade Dancer stealth + global recovery + Edge (crit stacks) + crits this chain
     mc: p.momCut ? (p.momCut.Q ? 1 : 0) | (p.momCut.E ? 2 : 0) | (p.momCut.R ? 4 : 0) : 0, // Warrior Momentum cooldown-cut flags
-    uw: p.uw ? [p.uw.t, ...packRoute(p.uw.rt)] : 0, cs: p.cst ? [p.cst.g, p.cst.t] : 0, br: p.br && (p.br.bank || p.br.win) ? [p.br.bank, p.br.win] : 0, // boss rotation [bank, window ticks] (sim/bossrot.js) // ult window [ticks, route...], class state [stage, ticks]
+    uw: p.uw ? [p.uw.t, ...packRoute(p.uw.rt)] : 0, cs: p.cst ? [p.cst.g, p.cst.t] : 0, // ult window [ticks, route...], class state [stage, ticks]
     ws: p.ws ? [p.ws.keys.join(''), p.ws.t, p.ws.rw ?? -1, p.ws.bp || 0, p.ws.emp ? 1 : 0] : 0, wq: p.wq && p.wq.length ? p.wq.map((e) => [e.k, e.c, e.rh, e.ttl]) : 0, wv: p.weave || 0, hk: p.holdKey ? [p.holdKey, p.holdT] : 0, bh: p.bufCharge || 0,
     dg: p.drg ? [p.drg.emp ? 1 : 0, p.drg.mk, p.drg.dv] : 0, // Dragoon [Skyborne-empowered next chain, dive-mark ticks, dives left]
     ar: p.arc ? [p.arc.emp ? 1 : 0] : 0, // Summoner [next summon empowered]
@@ -87,7 +87,6 @@ export function unpackMe(p, m) {
   p.stealth = m.sl || 0; p.stealthSrc = m.ss || null; p.gcd = m.gc || 0; p.edge = m.eg || 0; p.edgeT = m.et || 0; p.critRun = m.cr || 0;
   p.momCut = { Q: m.mc & 1 ? 1 : 0, E: m.mc & 2 ? 1 : 0, R: m.mc & 4 ? 1 : 0 };
   if (m.cl) { if (!p.eclipse) p.eclipse = { t: 0, ext: 0, dmg: new Map(), bs: new Set() }; p.eclipse.t = m.cl[0]; p.eclipse.ext = m.cl[1]; p.eclipse.vc = m.cl[2] || 0; p.eclipse.rt = unpackRoute(m.cl.slice(3), p.eclipse.rt); } else p.eclipse = null;
-  if (m.br) { if (!p.br) p.br = { bank: 0, win: 0, waves: [] }; p.br.bank = m.br[0]; p.br.win = m.br[1]; } else if (p.br) { p.br.bank = 0; p.br.win = 0; }
   if (m.uw) { if (!p.uw) p.uw = { t: 0, rt: null }; p.uw.t = m.uw[0]; p.uw.rt = unpackRoute(m.uw.slice(1), p.uw.rt); } else p.uw = null;
   p.cst = m.cs ? { g: m.cs[0], t: m.cs[1] } : null;
   p.ws = m.ws ? { keys: String(m.ws[0]).split(''), t: m.ws[1], rw: m.ws[2] ?? -1, bp: m.ws[3] || 0, emp: !!m.ws[4] } : null;

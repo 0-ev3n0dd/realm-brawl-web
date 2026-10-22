@@ -1,6 +1,5 @@
 // Player controller: input command -> actions (basic combo, skills, dodge), chain detection,
 // inventory commands. Pure sim code.
-import { brChain, brSpecial, brUlt, brUltEnd, brTick } from './bossrot.js'; // boss rotation cycle (bank / Special hinge / window / ult release)
 import { ascendedUlt } from './ascended.js';
 import { altSkill, ALT_SKILLS } from './ascalt.js';
 import { startDuel, leaveDuel, duelSkip, duelClash } from './shadowduel.js';
@@ -206,7 +205,6 @@ function endEclipse(sim, p, finisher = null) {
   const hits = eclipseBurst(sim, p);
   p.eclipse = null;
   p.res = p.stats.maxRes;
-  brUltEnd(sim, p);
   sim.emit({ type: 'eclipseEnd', pid: p.id, x: p.x, y: p.y, n: hits.length, total: hits.reduce((t, h) => t + h.dmg, 0), finisher: finisher || undefined });
 }
 
@@ -419,7 +417,6 @@ export function updatePlayer(sim, p) {
   if (p.dead) { if (sim.tick >= p.respawnAt) respawnPlayer(sim, p); return; }
   const st = p.stats, cls = CLASSES[p.cls];
   if (p.potCd > 0) p.potCd--;
-  if (p.br) brTick(sim, p);
   if (!(p.action && p.action.bf) && !p.shAct) p.shd = null; // (boss-form shadow shown only while its skill runs)
   if (p.rwHold > 0) { p.rwHold--; if (p.iframes < 2) p.iframes = 2; } // reading the hunt's reward screen: untouchable (fix pass)
   const inSafe = zoneAt(p.x, p.y).id === 0;
@@ -581,7 +578,7 @@ function startBasic(sim, p) {
     const chain = findChain(p, 'BS', sim.tick);
     p.action.backstab = true; p.action.key = 'BS'; p.action.chain = chain;
     pushHistory(sim, p, 'BS');
-    if (chain) { p.chainPending = { id: chain.id, tick: sim.tick }; sim.emit({ type: 'chain', pid: p.id, id: chain.id, name: chain.name, x: p.x, y: p.y, ...(chain.route ? { fin: 1 } : {}) }); brChain(sim, p, chain); }
+    if (chain) { p.chainPending = { id: chain.id, tick: sim.tick }; sim.emit({ type: 'chain', pid: p.id, id: chain.id, name: chain.name, x: p.x, y: p.y, ...(chain.route ? { fin: 1 } : {}) }); }
     sim.emit({ type: 'unstealth', pid: p.id, x: p.x, y: p.y, attack: true });
   } else pushHistory(sim, p, 'B' + (idx + 1));
   sim.emit({ type: 'attack', pid: p.id, cls: p.cls, idx, ang: p.aim, x: p.x, y: p.y, w: p.action.wmw });
@@ -622,8 +619,6 @@ function startSkill(sim, p, key, sk, chain, cost, onRoute = false, sc = null, wo
   if (chain) hordeChainBurst(sim, p, chain); // horde AoE: a chain bursts the class shape into the crowd (sim/hordeaoe.js)
   if (chain) defChain(sim, p, chain); // Warrior chain shield / Monk Iron Body purge (sim/defense.js)
   if (chain) sim.emit({ type: 'chain', pid: p.id, id: chain.id, name: chain.name, x: p.x, y: p.y, ...(chain.route ? { fin: 1 } : {}) });
-  if (key === SPK) brSpecial(sim, p); // near a boss: the Special starts the bank's waves and sets the cycle cooldown
-  if (chain) brChain(sim, p, chain);
 }
 
 // ------------------------------------------------------------------ Warrior: Rage spend + Momentum
@@ -829,7 +824,6 @@ function startUlt(sim, p) {
   if (CLASSES[p.cls].grim || CLASSES[p.cls].bard) arcCast(sim, p, p.action, 'T', null);
   if (U.id !== 'eclipse' && CLASSES[p.cls].routes) p.uw = { t: ULTWIN.dur, rt: newRouteState() }; // the ult window: routes, free skills, fast cooldowns
   sim.emit({ type: 'ult', pid: p.id, cls: p.cls, id: U.id, name: U.name, x: p.x, y: p.y, tx: p.action.data.tx, ty: p.action.data.ty });
-  brUlt(sim, p);
   ascendedUlt(sim, p, p.action.data.tx, p.action.data.ty); // (Part B: an Ascended hero's Astral Echo)
 }
 

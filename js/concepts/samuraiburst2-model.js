@@ -179,10 +179,10 @@ export const ROUTES = {
 export class Driver {
   constructor(concept, route = 'good', { seed = 1, auto = true, cls = 'samurai' } = {}) {
     this.cls = cls; this.cid = concept; this.M = concept === 'sig' ? new Signature(cls) : new CONCEPTS[concept](); this.R = typeof route === 'object' ? route : concept === 'sig' ? SIG_ROUTES[cls][route] : ROUTES[concept][route]; this.auto = auto;
-    this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false }); this.sim.noBossRot = true; // (the concept layer replaces the game's boss cycle here)
+    this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
     this.player = addHero(this.sim, cls, seed, cls === 'samurai' ? { name: 'Hayate' } : {});
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
-    this.bot = new RotBot(cls, this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: !!this.M.wantUlt, opener: (this.R.opener || []).map((keys) => ({ keys, chain: null })) });
+    this.bot = new RotBot(cls, this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { cycle: false, useUlt: !!this.M.wantUlt, opener: (this.R.opener || []).map((keys) => ({ keys, chain: null })) });
     let a = 77 + seed; this.rng = () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
     this.ticks = 0; this.listeners = []; this.pre = this.R.prepull && this.M.prepull ? this.M.prepull(this) : null; this.dropping = null; this.idle = 0; this.manual = { queue: [], skill: null, attack: false, mx: 0, my: 0 }; this.lastCh = null;
   }

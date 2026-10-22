@@ -3,7 +3,6 @@
 // hero piloted by the same rotation bot the headless optimizer measured (rotations/rotbot.js) in the same arena
 // (rotations/arena.js). Data: /rotations/rotations.json (tools/rotations/optimize.mjs).
 //   rotations.html?cls=monk&view=mob    deep link;  window.__rot exposes the live session to tools (tools/rotations/media.mjs)
-import { BR_CLS } from '../sim/bossrot.js';
 import { notation, mkLabel } from '../rotations/notation.js';
 import { Sim } from '../sim/sim.js';
 import { playNotes } from './playnotes.js';
@@ -182,7 +181,7 @@ const ui = {
       });
       const nm = document.createElement('div'); nm.className = 'k-name';
       const fired = st.filter((x) => x.chainName).map((x) => x.chainName);
-      nm.textContent = (u.sp && N.win ? '★ ' : '') + (fired.length ? fired.join(' → ') : (u.chainName || 'cast')) + (u.sp && N.win ? ` → ${N.win}` : '');
+      nm.textContent = (u.sp && N.spName ? '★ ' : '') + (fired.length ? fired.join(' → ') : (u.chainName || 'cast'));
       g.append(caps, nm); seq.appendChild(g); this.caps.push(row); this.units.push(g);
     });
     const ult = $('kUlt'); ult.innerHTML = `<span class="k-lbl">${esc(N.ult.lbl)}</span>`; this.ultCaps = [];
@@ -210,13 +209,13 @@ const ui = {
         <div><b>${fmt(rot.windows.d480)}</b><span>DPS, 8 min</span></div>
         <div><b>${fmt(rot.windows.dMove)}</b><span>DPS, moving every 4 s</span></div>
         ${rot.old ? `<div><b>${pct(rot.windows.score, rot.old.windows.score)}</b><span>vs old order (${esc(rot.old.keys ? rot.old.keys.map((u) => u.map(label).join(' ')).join(' · ') : rot.old.loop.join(' · '))}: ${fmt(rot.old.windows.score)})</span></div>` : ''}
-      </div>${rot.opener && rot.opener.length ? `<div class="sb-note">Opener (once): <code>${esc(N.text.opener)}</code></div>` : '<div class="sb-note">No opener: start straight into the loop.</div>'}<div class="sb-note">Weave basic attacks (LMB) between every GCD; they never break a chain. ${N.win ? `Boss cycle: ${esc(N.spName)} (${esc(label('SP'))}) as soon as it is up opens ${esc(N.win)}; cast the ultimate (${esc(label('T'))}) inside it, once per cycle` : `Pop the ultimate (${esc(label('T'))}) the moment it fills`}; its route chains are off the GCD.</div></div>` : ''}
+      </div>${rot.opener && rot.opener.length ? `<div class="sb-note">Opener (once): <code>${esc(N.text.opener)}</code></div>` : '<div class="sb-note">No opener: start straight into the loop.</div>'}<div class="sb-note">Weave basic attacks (LMB) between every GCD; they never break a chain. ${N.spName ? `Boss cycle: ${esc(N.spName)} (${esc(label('SP'))}) as soon as it is up; cast the ultimate (${esc(label('T'))}) right after it, once per cycle` : `Pop the ultimate (${esc(label('T'))}) the moment it fills`}; its route chains are off the GCD.</div></div>` : ''}
       <div class="sb-card"><h3>How ${esc(C.name)} plays now</h3><div class="sb-note">${playNotes(cls, C, data.classes[cls].boss, label)}</div></div>
       <div class="sb-card"><h3>Loop (repeat) ↻</h3><ol class="sb-steps" id="sbSteps">${steps}</ol></div>
-      <div class="sb-card"><h3>Ultimate (${esc(N.ult.label)}) ${N.win ? `in ${esc(N.win)}` : 'when full'} → ${esc(rot.ult.routeName)}</h3><ol class="sb-steps">${ult}</ol></div>
+      <div class="sb-card"><h3>Ultimate (${esc(N.ult.label)}) ${N.spName ? `after ${esc(N.spName)}` : 'when full'} → ${esc(rot.ult.routeName)}</h3><ol class="sb-steps">${ult}</ol></div>
       <div class="sb-card"><h3>Chains fired per 90 s</h3>${chains}</div>
       <div class="sb-card"><h3>Other view</h3><div class="sb-note">${other ? `${view === 'boss' ? 'Mobbing' : 'Boss'}: <code>${esc(other.loop.map((u) => u.keys.map(label).join(' ')).join('  ·  '))}</code> · ${fmt(other.dps)} DPS` : 'not measured yet'}</div></div>
-      <div class="sb-card"><h3>How this was found</h3><div class="sb-note">${esc(data.method)}. Level ${data.setup.level}, one gear tier for every class (tier ${data.setup.gear.tier}, rarity ${data.setup.gear.rarity}, +${data.setup.gear.up}, no set / exotic procs). ${view === 'boss' ? 'Target: Grimtusk pinned as a training boss (armour intact, no attacks, HP held at 60%).' : `Target: ${data.setup.mob.pack.length} mobs (wolves, imps, knights, golems, HP ×${data.setup.mob.hpMul}) that chase but never attack; each kill respawns 1 s later.`} ${N.win ? `The ult is cast inside ${esc(N.win)} (one per ~20 s Special cycle) and spent on the` : 'The ult is cast whenever full and spent on the'} ${esc(rot.ult.routeName)} finisher route. Between chains the hero swings basics while skills cool down; a chain that uses the Special (F) is skipped while the Special is on cooldown. ${rot.gate === 'first' ? 'Each chain starts as soon as its first key is ready (later keys are pressed as they come off cooldown, inside the chain window).' : 'Each chain starts once every key in it is ready.'} Keys (your binds): ${esc(label('F'))} = 4th skill, ${esc(label('SP'))} = Special, ${esc(label('T'))} = ultimate, ${esc(label('B1'))} = basic attack.</div></div>`;
+      <div class="sb-card"><h3>How this was found</h3><div class="sb-note">${esc(data.method)}. Level ${data.setup.level}, one gear tier for every class (tier ${data.setup.gear.tier}, rarity ${data.setup.gear.rarity}, +${data.setup.gear.up}, no set / exotic procs). ${view === 'boss' ? 'Target: Grimtusk pinned as a training boss (armour intact, no attacks, HP held at 60%).' : `Target: ${data.setup.mob.pack.length} mobs (wolves, imps, knights, golems, HP ×${data.setup.mob.hpMul}) that chase but never attack; each kill respawns 1 s later.`} ${N.spName ? `The ult is cast right after ${esc(N.spName)} (one per Special cycle) and spent on the` : 'The ult is cast whenever full and spent on the'} ${esc(rot.ult.routeName)} finisher route. Between chains the hero swings basics while skills cool down; a chain that uses the Special (F) is skipped while the Special is on cooldown. ${rot.gate === 'first' ? 'Each chain starts as soon as its first key is ready (later keys are pressed as they come off cooldown, inside the chain window).' : 'Each chain starts once every key in it is ready.'} Keys (your binds): ${esc(label('F'))} = 4th skill, ${esc(label('SP'))} = Special, ${esc(label('T'))} = ultimate, ${esc(label('B1'))} = basic attack.</div></div>`;
     this.sideSteps = [...document.querySelectorAll('#sbSteps li')];
   },
   feed(name, sub, cls) {

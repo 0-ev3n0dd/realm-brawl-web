@@ -2,7 +2,7 @@
 // ultimate on the matching ult-window finisher route. Pure (no DOM): the headless optimizer (tools/rotations/optimize.mjs)
 // and the in-browser preview page (rotations.html) both drive the hero with this, so the page plays exactly what was measured.
 //   unit = { keys: ['R','E','Q'], chain: 'executioners_verdict' | null }   keys are sim slots: Q E R F(=V key) SP(=F key) B1..B3 (basic swings)
-import { brActive, brUltReady } from '../sim/bossrot.js';
+import { BossCycle } from './bosscycle.js';
 import { CLASSES } from '../sim/data/classes.js';
 import { gcdBlocks } from '../sim/player.js';
 
@@ -27,6 +27,7 @@ export class RotBot {
     this.pressed = null; // { key, unit, step, route, tick } of the last key sent (for the overlay)
     this.aborts = 0; this.units = 0; this.ults = 0;
     this.melee = MELEE.has(cls);
+    this.cyc = route === 'boss' && opts.cycle !== false ? new BossCycle() : null; // (boss: bot policy only - rotations/bosscycle.js)
   }
   nextUi() { const n = this.ui + 1; return n >= this.loop.length ? this.wrap : n; }
   /** pick the target: the boss / the densest spot of the pack */
@@ -55,6 +56,7 @@ export class RotBot {
     const inp = { mx: Math.cos(dir) * s, my: Math.sin(dir) * s, ax: t.x, ay: t.y, attack: false };
     const inRange = bd < (this.melee ? t.r + 110 : 520);
     const host = p.eclipse || p.uw;
+    if (this.cyc) this.cyc.tick(sim, p);
     // ---- ult-window finisher route
     if (host && host.rt && this.inRoute) {
       const r = C.routes.find((q) => q.route === this.route), rt = host.rt, R = this.route;
@@ -72,12 +74,13 @@ export class RotBot {
     if (!host) this.inRoute = false;
     if (this.si < 0) {
       // between units: the ultimate first when the meter is full
-      if (this.useUlt && C.routes && p.ult >= 100 && !host && inRange && !busy(p) && (this.route !== 'boss' || !brActive(sim, p) || brUltReady(sim, p))) { // (boss: the ult goes into the Special's window, one per cycle - sim/bossrot.js)
+      if (this.useUlt && C.routes && p.ult >= 100 && !host && inRange && !busy(p) && (!this.cyc || this.cyc.ultOk(sim))) { // (boss: one ult per Special cycle, right after the Special chain)
+        if (this.cyc) this.cyc.cast(sim);
         inp.ult = true; this.ults++; this.inRoute = true; this.rLast = -1; this.rStepT = sim.tick + 30; this.mode = 'ult';
         this.pressed = { key: 'T', tick: sim.tick, ult: true };
         return inp;
       }
-      if (this.route === 'boss' && this.ui >= this.wrap && !(p.cds.SP > 0) && brActive(sim, p)) { const i = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP')); if (i >= 0) this.ui = i; } // (boss: the Special chain as soon as it is up - it is the cycle's hinge)
+      if (this.cyc && this.ui >= this.wrap && !(p.cds.SP > 0)) { const i = this.loop.findIndex((q, j) => j >= this.wrap && q.keys.includes('SP')); if (i >= 0) this.ui = i; } // (boss: the Special chain as soon as it is up - it is the cycle's hinge)
       let u = this.loop[this.ui], guard = 0;
       while (u.keys.includes('SP') && p.cds.SP > 0 && guard++ < this.loop.length) { this.ui = this.nextUi(); u = this.loop[this.ui]; } // (Special on cooldown: skip its unit)
       const pre = this.gate === 'first' ? u.keys.slice(0, 1) : u.keys.includes('SP') ? u.keys.slice(0, u.keys.indexOf('SP') + 1) : u.keys;

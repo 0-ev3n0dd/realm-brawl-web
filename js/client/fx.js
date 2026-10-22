@@ -285,14 +285,6 @@ export class FX {
         if (ev.full) { this.banner('ULTIMATE READY!', '#ffd23f', 'Press ' + (this.ultKeyLabel ? this.ultKeyLabel() : 'T'), 1.4, 48); this.ring(ev.x, ev.y + 44, 120, '#ffd23f', 0.5, 10); }
         break;
       }
-      case 'brx': { // boss rotation (sim/bossrot.js): bank / waves / window / the ult's release
-        if (!me) break;
-        if (ev.ph === 'bank' || ev.ph === 'hold') this.text(ev.x, ev.y - 70 - heroTextLift(), `+${ev.n}${ev.dbl ? ' ×2' : ''}`, { size: ev.dbl ? 17 : 14, color: ev.dbl ? '#fff3c4' : '#ffd6a0', vy: -40, life: 0.8 });
-        else if (ev.ph === 'win') this.ring(ev.x, ev.y + 30, 110, '#fff3c4', 0.6, 7);
-        else if (ev.ph === 'wave') this.ring(ev.x, ev.y, 80, '#ffd6a0', 0.35, 5);
-        else if (ev.ph === 'fin' || ev.ph === 'ult') { this.ring(ev.x, ev.y, ev.ph === 'ult' ? 200 : 140, ev.mul > 1 ? '#fff3c4' : '#ffd6a0', 0.6, 10); if (ev.ph === 'ult' && ev.mul > 1) this.shake && this.shake(0.3); }
-        break;
-      }
       case 'rotationBroken': if (me) this.text(ev.x, ev.y - 30, 'ROTATION BROKEN', { size: 18, color: '#ff8a7a', vy: -40, pop: 1.4, life: 0.9 }); break;
       case 'ascult': ascUltFx(this, ev, me); break; // (Part B: the Ascended Astral Echo)
       case 'ascalt': ascAltFx(this, ev); break; // (Part D A3: an Astral skill variant)

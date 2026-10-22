@@ -1,7 +1,6 @@
 // Skill / ult tooltips for the HUD (desktop hover, phone long-press). Pure: builds a model from the class data
 // (skills[k].stats, cd, cost, desc, tip; basic combo; ult) and the sim's tuning constants, so the text follows
 // balance changes. tooltipHTML() renders the model; both HUDs use it.
-import { BR, BR_CLS, spChainOf } from '../sim/bossrot.js';
 import { hordeAoeText } from '../sim/hordeaoe.js';
 import { EVADE } from '../sim/evade.js'; // (sets evade: true on the dashing skills / ults / chains)
 import { CLASSES, dodgeOf, TICKS_PER_SEC, BERSERK } from '../sim/data/classes.js';
@@ -46,7 +45,7 @@ export function tipVars(cls) {
 }
 export function fillTip(text, vars) { return String(text || '').replace(/\{(\w+)\}/g, (m, k) => (k in vars ? String(vars[k]) : m)); }
 
-const defaultKey = { basic: 'LMB', Q: 'Q', E: 'E', R: 'R', F: 'V', SP: 'F', dodge: 'SHIFT', ult: 'T' }; // (F = the Special; the old 4th skill moved to G)
+const defaultKey = { basic: 'LMB', Q: 'Q', E: 'E', R: 'R', F: 'V', SP: 'F', dodge: 'SHIFT', ult: 'T' }; // (F = the Special; the 4th skill is V)
 const actionOf = { basic: 'attack', Q: 'skillQ', E: 'skillE', R: 'skillR', F: 'skillF', SP: 'special', dodge: 'dodge', ult: 'ult' };
 
 /** Chains a slot takes part in ('B3'/'BS' steps belong to the basic combo, 'F+' to F). */
@@ -338,10 +337,7 @@ function slotTooltip0(cls, slot, opts = {}) {
   if (slot === 'SP' && c.skills.SP) { // the SPECIAL (4th slot): stronger than Q/E/R, weaker than the ult, long cooldown
     const sp = c.skills.SP, live = p && p.spx && p.spx.t > 0 ? p.spx : null;
     const state = live ? [live.id === 'shadow_clone' ? `Clones active: ${live.n} chain${live.n === 1 ? '' : 's'} left to copy` : `Active: ${sec(live.t)} s left`] : [];
-    const B = BR_CLS[cls], spc = spChainOf(cls);
-    if (B && spc) state.push(p && p.br && p.br.win > 0 ? `${B.win}: ${sec(p.br.win)} s (chains bank ×2)` : `${B.unit} banked: ${p && p.br ? p.br.bank : 0}`);
-    const boss = B && spc ? ` BOSS CYCLE: near a boss every chain finisher banks ${B.unit} (longer chains bank more; banking also fills the ult meter). ${spc.name} is the hinge (${BR.cd} s cooldown near a boss, about one per 20 s): the Special releases the bank in ${BR.waves} waves, the finisher releases the rest and opens ${B.win} (${sec(BR.win)} s, chains bank ×2). Cast your ultimate inside ${B.win}: when it ends the whole bank releases ×${BR.ultMul}${B.hold ? `; with the ult ready, ${spc.name} banks (+${BR.spBank}) instead of releasing so the ultimate gets it all` : ''}.` : '';
-    return { slot, kind: 'SPECIAL skill', title: sp.name, key, desc: sp.desc, how: sp.tip + boss, state, stats: specialStats(cls, atk), chains: withSeq(chainsFor(cls, 'SP')), chainsTitle: 'Special chains (the Special, then…)' };
+    return { slot, kind: 'SPECIAL skill', title: sp.name, key, desc: sp.desc, how: sp.tip, state, stats: specialStats(cls, atk), chains: withSeq(chainsFor(cls, 'SP')), chainsTitle: 'Special chains (the Special, then…)' };
   }
   const sk = c.skills[slot];
   if (!sk) return null;

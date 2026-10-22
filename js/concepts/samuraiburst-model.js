@@ -71,7 +71,7 @@ export class Driver {
     this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
     this.player = addHero(this.sim, 'samurai', seed, { name: 'Hayate' });
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
-    this.bot = new RotBot('samurai', this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { useUlt: false });
+    this.bot = new RotBot('samurai', this.R.loop.map((keys) => ({ keys, chain: null })), 'boss', { cycle: false, useUlt: false });
     this.model = new BurstModel(); this.rng = mulberry(77 + seed); this.events = []; this.ticks = 0;
     this.dropping = null; this.pending = 0; this.prepull = auto ? 70 : 0; this.pulled = false; this.listeners = [];
     this.manual = { skill: null, attack: false, mx: 0, my: 0, draw: false };
