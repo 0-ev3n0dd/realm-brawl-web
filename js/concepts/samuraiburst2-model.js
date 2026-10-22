@@ -187,7 +187,7 @@ export const ROUTES = {
 /** one run: real Sim + arena boss + one concept layer. events: { k: 'bonus', r } / { k: 'sim', ev } */
 export class Driver {
   constructor(concept, route = 'good', { seed = 1, auto = true, cls = 'samurai' } = {}) {
-    this.cls = cls; this.cid = concept; this.M = concept === 'sig' ? new Signature(cls) : new CONCEPTS[concept](); this.R = typeof route === 'object' ? route : concept === 'sig' ? SIG_ROUTES[cls][route] : ROUTES[concept][route]; this.auto = auto;
+    this.cls = cls; this.cid = concept; this.M = concept === 'sig' ? new Signature(cls) : new CONCEPTS[concept]((typeof route === 'object' && route.buff) || undefined); this.R = typeof route === 'object' ? route : concept === 'sig' ? SIG_ROUTES[cls][route] : ROUTES[concept][route]; this.auto = auto;
     this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
     this.player = addHero(this.sim, cls, seed, cls === 'samurai' ? { name: 'Hayate' } : {});
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
