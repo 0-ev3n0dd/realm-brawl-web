@@ -172,6 +172,8 @@ export function samFx(fx, ev, me) {
       fx.text(ev.x, ev.y + (ev.r || 30) + 70, `ONE PERFECT CUT · ${ev.n} CUT${ev.n === 1 ? '' : 'S'} · ×${ev.mul}`, { size: me ? 30 : 22, color: '#ffffff', pop: 2.4, life: 1.8, vx: 0, vy: -20, stroke: C.ink });
       endDark(fx, ev.pid, 0.5); flash(fx, me, '#ffffff', 0.7); if (me) fx.slowmo(0.45, 0.25); fx.shake(1); return true;
     }
+    case 'vmark': { const r = (ev.r || 30) + 40; fx.ring(ev.x, ev.y, r + 50, C.ink, 0.9, 12); fx.ring(ev.x, ev.y, r, C.pink, 1.1, 7); petals(fx, ev.x, ev.y, 18, r, 160); fx.text(ev.x, ev.y - r - 40, 'VOID MARK', { size: me ? 22 : 16, color: C.petal, pop: 1.8, life: 1.1, vx: 0, vy: -20, stroke: C.ink }); return true; }
+    case 'held': petals(fx, ev.x, ev.y, 4, (ev.r || 30) + 10, 90); if (me) fx.text(ev.x, ev.y - (ev.r || 30) - 56, `${ev.n} HELD`, { size: 15, color: C.petal, life: 0.8, vx: 0, vy: -24, stroke: C.ink }); return true;
     case 'stormburst': { // Thousand Petal Storm: one sheathe click, every cut on the screen bursts
       for (const q of fx.parts) if (q.type === 'ink' && q.hang && q.pid === ev.pid) { q.hang = false; q.t = q.life * 0.55; } // the hanging cuts flare out
       for (let i = 0; i < 4; i++) fx.ring(ev.x, ev.y, 200 + i * 130, i % 2 ? C.pink : C.hi, 0.5 + i * 0.12, 12 - i * 2);

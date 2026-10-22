@@ -140,7 +140,7 @@ export const SPECIAL_KIT = {
         fx: { dur: 28, cancel: 20, steps: [{ t: 6, n: 2, every: 9, at: 'self', shape: 'cone', r: 220, arc: 3.0, mul: 1.5, o: { kb: 120 }, stack: ['cut', 1], look: 'crescent' }] } },
       { id: 'void_sheath', name: 'Void Sheath', kind: 'boss', seq: ['R', 'E', 'Q', 'SP', 'R'], window: 220, pre: 'moment_of_death',
         fin: { at: 'tgt', range: 420, r: 150, mul: 4.2, stack: ['cut', 3], o: { forceCrit: true }, txt: 'the blade clicks home and the void tears through your target (guaranteed crit, +3 Delayed Cuts)' },
-        desc: 'Void Draw → Sheathe: the blade clicks home and your target is split open (160 px, ×2 ATK guaranteed crit), bursting every Delayed Cut on it (×0.5 ATK per Cut).',
+        desc: 'Void Draw → Sheathe: the blade clicks home and your target is split open (160 px, ×2 ATK guaranteed crit), bursting every Delayed Cut on it (×0.5 ATK per Cut). Bosses: it also sets a VOID MARK on the boss for 10 s (an ink ensō).',
         fx: { dur: 26, cancel: 18, steps: [{ t: 12, at: 'tgt', range: 900, shape: 'circle', r: 160, mul: 2.0, o: { forceCrit: true, heavy: true, hitstop: 8 }, pop: { kind: 'cut', per: 0.5 }, look: 'x' }] } },
       { id: 'stillwater_execution', name: 'Stillwater Execution', kind: 'boss', seq: ['R', 'E', 'Q', 'F'], window: 150, sp: false,
         desc: 'Moment of Death (Sheathe → Crescent Parry → Iaido Slash) → Kesa Slash: one perfect cut through your target (500 px line, ×2.52 ATK guaranteed crit, +3 Delayed Cuts).',

@@ -207,7 +207,20 @@ function samEv(fx, ev, me) {
       const m = climax(fx, ev.pid, ev.x, ev.y, ev.ang);
       if (!m) samClimax(fx, { x: ev.x, y: ev.y, ang: ev.ang, pid: ev.pid }, { big: 1 });
       for (let i = 0; i < 3; i++) ring(fx, ev.x, ev.y, 180 + i * 100, i % 2 ? C.pink : '#ffffff', { w: 12 - i * 3, life: 0.5 + i * 0.12 });
+      if (ev.vm) { ring(fx, ev.x, ev.y, 260, C.ink, { enso: true, w: 14, life: 0.9 }); petals(fx, ev.x, ev.y, 30, 200, 380); fx.text(ev.x, ev.y - (ev.r || 30) - 70, 'VOID MARK ×2', { size: me ? 26 : 18, color: C.petal, pop: 2.2, life: 1.4, vx: 0, vy: -20, stroke: C.ink }); }
       fx.text(ev.x, ev.y + (ev.r || 30) + 80, `ONE PERFECT CUT · ${ev.n} CUT${ev.n === 1 ? '' : 'S'} · ×${ev.mul}`, { size: me ? 28 : 22, color: '#ffffff', pop: 2.4, life: 1.8, vx: 0, vy: -20, stroke: C.ink });
+      return true;
+    }
+    case 'vmark': { // Void Sheath Mark: an ink ensō closes around the boss, a pink one inside it, petals settle
+      const r = (ev.r || 30) + 40;
+      ring(fx, ev.x, ev.y, r + 50, C.ink, { enso: true, w: 12, life: 0.9 }); ring(fx, ev.x, ev.y, r, C.pink, { enso: true, w: 7, life: 1.1 });
+      petals(fx, ev.x, ev.y, 18, r, 160);
+      fx.text(ev.x, ev.y - r - 40, 'VOID MARK', { size: me ? 22 : 16, color: C.petal, pop: 1.8, life: 1.1, vx: 0, vy: -20, stroke: C.ink });
+      return true;
+    }
+    case 'held': { // sheathe inside the ult on a boss: the ult-built cuts stay on the mark (no burst)
+      petals(fx, ev.x, ev.y, 4, (ev.r || 30) + 10, 90);
+      if (me) fx.text(ev.x, ev.y - (ev.r || 30) - 56, `${ev.n} HELD`, { size: 15, color: C.petal, life: 0.8, vx: 0, vy: -24, stroke: C.ink });
       return true;
     }
     case 'stormburst': { // Thousand Petal Storm: one click, every cut bursts

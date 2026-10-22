@@ -295,7 +295,7 @@ export const CLASSES = {
     state: { id: 'stillness', name: 'Stillness', dur: 120, color: '#ffe3f1', on: 'sheathe',
       desc: 'Sheathe (and Blossom Burst / Counter Sheathe) opens 2 s of Stillness: Focus builds, and the next skill transforms (Iaido → then Parry = Petal Rain; Parry = Moonlit Guard → then Iaido = Moment of Death).',
       steps: { base: { Q: { chain: null, to: 'draw' }, E: { chain: 'moonlit_guard', to: 'guard' } }, draw: { E: { chain: 'petal_rain' } }, guard: { Q: { chain: 'moment_of_death' } } } },
-    stack: { id: 'cut', name: 'Delayed Cuts', max: 8, bossMax: 16, desc: 'Katana hits leave glowing slash marks (Delayed Cuts, max 8, bosses 16, 8 s). They do nothing until you SHEATHE: then every one bursts at once (×0.42 ATK per cut). Counter Sheathe bursts them at double damage; Moment of Death and One Perfect Cut feed on them.' },
+    stack: { id: 'cut', name: 'Delayed Cuts', max: 8, bossMax: 16, desc: 'Katana hits leave glowing slash marks (Delayed Cuts, max 8, bosses 16, 8 s). They do nothing until you SHEATHE: then every one bursts at once (×0.42 ATK per cut). Counter Sheathe bursts them at double damage; Moment of Death and One Perfect Cut feed on them. Bosses, during Blade of the Void: hits leave 1.5× the cuts and Sheathes HOLD the cuts built in the window (no burst) for One Perfect Cut.' },
     chains: [
       { id: 'wind_step', name: 'Wind Step', kind: 'mob', seq: ['Q', 'Q'], window: 110, desc: 'Iaido → Iaido: dash through the pack and back again: two line cuts (×1.1 ATK each), +2 Delayed Cuts per pass.' },
       { id: 'blossom_burst', name: 'Blossom Burst', kind: 'mob', seq: ['F', 'R'], window: 100, desc: 'Kesa Slash → Sheathe: a last draw (×1.0 ATK, +1 cut) then the sheathe blooms: every burst also blossoms onto enemies around it (25% of the burst, 90 px). Opens Stillness.' },
@@ -310,7 +310,7 @@ export const CLASSES = {
       { id: 'thousand_petal_storm', name: 'Thousand Petal Storm', route: 'mob', seq: ['R', 'Q', 'E', 'Q', 'E'], chains: [null, null, 'petal_rain', null, 'thousand_petal_storm'],
         desc: 'Blade of the Void → Sheathe → Iaido → Petal Rain → Iaido → Parry: you vanish into a storm of petals: hundreds of cuts rain across 650 px (each hit ×0.3 ATK, +2 Delayed Cuts), then ONE sheathe click bursts them all (×(1.2 + 0.6 per cut) ATK each). Scales with your Focus (up to +100%; kept). Ends the window.' },
       { id: 'one_perfect_cut', name: 'One Perfect Cut', route: 'boss', seq: ['R', 'E', 'Q', 'E', 'R'], chains: [null, 'moonlit_guard', 'moment_of_death', null, 'one_perfect_cut'],
-        desc: 'Blade of the Void → Sheathe → Moonlit Guard → Moment of Death → Parry → Sheathe: the screen goes black, a single white line crosses your target and it splits open: ONE guaranteed crit of ×(10 + 0.6 per Delayed Cut on it) ATK. Scales with your Focus (up to +100%; kept). Ends the window.' },
+        desc: 'Blade of the Void → Sheathe → Moonlit Guard → Moment of Death → Parry → Sheathe: the screen goes black, a single white line crosses your target and it splits open: ONE guaranteed crit of ×(10 + 0.6 per Delayed Cut on it) ATK; inside a Void Mark (Void Sheath) every cut counts twice and the mark is spent. Scales with your Focus (up to +100%; kept). Ends the window.' },
     ],
   },
   monk: {

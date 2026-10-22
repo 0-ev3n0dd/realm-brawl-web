@@ -29,6 +29,9 @@ export const SAM = {
   storm: { r: 650, every: 2, from: 4, to: 64, mul: 0.3, cuts: 2, base: 1.2, per: 0.6, burstAt: 84 },
   perfect: { range: 520, base: 10, per: 0.6, line: 2.0 },
   voidEnd: 1.5,
+  // Void Sheath Mark (boss form): Void Sheath marks the boss for `dur` ticks; in the ult window hits on a boss build ×ultCuts Delayed
+  // Cuts and sheathes HOLD the cuts built in the window; One Perfect Cut on a marked boss cashes its cuts out ×cash.
+  mark: { dur: 600, ultCuts: 1.5, cash: 2 },
 };
 const R0 = (v) => Math.round(v);
 const r2 = (v) => Math.round(v * 100) / 100;
@@ -81,9 +84,22 @@ export function samCast(sim, p, a, key, chain) {
     a.data.fm = 1 + k * Math.min(1, p.res / 100);
     if (!sim.predicting && !fin && !p.uw) p.res = 0; // (Blade of the Void: the window's extra Focus is not spent)
   }
+  if (id === 'void_sheath') voidMark(sim, p, a);
   if (fin) sim.emit({ type: 'sam', ph: 'fin', pid: p.id, id, route: chain.route, name: chain.name, x: R0(p.x), y: R0(p.y), ang: r2(a.ang), fm: r2(a.data.fm || 1) });
   else sim.emit({ type: 'sam', ph: 'cast', pid: p.id, id, key, chain: chain ? 1 : undefined, x: R0(p.x), y: R0(p.y), ang: r2(a.ang), fm: a.data.fm > 1.01 ? r2(a.data.fm) : undefined });
 }
+
+/** Void Sheath leaves a Void Mark on the boss (boss form only; authoritative sim). */
+function voidMark(sim, p, a) {
+  if (sim.predicting || sim.noVMark) return;
+  let e = null, bd = Infinity;
+  for (const q of targetsOf(sim)) if (!q.dead && q.boss) { const d = Math.hypot(q.x - p.x, q.y - p.y); if (d < bd) { bd = d; e = q; } }
+  if (!e) return;
+  e.vmark = { pid: p.id, end: sim.tick + SAM.mark.dur };
+  sim.emit({ type: 'samx', ph: 'vmark', pid: p.id, id: e.id, x: R0(e.x), y: R0(e.y), r: e.r, t: SAM.mark.dur });
+}
+/** Is `e` under `p`'s Void Mark? */
+export const vMarked = (sim, p, e) => !!(e && e.vmark && e.vmark.pid === p.id && sim.tick <= e.vmark.end);
 
 /** The HUD's view. */
 export function samInfo(p) { return p.sam ? { parry: p.sam.parry, pk: p.sam.pk, n: p.sam.n } : null; }
@@ -145,7 +161,13 @@ export function burstCuts(sim, p, a, { mul = 1, blossom = false, r = C().cut.r, 
   let total = 0, hit = 0;
   const list = sim.enemies.filter((e) => !e.dead && stackN(e, 'cut', p.id) > 0 && Math.hypot(e.x - p.x, e.y - p.y) < r + e.r);
   for (const e of list) {
-    const n = takeStacks(sim, p, e, 'cut');
+    const rec = e.stx && e.stx.cut, w = !ult && p.uw && e.boss && rec && !sim.noVMark ? Math.min(rec.n || 1, rec.w || 0) : 0;
+    let n;
+    if (w > 0) { // Void Sheath Mark: in the ult window the cuts built in it are HELD for One Perfect Cut; only older cuts burst
+      n = (rec.n || 1) - w; rec.n = w;
+      sim.emit({ type: 'samx', ph: 'held', pid: p.id, id: e.id, x: R0(e.x), y: R0(e.y), r: e.r, n: w, m: vMarked(sim, p, e) ? 1 : undefined });
+      if (!n) continue;
+    } else n = takeStacks(sim, p, e, 'cut');
     if (!n) continue;
     total += n; hit++;
     const m = K.per * n * mul * gear;
@@ -386,10 +408,11 @@ export const SAM_SKILLS = {
         let n = 0, mul = P.base;
         const set = new Set();
         if (e && !e.dead && !sim.predicting) {
-          set.add(e.id); n = takeStacks(sim, p, e, 'cut'); mul = P.base + P.per * n;
+          set.add(e.id); n = takeStacks(sim, p, e, 'cut'); a.data.vm = vMarked(sim, p, e); if (a.data.vm) e.vmark = null; // (the mark is spent)
+          mul = P.base + P.per * n * (a.data.vm ? SAM.mark.cash : 1); // Void Sheath Mark: a marked boss cashes its cuts out twice
           hitEnemy(sim, p, e, strikeOpts(p, a, { mul, forceCrit: true, pierce: true, poise: 90, stagger: 70, kb: 120, hitstop: 22, bigNum: true }));
         }
-        sim.emit({ type: 'samx', ph: 'split', pid: p.id, id: e ? e.id : null, x: R0(e ? e.x : p.x), y: R0(e ? e.y : p.y), r: e ? e.r : 30, ang: r2(a.ang), n, mul: r2(mul * (a.data.fm || 1)) });
+        sim.emit({ type: 'samx', ph: 'split', pid: p.id, id: e ? e.id : null, x: R0(e ? e.x : p.x), y: R0(e ? e.y : p.y), r: e ? e.r : 30, ang: r2(a.ang), n, mul: r2(mul * (a.data.fm || 1)), vm: a.data.vm ? 1 : undefined });
         strike(sim, p, a, line(a.data.ox ?? p.x, a.data.oy ?? p.y, a.ang, (a.data.dd || 200) + 60, 90), { mul: P.line, forceCrit: true, stagger: 40, kb: 160, hitstop: 10, selfHs: 10 }, 'splitline', set);
       }
       if (a.t === 108) endUltWindow(sim, p, 'one_perfect_cut');

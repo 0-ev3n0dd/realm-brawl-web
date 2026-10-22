@@ -10,7 +10,7 @@ import { pointBlocked, clearPath } from './world.js';
 import { hitEnemy, hitEnemiesInShape, spawnProjectile, addArea, healAllies, grantShield, healPlayer } from './combat.js';
 import { pickTarget, targetsOf, shieldAmount, SKILLS, leapTo, leapTick, dragIn, rushImpact } from './player.js';
 import { aimLeapPoint, spinDrift, WSTR } from './warrior.js';
-import { voidSheathe } from './samurai.js';
+import { voidSheathe, SAM } from './samurai.js';
 import { spiritRelease } from './monk.js';
 import { dragonWrath } from './dragoon.js';
 import { arcUltEnd } from './arcana.js';
@@ -45,8 +45,11 @@ export function stackN(e, kind, pid) { const s = stackOf(e, kind, pid); return s
 export function addStacks(sim, p, e, kind, n = 1) {
   if (sim.predicting || e.dead) return 0;
   const S = STACKS[kind], old = stackOf(e, kind, p.id);
-  const cnt = Math.min(capOf(kind, e), (old ? old.n || 1 : 0) + n);
+  const uwc = kind === 'cut' && p.uw && e.boss && p.sam && !sim.noVMark; // Samurai Void Sheath Mark: in the ult window a boss takes ×1.5 cuts, and they are held
+  if (uwc) { const f = n * SAM.mark.ultCuts + (p.sam.cf || 0); n = Math.floor(f); p.sam.cf = f - n; }
+  const on = old ? old.n || 1 : 0, cnt = Math.min(capOf(kind, e), on + n);
   const rec = { pid: p.id, t: S.ttl, n: cnt };
+  if (uwc) rec.w = Math.min(cnt, (old && old.w || 0) + Math.max(0, cnt - on));
   if (kind === 'sunder') e.sunder = rec; else (e.stx || (e.stx = {}))[kind] = rec;
   if (!old) { if (kind === 'sunder') sim.emit({ type: 'sunder', pid: p.id, id: e.id, x: e.x, y: e.y - e.r - 20 }); }
   sim.emit({ type: 'stack', pid: p.id, id: e.id, kind, n: cnt, x: Math.round(e.x), y: Math.round(e.y - e.r - 24) });

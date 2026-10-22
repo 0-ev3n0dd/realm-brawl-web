@@ -186,9 +186,10 @@ export const ROUTES = {
 
 /** one run: real Sim + arena boss + one concept layer. events: { k: 'bonus', r } / { k: 'sim', ev } */
 export class Driver {
-  constructor(concept, route = 'good', { seed = 1, auto = true, cls = 'samurai' } = {}) {
+  constructor(concept, route = 'good', { seed = 1, auto = true, cls = 'samurai', game = false } = {}) {
     this.cls = cls; this.cid = concept; this.M = concept === 'sig' ? new Signature(cls) : new CONCEPTS[concept]((typeof route === 'object' && route.buff) || undefined); this.R = typeof route === 'object' ? route : concept === 'sig' ? SIG_ROUTES[cls][route] : ROUTES[concept][route]; this.auto = auto;
     this.sim = new Sim({ seed: 9100 + seed, spawnEnemies: false });
+    if (!game) this.sim.noVMark = true; // (concepts model the pre-Void-Sheath-Mark game; the shipped mark is in sim/samurai.js)
     this.player = addHero(this.sim, cls, seed, cls === 'samurai' ? { name: 'Hayate' } : {});
     this.arena = new Arena(this.sim, this.player, 'boss').setup();
     const U = (x) => (Array.isArray(x) ? { keys: x, chain: null } : x);
