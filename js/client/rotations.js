@@ -56,7 +56,7 @@ class Session {
     this.sim = new Sim({ seed: 9101, spawnEnemies: false });
     this.player = addHero(this.sim, cls, 1, { name: this.C.name });
     this.arena = new Arena(this.sim, this.player, view).setup();
-    this.bot = new RotBot(cls, rot.loop.map((u) => ({ keys: u.keys, chain: u.chain })), view, { gate: rot.gate, opener: (rot.opener || []).map((u) => ({ keys: u.keys, chain: u.chain })) });
+    this.bot = new RotBot(cls, rot.loop.map((u) => ({ keys: u.keys, chain: u.chain })), view, { gate: rot.gate, openUlt: !!rot.openUlt, opener: (rot.opener || []).map((u) => ({ keys: u.keys, chain: u.chain })) });
     this.renderer = new Renderer(canvas);
     const stage = canvas.parentElement, r = this.renderer; // (#rotView)
     r.resize = function () { // (the stage area, not the whole window: same maths as Renderer.resize)
