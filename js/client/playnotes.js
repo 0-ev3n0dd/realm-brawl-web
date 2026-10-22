@@ -16,10 +16,10 @@ export function playNotes(cls, C, rot = null, label = mkLabel()) {
   ];
   if (CLS_NOTE[cls]) li.push(CLS_NOTE[cls]);
   const spc = spChainOf(cls), mech = mechOf(cls);
-  if (spc) li.push(`<b>Boss cycle.</b> ${spc.name} is the hinge: press it as soon as the Special is off cooldown (${spCdOf(cls)} s), and cast the ultimate right after it, one per cycle. Your chains build ${mech} as usual between Specials.`);
+  if (spc) li.push(`<b>Boss cycle.</b> ${spc.name} is the hinge: press it as soon as the Special is off cooldown (${spCdOf(cls)} s), ${rot && rot.ultWhenFull ? 'and cast the ultimate the moment the meter is full' : 'and cast the ultimate right after it, one per cycle'}. Your chains build ${mech} as usual between Specials.`);
   if (rot && rot.loop) { // the measured best route under these rules (tools/rotations/optimize.mjs)
     const N = notation(cls, 'boss', rot, label);
-    li.push('<b>Best boss route:</b> ' + (N.wrap ? 'open with ' + N.text.opener + ', then ' : '') + 'loop ' + N.text.loop + ', basics between every press; ' + (spc ? `${spc.name} (${label('SP')}) as soon as it is up, the ult (${N.ult.label}) right after it` : `ult (${N.ult.label}) when full`) + ' → ' + N.text.ult + ' (' + rot.ult.routeName + ').');
+    li.push('<b>Best boss route:</b> ' + (N.wrap ? 'open with ' + N.text.opener + ', then ' : '') + 'loop ' + N.text.loop + ', basics between every press; ' + (spc ? `${spc.name} (${label('SP')}) as soon as it is up, the ult (${N.ult.label}) ${rot.ultWhenFull ? 'the moment the meter is full' : 'right after it'}` : `ult (${N.ult.label}) when full`) + ' → ' + N.text.ult + ' (' + rot.ult.routeName + ').');
   }
   return '<ul class="sb-play">' + li.map((x) => '<li>' + x + '</li>').join('') + '</ul>';
 }

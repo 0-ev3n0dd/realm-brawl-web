@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-22T19:46:34.121Z",
+ "generated": "2026-10-22T21:07:10.833Z",
  "method": "beam search (width 12, depth ≤ 7) over repeating chain loops, 60 s per candidate; the top 4 re-measured over 3 seeds × 90 s",
  "setup": {
   "level": 30,
@@ -2764,17 +2764,13 @@
      },
      {
       "keys": [
-       "R",
-       "E",
        "Q"
       ],
       "labels": [
-       "R",
-       "E",
        "Q"
       ],
-      "chain": "moment_of_death",
-      "chainName": "Moment of Death"
+      "chain": null,
+      "chainName": null
      },
      {
       "keys": [
@@ -2792,52 +2788,22 @@
       "keys": [
        "R",
        "Q",
-       "E",
-       "F"
+       "E"
       ],
       "labels": [
        "R",
        "Q",
-       "E",
-       "V"
+       "E"
       ],
-      "chain": "riposte_wave",
-      "chainName": "Riposte Wave"
-     },
-     {
-      "keys": [
-       "R",
-       "Q",
-       "E",
-       "F"
-      ],
-      "labels": [
-       "R",
-       "Q",
-       "E",
-       "V"
-      ],
-      "chain": "riposte_wave",
-      "chainName": "Riposte Wave"
-     },
-     {
-      "keys": [
-       "F"
-      ],
-      "labels": [
-       "V"
-      ],
-      "chain": null,
-      "chainName": null
+      "chain": "petal_rain",
+      "chainName": "Petal Rain"
      }
     ],
     "steps": [
      {
       "key": "R",
       "slot": "R",
-      "unit": 0,
-      "chain": "blossom_burst",
-      "chainName": "Blossom Burst"
+      "unit": 0
      },
      {
       "key": "E",
@@ -2866,37 +2832,23 @@
       "chainName": "Void Sheath"
      },
      {
-      "key": "R",
-      "slot": "R",
-      "unit": 1,
-      "chain": "blossom_burst",
-      "chainName": "Blossom Burst"
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 1,
-      "chain": "moonlit_guard",
-      "chainName": "Moonlit Guard"
-     },
-     {
       "key": "Q",
       "slot": "Q",
-      "unit": 1,
-      "chain": "moment_of_death",
-      "chainName": "Moment of Death"
+      "unit": 1
      },
      {
       "key": "E",
       "slot": "E",
-      "unit": 2
+      "unit": 2,
+      "chain": "petal_rain",
+      "chainName": "Petal Rain"
      },
      {
       "key": "R",
       "slot": "R",
       "unit": 2,
-      "chain": "one_perfect_cut",
-      "chainName": "One Perfect Cut"
+      "chain": "counter_sheathe",
+      "chainName": "Counter Sheathe"
      },
      {
       "key": "R",
@@ -2914,40 +2866,6 @@
       "unit": 3,
       "chain": "petal_rain",
       "chainName": "Petal Rain"
-     },
-     {
-      "key": "V",
-      "slot": "F",
-      "unit": 3,
-      "chain": "riposte_wave",
-      "chainName": "Riposte Wave"
-     },
-     {
-      "key": "R",
-      "slot": "R",
-      "unit": 4
-     },
-     {
-      "key": "Q",
-      "slot": "Q",
-      "unit": 4
-     },
-     {
-      "key": "E",
-      "slot": "E",
-      "unit": 4
-     },
-     {
-      "key": "V",
-      "slot": "F",
-      "unit": 4
-     },
-     {
-      "key": "V",
-      "slot": "F",
-      "unit": 5,
-      "chain": "stillwater_execution",
-      "chainName": "Stillwater Execution"
      }
     ],
     "ult": {
@@ -2983,9 +2901,9 @@
       "One Perfect Cut"
      ]
     },
-    "dps": 9456,
+    "dps": 9854,
     "kpm": 0,
-    "noUltDps": 3894,
+    "noUltDps": 4905,
     "baselineDps": 8308,
     "baselineKpm": 0,
     "ultsPer90s": 5,
@@ -2993,35 +2911,31 @@
     "chainsUsed": {
      "moonlit_guard": {
       "name": "Moonlit Guard",
-      "per90s": 16
+      "per90s": 11
      },
      "moment_of_death": {
       "name": "Moment of Death",
-      "per90s": 15
+      "per90s": 11
      },
-     "blossom_burst": {
-      "name": "Blossom Burst",
-      "per90s": 8
+     "petal_rain": {
+      "name": "Petal Rain",
+      "per90s": 7
      },
      "void_sheath": {
       "name": "Void Sheath",
-      "per90s": 5
-     },
-     "stillwater_execution": {
-      "name": "Stillwater Execution",
       "per90s": 5
      },
      "one_perfect_cut": {
       "name": "One Perfect Cut",
       "per90s": 5
      },
-     "petal_rain": {
-      "name": "Petal Rain",
-      "per90s": 4
+     "counter_sheathe": {
+      "name": "Counter Sheathe",
+      "per90s": 5
      },
-     "riposte_wave": {
-      "name": "Riposte Wave",
-      "per90s": 4
+     "stillwater_execution": {
+      "name": "Stillwater Execution",
+      "per90s": 1
      },
      "twin_moons": {
       "name": "Twin Moons",
@@ -3032,30 +2946,13 @@
       "per90s": 1
      }
     },
-    "evals": 8514,
-    "runnersUp": [
-     {
-      "loop": "REQSPR · REQ · ER · RQEF · QFQE · F",
-      "dps": 8415
-     },
-     {
-      "loop": "REQSPR · REQ · ER · RQEF · REQF · F",
-      "dps": 8415
-     },
-     {
-      "loop": "REQSPR · REQ · ER · RQE · F · RQEF",
-      "dps": 7892
-     },
-     {
-      "loop": "REQSPR · REQ · ER · RQE · F · QFQE",
-      "dps": 7892
-     }
-    ],
+    "evals": 6400,
+    "runnersUp": [],
     "windows": {
-     "d180": 9825,
-     "d480": 8242,
-     "dMove": 8437,
-     "score": 8834
+     "d180": 10598,
+     "d480": 8781,
+     "dMove": 8937,
+     "score": 9439
     },
     "opener": [
      {
@@ -3108,10 +3005,10 @@
       "R E Q V"
      ],
      "windows": {
-      "d180": 6661,
-      "d480": 5995,
-      "dMove": 5638,
-      "score": 6098
+      "d180": 11285,
+      "d480": 10042,
+      "dMove": 9501,
+      "score": 10276
      }
     },
     "gate": "all",
@@ -3123,7 +3020,7 @@
       "ok": true
      },
      "s8": {
-      "sp": 26,
+      "sp": 27,
       "ults": 26,
       "ok": true
      },
@@ -3131,11 +3028,12 @@
      "inOpener": true,
      "fill": 0,
      "afterSpecial": {
-      "s3": "9/9",
-      "s8": "25/25"
+      "s3": "0/9",
+      "s8": "0/25"
      }
     },
-    "openUlt": true
+    "openUlt": true,
+    "ultWhenFull": true
    },
    "mob": {
     "loop": [

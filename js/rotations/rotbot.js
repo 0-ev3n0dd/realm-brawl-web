@@ -79,7 +79,7 @@ export class RotBot {
         if (p.ult < 100 && sim.tick - this.openWait < 900) { inp.attack = inRange; this.mode = 'fill'; this.openFill = sim.tick - this.openWait; if (inp.attack) this.pressed = { key: 'B1', tick: sim.tick, fill: true }; return inp; }
       }
       // between units: the ultimate first when the meter is full
-      if (this.useUlt && C.routes && p.ult >= 100 && !host && inRange && !busy(p) && (!this.cyc || this.cyc.ultOk(sim))) { // (boss: one ult per Special cycle, right after the Special chain)
+      if (this.useUlt && C.routes && p.ult >= 100 && !host && inRange && !busy(p) && (!this.cyc || this.openUlt || this.cyc.ultOk(sim))) { // (boss: one ult per Special cycle, right after the Special chain)
         if (this.cyc) this.cyc.cast(sim);
         if (this.firstUlt == null) { this.firstUlt = sim.tick; this.firstUltInOpener = this.units <= this.wrap; }
         inp.ult = true; this.ults++; this.inRoute = true; this.rLast = -1; this.rStepT = sim.tick + 30; this.mode = 'ult';

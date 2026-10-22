@@ -16,7 +16,7 @@ export function notation(cls, view, rot, label = mkLabel()) {
   const unit = (phase) => (u) => ({ phase, keys: [...u.keys], labels: u.keys.map(label), chain: u.chain || null, chainName: u.chainName || null, sp: u.keys.includes('SP') });
   const opener = (rot.opener || []).map(unit('opener')), loop = rot.loop.map(unit('loop'));
   const units = [...opener, ...loop];
-  const ult = { key: 'T', label: label('T'), seq: [...rot.ult.seq], labels: rot.ult.seq.map(label), chainNames: rot.ult.chainNames || [], routeName: rot.ult.routeName, lbl: spc ? `Ult after ${spc.name}:` : 'Ult full:' };
+  const ult = { key: 'T', label: label('T'), seq: [...rot.ult.seq], labels: rot.ult.seq.map(label), chainNames: rot.ult.chainNames || [], routeName: rot.ult.routeName, lbl: spc && !rot.ultWhenFull ? `Ult after ${spc.name}:` : 'Ult full:' };
   const txt = (us) => us.map((u) => u.labels.join(' ') + (u.chainName ? ` (${u.chainName})` : '')).join(' → ');
   return { units, wrap: opener.length, ult, boss, spName: spc ? spc.name : null, mech: boss ? mechOf(cls) : null,
     text: { opener: txt(opener), loop: txt(loop), ult: ult.labels.join(' ') } };
