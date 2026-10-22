@@ -16,10 +16,10 @@ export class VoidMark {
   //  cuts:   hits during the ult window build x K.cutsMul Delayed Cuts (the extra cuts burst / split with the real ones)
   //  hold:   sheathes inside the ult window do not burst the cuts built inside the window (that burst damage is removed); they land on One Perfect Cut, each worth K.holdW cuts
   //  chains: damage dealt during the ult window (except the One Perfect Cut split itself) +K.chainPct
-  static BUFF = { cuts: { cutsMul: 2 }, hold: { holdW: 1.5 }, chains: { chainPct: 0.6 } };
-  static BUFFS = { none: 'plain mark', cuts: 'Doubled cuts', hold: 'No burst on sheathe', chains: 'Stronger chains' };
-  static tuneText(id) { const B = VoidMark.BUFF[id]; return id === 'cuts' ? `×${B.cutsMul} cuts` : id === 'hold' ? `held cuts ×${B.holdW}` : id === 'chains' ? `+${Math.round(B.chainPct * 100)}% damage` : ''; }
-  static get BUFF_BLURB() { return { cuts: `Variant: while the ultimate is active, every hit builds ×${VoidMark.BUFF.cuts.cutsMul} Delayed Cuts on the boss, so the marked One Perfect Cut splits on twice the cuts.`,
+  static BUFF = { unified: { cutsMul: 1.5 }, cuts: { cutsMul: 2 }, hold: { holdW: 1.5 }, chains: { chainPct: 0.6 } };
+  static BUFFS = { unified: 'Void Sheath Mark (unified)', none: 'plain mark', cuts: 'Doubled cuts', hold: 'No burst on sheathe', chains: 'Stronger chains' };
+  static tuneText(id) { const B = VoidMark.BUFF[id]; return id === 'unified' ? `×${B.cutsMul} cuts in the ult, held, cashed ×2` : id === 'cuts' ? `×${B.cutsMul} cuts` : id === 'hold' ? `held cuts ×${B.holdW}` : id === 'chains' ? `+${Math.round(B.chainPct * 100)}% damage` : ''; }
+  static get BUFF_BLURB() { return { unified: `One loop around Delayed Cuts: Void Sheath (the Special, on cooldown) marks the boss for 10 s → cast the ultimate inside it: while it is active, hits build ×${VoidMark.BUFF.unified.cutsMul} Delayed Cuts and sheathes HOLD the cuts built in the window instead of bursting them → One Perfect Cut inside the mark cashes every held cut out twice. Cuts from before the ult still burst as usual. No separate damage buff: everything feeds the one cash-out.`, cuts: `Variant: while the ultimate is active, every hit builds ×${VoidMark.BUFF.cuts.cutsMul} Delayed Cuts on the boss, so the marked One Perfect Cut splits on twice the cuts.`,
     hold: `Variant: while the ultimate is active, sheathes do not burst the cuts built inside the window (those bursts deal nothing); they all ride into One Perfect Cut, each worth ×${VoidMark.BUFF.hold.holdW} cuts. Cuts from before the ult still burst as usual.`,
     chains: `Variant: while the ultimate is active, chain hits on the boss deal +${Math.round(VoidMark.BUFF.chains.chainPct * 100)}% damage (not the One Perfect Cut split itself).` }; }
   constructor(buff = null) { this.buff = buff && buff !== 'none' ? buff : null; this.bk = this.buff ? { ...VoidMark.BUFF[this.buff] } : {}; this.extra = 0; this.held = 0; this.prevN = 0; this.pend = 0; this.lastUwDmg = 0; this.buffBonus = 0; this.extraAtOpc = [];
@@ -28,7 +28,7 @@ export class VoidMark {
   chain() { return null; }
   add_(b) { this.bonus += b; this.buffBonus += b; return b; }
   tick(d) { const p = d.player, B = d.boss; if (!this.buff || !B) return null; const cur = B.dead ? 0 : stackN(B, 'cut', p.id);
-    if (this.buff === 'cuts' && p.uw && cur > this.prevN) this.extra += (cur - this.prevN) * (this.bk.cutsMul - 1);
+    if ((this.buff === 'cuts' || this.buff === 'unified') && p.uw && cur > this.prevN) this.extra += (cur - this.prevN) * (this.bk.cutsMul - 1);
     if (!cur && !p.uw) { this.extra = 0; this.held = 0; } this.prevN = cur; this.pend = 0; return null; }
   sim(ev, d) {
     const p = d.player;
@@ -39,7 +39,7 @@ export class VoidMark {
     if (ev.pid !== p.id) return null;
     if (this.buff && ev.type === 'samx' && ev.ph === 'burst' && d.boss && ev.id === d.boss.id && ev.n) {
       if (this.buff === 'cuts' && this.extra) { const x = Math.min(this.extra, ev.n * (this.bk.cutsMul - 1)); this.extra -= x; this.pend = x / ev.n; }
-      if (this.buff === 'hold' && p.uw && !this.splitDone) { const k = Math.max(0, ev.n - this.pre); this.pre = 0; if (k) { this.held += k; this.pend = -k / ev.n; } } // (only cuts built inside the window are held; older cuts still burst)
+      if ((this.buff === 'hold' || this.buff === 'unified') && p.uw && !this.splitDone) { const k = Math.max(0, ev.n - this.pre); this.pre = 0; if (k) { this.held += k; this.pend = -k / ev.n; } } // (only cuts built inside the window are held; older cuts still burst)
       return null; }
     if (ev.type === 'ult') { this.splitDone = false; this.pre = d.boss && !d.boss.dead ? stackN(d.boss, 'cut', p.id) : 0; }
     if (ev.type === 'chain' && ev.id === 'void_sheath') { if (this.marked_(d)) this.wasted++; this.specials++; this.markT = d.sim.tick; this.markEnd = d.sim.tick + this.constructor.K.dur; return { fx: 'mark', dur: this.constructor.K.dur }; }
@@ -47,7 +47,7 @@ export class VoidMark {
     if (ev.type === 'samx' && ev.ph === 'split' && d.boss && ev.id === d.boss.id) {
       this.opcs++; this.splitDone = true; let n = ev.n || 0; const h0x = d.arena.hp.get(d.boss), hitx = h0x != null ? Math.max(0, h0x - Math.max(0, d.boss.hp)) : 0;
       if (this.buff === 'chains') { this.add_(-this.lastUwDmg); } // (the split hit itself is not a chain)
-      const xn = this.buff === 'cuts' ? this.extra : this.buff === 'hold' ? this.held * this.bk.holdW : 0; this.extra = 0; this.held = 0; this.extraAtOpc.push(xn);
+      const xn = this.buff === 'cuts' ? this.extra : this.buff === 'hold' ? this.held * this.bk.holdW : this.buff === 'unified' ? this.held + this.extra : 0; this.extra = 0; this.held = 0; this.extraAtOpc.push(xn);
       if (xn && hitx) this.add_(Math.round(hitx * PERFECT.per * xn / (PERFECT.base + PERFECT.per * n)));
       const n0 = n; n = n0 + xn; const sh = (k) => hitx * PERFECT.per * k / (PERFECT.base + PERFECT.per * n0); this.cutsAtOpc.push(n); if (this.markT >= 0) this.gap.push((d.sim.tick - this.markT) / 60);
       if (!this.marked_(d) || !n) return { fx: 'opc', cuts: n, marked: false };
@@ -57,7 +57,7 @@ export class VoidMark {
     return null;
   }
   wantBurst() { return false; } burst() { return false; }
-  widget(d) { const p = d && d.player, left = d ? Math.max(0, this.markEnd - d.sim.tick) : 0; return { kind: 'mark', mark: left / this.constructor.K.dur, left: left / 60, ult: p ? Math.floor(p.ult) : 0, uw: !!(p && p.uw) }; }
+  widget(d) { const p = d && d.player, left = d ? Math.max(0, this.markEnd - d.sim.tick) : 0; return { kind: 'mark', held: this.buff === 'unified' && p && p.uw ? Math.round(this.held + this.extra + (d.boss && !d.boss.dead ? stackN(d.boss, 'cut', p.id) : 0)) : 0, mark: left / this.constructor.K.dur, left: left / 60, ult: p ? Math.floor(p.ult) : 0, uw: !!(p && p.uw) }; }
 }
 
 /** the live rotations bot, optionally holding the Special / the ultimate for spHold / ultHold ticks after they are ready (comparisons). */
