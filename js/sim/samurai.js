@@ -31,7 +31,7 @@ export const SAM = {
   voidEnd: 1.5,
   // Void Sheath Mark (boss form): Void Sheath marks the boss for `dur` ticks; in the ult window hits on a boss build ×ultCuts Delayed
   // Cuts and sheathes HOLD the cuts built in the window; One Perfect Cut on a marked boss cashes its cuts out ×cash.
-  mark: { dur: 600, ultCuts: 1.5, cash: 2 },
+  mark: { dur: 600, ultCuts: 2, cash: 2 },
 };
 const R0 = (v) => Math.round(v);
 const r2 = (v) => Math.round(v * 100) / 100;

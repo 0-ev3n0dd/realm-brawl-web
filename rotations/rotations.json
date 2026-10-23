@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-22T23:46:33.519Z",
+ "generated": "2026-10-23T01:45:10.420Z",
  "method": "beam search (width 12, depth ≤ 7) over repeating chain loops, 60 s per candidate; the top 4 re-measured over 3 seeds × 90 s",
  "setup": {
   "level": 30,
@@ -2901,10 +2901,10 @@
       "One Perfect Cut"
      ]
     },
-    "dps": 13658,
+    "dps": 15193,
     "kpm": 0,
     "noUltDps": 4905,
-    "baselineDps": 9549,
+    "baselineDps": 10300,
     "baselineKpm": 0,
     "ultsPer90s": 5,
     "aborts": 0,
@@ -2946,13 +2946,13 @@
       "per90s": 1
      }
     },
-    "evals": 6341,
+    "evals": 6355,
     "runnersUp": [],
     "windows": {
-     "d180": 14328,
-     "d480": 11460,
-     "dMove": 11645,
-     "score": 12477
+     "d180": 15873,
+     "d480": 12680,
+     "dMove": 12952,
+     "score": 13835
     },
     "opener": [
      {
@@ -3005,10 +3005,10 @@
       "R E Q V"
      ],
      "windows": {
-      "d180": 13487,
-      "d480": 11662,
-      "dMove": 11668,
-      "score": 12272
+      "d180": 14925,
+      "d480": 12900,
+      "dMove": 12925,
+      "score": 13583
      }
     },
     "gate": "all",

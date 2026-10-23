@@ -16,7 +16,7 @@ export class VoidMark {
   //  cuts:   hits during the ult window build x K.cutsMul Delayed Cuts (the extra cuts burst / split with the real ones)
   //  hold:   sheathes inside the ult window do not burst the cuts built inside the window (that burst damage is removed); they land on One Perfect Cut, each worth K.holdW cuts
   //  chains: damage dealt during the ult window (except the One Perfect Cut split itself) +K.chainPct
-  static BUFF = { unified: { cutsMul: 1.5 }, cuts: { cutsMul: 2 }, hold: { holdW: 1.5 }, chains: { chainPct: 0.6 } };
+  static BUFF = { unified: { cutsMul: 2 }, cuts: { cutsMul: 2 }, hold: { holdW: 1.5 }, chains: { chainPct: 0.6 } };
   static BUFFS = { unified: 'Void Sheath Mark (unified)', none: 'plain mark', cuts: 'Doubled cuts', hold: 'No burst on sheathe', chains: 'Stronger chains' };
   static tuneText(id) { const B = VoidMark.BUFF[id]; return id === 'unified' ? `×${B.cutsMul} cuts in the ult, held, cashed ×2` : id === 'cuts' ? `×${B.cutsMul} cuts` : id === 'hold' ? `held cuts ×${B.holdW}` : id === 'chains' ? `+${Math.round(B.chainPct * 100)}% damage` : ''; }
   static get BUFF_BLURB() { return { unified: `One loop around Delayed Cuts: Void Sheath (the Special, on cooldown) marks the boss for 10 s → cast the ultimate inside it: while it is active, hits build ×${VoidMark.BUFF.unified.cutsMul} Delayed Cuts and sheathes HOLD the cuts built in the window instead of bursting them → One Perfect Cut inside the mark cashes every held cut out twice. Cuts from before the ult still burst as usual. No separate damage buff: everything feeds the one cash-out.`, cuts: `Variant: while the ultimate is active, every hit builds ×${VoidMark.BUFF.cuts.cutsMul} Delayed Cuts on the boss, so the marked One Perfect Cut splits on twice the cuts.`,
