@@ -5,7 +5,7 @@ const CLS_NOTE = {
   dragoon: 'Exception: Lance Fall (the Jump) still leaps the hero with its i-frames, even vs bosses; every other skill and chain step runs on the shadow.',
   bladedancer: 'Shadow Clone Jutsu clones now flank your shadow, so the echo slashes land where the chain steps do.',
   bard: 'Songs keep playing while you dodge; the shadow finishes the strum.',
-  samurai: '<b>Void Sheath Mark (bosses).</b> Void Sheath marks the boss for 10 s. During Blade of the Void your hits leave 2× the Delayed Cuts and Sheathes HOLD the cuts built in the window instead of bursting them. One Perfect Cut inside the mark counts every cut twice. Cast the Special and the ult on cooldown: holding either loses damage.',
+  samurai: '<b>Focus → ult.</b> Focus comes only from finishing chains (+3 Sheathe, +4 other chains). At exactly 100 the Special (Void Draw) spends it all and fills your ult: Special → Sheathe (Void Sheath) → ult. <b>Void Sheath Mark (bosses).</b> Void Sheath marks the boss for 10 s. During Blade of the Void your hits leave 2× the Delayed Cuts and Sheathes HOLD the cuts built in the window instead of bursting them. One Perfect Cut inside the mark counts every cut twice. Cast the Special and the ult on cooldown: holding either loses damage.',
 };
 export function playNotes(cls, C, rot = null, label = mkLabel()) {
   const li = [

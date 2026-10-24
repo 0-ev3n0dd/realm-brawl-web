@@ -39,7 +39,7 @@ export function tipVars(cls) {
     edgeMax: bd.edge.max, edgeCrit: pct(bd.edge.crit), edgeCritDmg: pct(bd.edge.critDmg), critPipMax: bd.critPips.perAction, popBase: num(bd.markPop.base), popPer: num(bd.markPop.per),
     ...(c.lance ? { qlen: c.skills.Q.stats.len, qmul: c.skills.Q.stats.mul, pin: c.skills.Q.stats.pin, emul: c.skills.E.stats.mul, er: c.skills.E.stats.r, rmul: c.skills.R.stats.mul, rr: c.skills.R.stats.r, range: c.skills.R.stats.range, pinPer: DRG.pin.per, trange: c.skills.F.stats.range, tmul: c.skills.F.stats.mul, tpins: c.skills.F.stats.pins } : {}),
     ...(c.fist ? { hits: c.skills.Q.stats.hits, mul: c.skills.Q.stats.mul, chiDodge: c.chi.dodge, flowEmp: c.flowSt.emp, pr: c.skills.F.stats.r, pmul: c.skills.F.stats.mul } : {}),
-    ...(c.blade ? { len: c.skills.Q.stats.len, mul: c.skills.E.stats.mul, wmul: c.skills.E.stats.wmul, focusParry: c.focus.parry, cutR: c.cut.r, cutPer: c.cut.per, kr: c.skills.F.stats.r, kmul: c.skills.F.stats.mul } : {}),
+    ...(c.blade ? { len: c.skills.Q.stats.len, mul: c.skills.E.stats.mul, wmul: c.skills.E.stats.wmul, focusParry: 0, cutR: c.cut.r, cutPer: c.cut.per, kr: c.skills.F.stats.r, kmul: c.skills.F.stats.mul } : {}),
     gapRange: GAP.range, holyPerHit: c.resOnBasicHit || 0, finisherPip: c.resOnFinisher || 0, basicRes: c.resOnBasic ?? c.resOnBasicHit ?? c.resOnHit ?? 0,
   };
 }
@@ -123,9 +123,9 @@ function skillStats(cls, key, atk) {
     const K = c.cut;
     if (sk.id === 'kesa_slash') rows.push(['Damage', dmg(st.mul)], ['Cone', `${st.r} px diagonal cut`], [c.stack.name, `+${st.cuts} on everything cut`]);
     if (sk.id === 'iaido') rows.push(['Damage', dmg(st.mul)], ['Line', `${st.len} px dash-through (i-frames), ${st.w} px wide`], [c.stack.name, `+${st.cuts} on everything cut`]);
-    if (sk.id === 'crescent_parry') rows.push(['Block', `${sec(st.block)} s: a hit in it is parried (no damage)`], ['Perfect parry', `counter ${dmg(st.mul)} crit, +${st.cuts} cuts, +${c.focus.parry} Focus`], ['No hit', `crescent slash ${dmg(st.wmul)} (${st.wr} px), +${st.wcuts} cut`]);
-    if (sk.id === 'sheathe') { rows.push(['Burst', `every Delayed Cut within ${K.r} px: ×${num(K.per)} ATK per cut` + (atk ? ` (≈${Math.round(K.per * atk)} each)` : '')], ['Ring', `${dmg(st.rmul)}, ${st.ring} px`]); const S = c.state; rows.push([S.name, `${sec(S.dur)} s after any sheathe (Sheathe, Blossom Burst, Counter Sheathe): +${Math.round(c.focus.still * 60)} Focus/s; Q → then E Petal Rain; E → Moonlit Guard → then Q Moment of Death`]); }
-    rows.push(['Focus', `+${c.focus.hit} per skill hit (max ${c.focus.hitCap}); Stillness +${Math.round(c.focus.still * 60)}/s; perfect parry +${c.focus.parry}`]);
+    if (sk.id === 'crescent_parry') rows.push(['Block', `${sec(st.block)} s: a hit in it is parried (no damage)`], ['Perfect parry', `counter ${dmg(st.mul)} crit, +${st.cuts} cuts, no Focus (Focus comes only from chains)`], ['No hit', `crescent slash ${dmg(st.wmul)} (${st.wr} px), +${st.wcuts} cut`]);
+    if (sk.id === 'sheathe') { rows.push(['Burst', `every Delayed Cut within ${K.r} px: ×${num(K.per)} ATK per cut` + (atk ? ` (≈${Math.round(K.per * atk)} each)` : '')], ['Ring', `${dmg(st.rmul)}, ${st.ring} px`]); const S = c.state; rows.push([S.name, `${sec(S.dur)} s after any sheathe (Sheathe, Blossom Burst, Counter Sheathe): Q → then E Petal Rain; E → Moonlit Guard → then Q Moment of Death`]); }
+    rows.push(['Focus', `only from chains: +${c.focus.sheathe} per Sheathe, +${c.focus.chain} per other chain; every Sheathe banks +${c.focus.bank} Delayed Cuts`]);
     return rows;
   }
   switch (sk.id) {
@@ -197,7 +197,7 @@ function ultStats(cls, atk) {
     case 'dragon_form': return [['Crash', dmg(DRG.form.mul) + `, ${DRG.form.r} px, launch`], ['Dragon Blood', `+${CLASSES.dragoon.blood.ult} at once, ×${CLASSES.dragoon.blood.ultMul} gain in the window`], ['Jump', `cooldown ${sec(DRG.form.rjump)} s for 10 s`], ['Dragon spirit', `every dive: a fire burst ${dmg(DRG.form.echo)} in ${DRG.form.echoR} px`]];
     case 'grimoire_unbound': return [['Burst', dmg(3.4) + ', 300 px'], ['Unbound', `a creature strikes by itself every ${sec(ARC.unbound.every)} s within ${ARC.unbound.r} px (×${ARC.unbound.muls[0]}–×${ARC.unbound.muls[4]} ATK)`], ['Ink', 'full for the window']];
     case 'encore': return [['Curtain call', dmg(3.0) + ', 290 px'], ['Encore', `every active song replayed at ×${ARC.songs.encore} (none: Valor + Haste)`], ['Notes', 'basic notes explode (70 px) in the window'], ['Tempo', 'full for the window']];
-    case 'void_blade': return [['Void cut', dmg(SAM.voidCut.mul) + `, ${SAM.voidCut.len} px line, +${SAM.voidCut.cuts} Delayed Cuts`], ['Focus', `+${CLASSES.samurai.focus.ult} at once, ×${CLASSES.samurai.focus.ultMul} Focus gain in the window (the spenders keep it)`], ['Free sheathes', 'Sheathe has no cooldown in the window'], ['Void Sheathe', `no route finisher: the window ends by bursting every cut at ×${SAM.voidEnd}`]];
+    case 'void_blade': return [['Void cut', dmg(SAM.voidCut.mul) + `, ${SAM.voidCut.len} px line, +${SAM.voidCut.cuts} Delayed Cuts`], ['Focus', 'none in the window (cast it right after Void Draw → Sheathe)'], ['Free sheathes', 'Sheathe has no cooldown in the window'], ['Void Sheathe', `no route finisher: the window ends by bursting every cut at ×${SAM.voidEnd}`]];
     default: return [];
   }
 }
@@ -326,7 +326,7 @@ function slotTooltip0(cls, slot, opts = {}) {
   }
   if (c.focusRes && (slot === 'focus' || slot === 'cuts')) { // Samurai: the Focus bar / the Delayed Cuts counter
     const F = c.focus;
-    if (slot === 'focus') return { slot, kind: 'Resource', title: 'Focus', key: '', desc: 'Built in Stillness and by perfect parries (skills are free). Petal Rain and Moment of Death spend ALL of it; both ult finishers scale with it without spending it.', how: focusText(c), stats: [['Focus chains', `×1 → ×${1 + F.spendMax} damage at 100 Focus`], ['Finishers', `+0 → +${pct(F.finMax)}% damage at 100 Focus (kept)`], ['Drains', `after ${sec(F.drainAfter)} s out of combat`]], chains: withSeq(c.chains.filter((ch) => ch.id === 'petal_rain' || ch.id === 'moment_of_death').map((ch) => ({ ...ch, role: 'spends Focus' }))) };
+    if (slot === 'focus') return { slot, kind: 'Resource', title: 'Focus', key: '', desc: `Built ONLY by finishing chains: +${F.sheathe} per Sheathe, +${F.chain} per other chain (skills are free). At exactly 100 the Special (Void Draw) spends it all and fills your ult meter; Moment of Death is primed at 100.`, how: focusText(c), stats: [['Sheathe', `+${F.sheathe} Focus, +${F.bank} Delayed Cuts banked`], ['Other chains', `+${F.chain} Focus`], ['Special', 'needs 100 Focus: spends it all, ult meter → full'], ['Primed', `Moment of Death ×${F.primed} at 100 Focus`], ['Pre-pull', `an out-of-combat Sheathe readies ${F.prepull} Focus (no drain)`]], chains: withSeq(c.chains.filter((ch) => ch.id === 'moment_of_death').map((ch) => ({ ...ch, role: 'primed at 100 Focus' }))) };
     return { slot, kind: 'Stacks', title: 'Delayed Cuts', key: '', desc: c.stack.desc, how: 'Cut everything first (Iaido, Wind Step, Twin Moons, basics), then Sheathe: every cut bursts at once. Counter Sheathe doubles it.', stats: [['Per cut', `×${num(c.cut.per)} ATK on the sheathe`], ['Max', `${c.stack.max} (bosses ${c.stack.bossMax}), 8 s`]], chains: [] };
   }
   if (c.gloryRes && (slot === 'glory' || slot === 'trinity')) { // Warrior: the Glory bar / the Weapon Trinity tracker

@@ -11,7 +11,7 @@ import { DT } from './constants.js';
 import { pointBlocked, clearPath } from './world.js';
 import { hitEnemy, hitEnemiesInShape } from './combat.js';
 import { targetsOf, leapTick } from './player.js';
-import { addStacks, takeStacks, stackN, endUltWindow } from './kit.js';
+import { addStacks, takeStacks, stackN, endUltWindow, setState } from './kit.js';
 import { tickBuffs } from './warrior.js';
 
 /** Samurai tuning (the per-skill numbers live in the class data: skills[k].stats). */
@@ -45,8 +45,8 @@ export function initSam(p) { p.sam = { parry: 0, pk: null, pp: -9999, n: 0 }; }
 /** Focus gain (gear: Focus Gain; x2 in the ult window). Authoritative sim only. */
 export function gainFocus(sim, p, n, why = null) {
   if (sim.predicting || !(n > 0) || !CLASSES[p.cls].focusRes) return 0;
-  const F = CLASSES[p.cls].focus, before = p.res;
-  p.res = Math.min(p.stats.maxRes, p.res + n * (1 + (p.stats.focusGain || 0)) * (p.uw ? F.ultMul : 1));
+  const before = p.res;
+  p.res = Math.min(100, p.res + n); // (exact: +3 per Sheathe, +4 per chain, so the cycle lands on 100 at the fork)
   const got = p.res - before;
   if (why && got >= 1) sim.emit({ type: 'samx', ph: 'focus', pid: p.id, n: R0(got), why, x: R0(p.x), y: R0(p.y - 56) });
   return got;
@@ -62,18 +62,11 @@ export function tickSamurai(sim, p) {
   if (S.parry > 0) S.parry--;
   if (p.uw) p.cds.R = 0; // Blade of the Void: free sheathes
   if (sim.predicting) return;
-  if (p.cst && !(p.action && p.action.data && p.action.data.fin)) gainFocus(sim, p, F.still); // Stillness: the sheathed blade gathers Focus
-  else if (p.res > 0 && !p.uw && sim.tick - (p.lastCombat || 0) > F.drainAfter) p.res = Math.max(0, p.res - F.drain * DT);
+  // Focus comes only from chain completions (samCast): no Stillness trickle, and no out-of-combat drain (the pre-pull head start is kept)
 }
 
 /** After a Samurai hit lands (authoritative): a little Focus per skill hit. */
-export function samOnHit(sim, p, e, o) {
-  if (sim.predicting || o.dot || o.ult || o.basic || !isSam(p)) return;
-  const F = C().focus, act = p.action;
-  if (!act || act.kind !== 'skill') return;
-  const add = Math.min(F.hit, F.hitCap - (act.fg || 0));
-  if (add > 0) { act.fg = (act.fg || 0) + add; gainFocus(sim, p, add); }
-}
+export function samOnHit() {} // (no per-hit Focus any more: Focus comes only from chain completions, see samCast)
 
 /** A skill / chain / finisher starts (player.js): the Focus spenders spend it all, the finishers scale with it; tell the clients. */
 export function samCast(sim, p, a, key, chain) {
@@ -82,7 +75,18 @@ export function samCast(sim, p, a, key, chain) {
   if (id === 'petal_rain' || id === 'moment_of_death' || fin) {
     const k = fin ? F.finMax : F.spendMax;
     a.data.fm = 1 + k * Math.min(1, p.res / 100);
-    if (!sim.predicting && !fin && !p.uw) p.res = 0; // (Blade of the Void: the window's extra Focus is not spent)
+    // (nothing spends Focus any more: only the Special does, all 100 of it)
+  }
+  if (!sim.predicting && !p.uw && key !== 'T') { // Focus economy: Focus comes only from chain completions; the Special spends it
+    if (key === 'SP') { p.res = 0; const b = p.ult; p.ult = 100; sim.emit({ type: 'ultGain', pid: p.id, x: p.x, y: p.y - 44, amount: R0(100 - b), bonus: 0, chain: 'void_draw', full: b < 100 }); }
+    else if (id !== 'void_sheath' && !fin && (chain || key === 'R')) {
+      if (key === 'R') {
+        if (sim.tick - (p.lastCombat ?? -1e9) > F.drainAfter) p.res = Math.max(p.res, F.prepull); // pre-pull: an out-of-combat Sheathe readies Focus
+        for (const e of sim.enemies) if (!e.dead && Math.hypot(e.x - p.x, e.y - p.y) < C().cut.r + e.r) addStacks(sim, p, e, 'cut', F.bank); // every Sheathe banks +2 Delayed Cuts
+      }
+      gainFocus(sim, p, key === 'R' ? F.sheathe : F.chain, 'chain');
+      if (id === 'moment_of_death') a.data.fm = p.res >= 100 ? F.primed : 1; // primed at 100 Focus: a harder hit
+    }
   }
   if (id === 'void_sheath') voidMark(sim, p, a);
   if (fin) sim.emit({ type: 'sam', ph: 'fin', pid: p.id, id, route: chain.route, name: chain.name, x: R0(p.x), y: R0(p.y), ang: r2(a.ang), fm: r2(a.data.fm || 1) });
@@ -179,7 +183,7 @@ export function burstCuts(sim, p, a, { mul = 1, blossom = false, r = C().cut.r, 
       sim.emit({ type: 'samx', ph: 'bloom', pid: p.id, x: R0(e.x), y: R0(e.y), r: K.splashR });
     }
   }
-  if (total) { const F = C().focus; gainFocus(sim, p, Math.min(F.burstCap, total * F.burst), 'burst'); p.sam.n += total; }
+  if (total) p.sam.n += total; // (bursts give no Focus: Focus comes only from chain completions)
   sim.emit({ type: 'samx', ph: 'sheathed', pid: p.id, x: R0(p.x), y: R0(p.y), n: total, k: hit, dbl: mul > 1.5 ? 1 : undefined, bl: blossom ? 1 : undefined });
   return total;
 }
@@ -202,7 +206,7 @@ export function samParry(sim, p, src, o = {}) {
   const tx = src && src.x != null ? src.x : p.x + Math.cos(a.ang) * 60, ty = src && src.y != null ? src.y : p.y + Math.sin(a.ang) * 60;
   a.ang = Math.atan2(ty - p.y, tx - p.x);
   sim.emit({ type: 'samx', ph: 'parry', pid: p.id, x: R0(p.x), y: R0(p.y), ang: r2(a.ang), moon: moon ? 1 : undefined, tx: R0(tx), ty: R0(ty) });
-  gainFocus(sim, p, moon ? F.guard : F.parry, 'parry');
+  // (a parry gives no Focus: Focus comes only from chain completions)
   const foe = src && src.hp != null && !src.dead && src.cc ? src : null;
   const set = new Set();
   if (foe && moon) { addStacks(sim, p, foe, 'cut', G.cuts); for (const q of sim.enemies) if (!q.dead && q !== foe && Math.hypot(q.x - foe.x, q.y - foe.y) < G.nearR + q.r) addStacks(sim, p, q, 'cut', G.near); }
@@ -356,7 +360,7 @@ export const SAM_SKILLS = {
       p.superArmor = true;
       if (a.t === 12) { dashAim(sim, p, a, 150, 5); a.data.t0 = 12; }
       if (a.data.t0 != null && a.t > 12 && a.t <= 17) { const k = (a.t - 12) / 5, d = a.data; p.x = d.fx + (d.lx - d.fx) * k; p.y = d.fy + (d.ly - d.fy) * k; }
-      if (a.t === 16) { strike(sim, p, a, line(a.data.ox ?? p.x, a.data.oy ?? p.y, a.ang, V.len, V.w), { mul: V.mul, kb: 300, stagger: 30, poise: 20, hitstop: 12, selfHs: 8, stack: cutOpt(V.cuts), ult: true }, 'void'); gainFocus(sim, p, C().focus.ult / C().focus.ultMul, 'void'); }
+      if (a.t === 16) { strike(sim, p, a, line(a.data.ox ?? p.x, a.data.oy ?? p.y, a.ang, V.len, V.w), { mul: V.mul, kb: 300, stagger: 30, poise: 20, hitstop: 12, selfHs: 8, stack: cutOpt(V.cuts), ult: true }, 'void'); } // (no Focus from the ult: Focus comes only from chain completions)
     },
   },
   // Thousand Petal Storm (mob finisher): hundreds of cuts across the screen, then one sheathe click bursts them all
@@ -416,7 +420,7 @@ export const SAM_SKILLS = {
         sim.emit({ type: 'samx', ph: 'split', pid: p.id, id: e ? e.id : null, x: R0(e ? e.x : p.x), y: R0(e ? e.y : p.y), r: e ? e.r : 30, ang: r2(a.ang), n, mul: r2(mul * (a.data.fm || 1)), vm: a.data.vm ? 1 : undefined });
         strike(sim, p, a, line(a.data.ox ?? p.x, a.data.oy ?? p.y, a.ang, (a.data.dd || 200) + 60, 90), { mul: P.line, forceCrit: true, stagger: 40, kb: 160, hitstop: 10, selfHs: 10 }, 'splitline', set);
       }
-      if (a.t === 108) endUltWindow(sim, p, 'one_perfect_cut');
+      if (a.t === 108) { endUltWindow(sim, p, 'one_perfect_cut'); setState(sim, p, 'base'); } // the One Perfect Cut click opens Stillness (the next Parry is Moonlit Guard)
     },
   },
 };

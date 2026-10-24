@@ -167,7 +167,7 @@ export const ECLIPSE = { dur: secs(8), stealth: 30, burst: 0.25, bsHits: 1, extP
 
 /** Small meter trickle for any landed (non-ult) hit; capped per tick and per second. */
 export function creditHit(sim, p, o) {
-  if (sim.predicting || o.ult || o.spill || p.uw) return 0; // (horde AoE spill hits: no meter) no meter during the ult window (free, fast skills would loop it)
+  if (sim.predicting || o.ult || o.spill || p.uw || p.cls === 'samurai') return 0; // (Samurai: the meter comes only from the Special's Focus) // (horde AoE spill hits: no meter) no meter during the ult window (free, fast skills would loop it)
   if (p.ultHitTick !== sim.tick) { p.ultHitTick = sim.tick; p.ultHitTickSum = 0; }
   const m = ultHitMul(p);
   const want = (o.dot ? ULT.hitDot : o.basic ? ULT.hitBasic : ULT.hitSkill) * m;
@@ -187,6 +187,7 @@ export function creditChain(sim, p, id) {
   p.chainPending = null;
   if (sim.predicting) return 0;
   if (p.eclipse && STEALTH_CHAINS.has(id)) return 0;
+  if (p.cls === 'samurai') return 0; // Samurai: chains give no meter (the Special turns 100 Focus into a full meter)
   if (p.uw || ROUTE_IDS.has(id)) return 0; // ult window: no meter (free skills + 3x cooldowns would loop it); finishers never give meter // Vanish chains give no meter during Eclipse (free pips + stealth would loop it)
   const repeat = p.ultLast === id;
   const m = ultMul(p);

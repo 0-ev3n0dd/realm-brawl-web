@@ -9,7 +9,7 @@ import { hitEnemy, hitEnemiesInShape, addArea, grantShield } from './combat.js';
 import { targetsOf, pickTarget, dragIn } from './player.js';
 import { addStacks, takeStacks, chainHist } from './kit.js';
 import { gainGlory, weaponOfKey } from './warrior.js';
-import { gainFocus, SAM } from './samurai.js';
+import { SAM } from './samurai.js';
 import { gainChi, MONK, monkTier } from './monk.js';
 import { DRG } from './dragoon.js';
 import { ARC, songCount } from './arcana.js';
@@ -220,7 +220,6 @@ const SPECIALS = {
       const still = !!(p.cst && CLASSES[p.cls].state);
       if (sim.predicting) return;
       const n = hitEnemiesInShape(sim, p, { shape: 'line', x: p.x, y: p.y, ang: a.ang, len: s.len, w: s.w }, { mul: s.mul * classScale('samurai') * (still ? s.stillMul : 1), stack: ['cut', s.cuts + (still ? s.still : 0)], kb: 90, stagger: 30, heavy: true, hitstop: 10, style: 'sam' });
-      gainFocus(sim, p, s.focus, 'Void Draw');
       emit(sim, p, { ph: 'impact', id: 'void_draw', x: R0(p.x), y: R0(p.y), ang: r2(a.ang), len: s.len, w: s.w, n, still: still ? 1 : undefined });
     },
   },

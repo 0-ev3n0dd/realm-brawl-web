@@ -126,10 +126,10 @@ export const SPECIAL_KIT = {
     ],
   },
   samurai: {
-    special: { id: 'void_draw', name: 'Iaijutsu: Void Draw', cd: 18, cost: 0, special: true,
+    special: { id: 'void_draw', name: 'Iaijutsu: Void Draw', cd: 32.5, cost: 0, special: true,
       stats: { charge: 40, len: 900, w: 120, mul: 3.2, cuts: 4, still: 2, stillMul: 1.3, focus: 30 },
-      tip: 'Hold still for a heartbeat (0.65 s, unstoppable) and draw one cut across the whole screen. It stacks 4 Delayed Cuts on everything in the line (6 in Stillness), ready for Sheathe.',
-      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit, +30 Focus. In Stillness: ×1.3 damage and +2 more Cuts.' },
+      tip: 'Needs exactly 100 Focus. Hold still for a heartbeat (0.65 s, unstoppable) and draw one cut across the whole screen: spends ALL your Focus and fills your ult meter. It stacks 4 Delayed Cuts on everything in the line (6 in Stillness); Sheathe right after = Void Sheath, then the ult.',
+      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit. Needs 100 Focus: spends it all and fills the ult meter. 32.5 s cooldown. In Stillness: ×1.3 damage and +2 more Cuts.' },
     chains: [
       { id: 'void_echo', name: 'Void Echo', kind: 'boss', seq: ['Q', 'F', 'Q', 'E'], window: 160, four: true, pre: 'twin_moons',
         desc: 'Void Draw → Iaido Slash: dash through the line again, the void echoing behind you (480 px, ×2.2 ATK, +2 Delayed Cuts).',

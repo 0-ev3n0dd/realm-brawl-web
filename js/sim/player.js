@@ -492,7 +492,8 @@ export function updatePlayer(sim, p) {
   } else if (p.bufSkill && canCancel) {
     const key = p.bufSkill;
     const sk = cls.skills[key];
-    if (sk && p.cds[key] <= 0) {
+    if (key === 'SP' && cls.focusRes && p.res < 100 && p.cds.SP <= 0) { p.bufSkill = null; sim.emit({ type: 'nores', pid: p.id, key }); } // Samurai: the Special needs 100 Focus
+    else if (sk && p.cds[key] <= 0) {
       const rc = routeCast(p, key); // Eclipse finisher route: this step's chain is forced (no Vanish-chain cap, no condition)
       const spc = rc ? null : specChain(p, key, sim.tick); // Special chains (the Special earlier in the history) beat class states
       const sc = rc || spc ? null : stateChain(p, key); // class state: this key's transformed chain
