@@ -161,13 +161,14 @@ export function burstCuts(sim, p, a, { mul = 1, blossom = false, r = C().cut.r, 
   let total = 0, hit = 0;
   const list = sim.enemies.filter((e) => !e.dead && stackN(e, 'cut', p.id) > 0 && Math.hypot(e.x - p.x, e.y - p.y) < r + e.r);
   for (const e of list) {
-    const rec = e.stx && e.stx.cut, w = !ult && p.uw && e.boss && rec && !sim.noVMark ? Math.min(rec.n || 1, rec.w || 0) : 0;
-    let n;
-    if (w > 0) { // Void Sheath Mark: in the ult window the cuts built in it are HELD for One Perfect Cut; only older cuts burst
-      n = (rec.n || 1) - w; rec.n = w;
-      sim.emit({ type: 'samx', ph: 'held', pid: p.id, id: e.id, x: R0(e.x), y: R0(e.y), r: e.r, n: w, m: vMarked(sim, p, e) ? 1 : undefined });
-      if (!n) continue;
-    } else n = takeStacks(sim, p, e, 'cut');
+    const rec = e.stx && e.stx.cut;
+    if (!ult && p.uw && e.boss && rec && !sim.noVMark) { // Void Sheath Mark: in the ult window a sheathe bursts NOTHING on a boss: every cut on it
+      // (pre-ult ones too) is HELD, and kept alive to the end of the window, for One Perfect Cut to cash out (x2 in the mark)
+      rec.w = rec.n || 1; rec.t = Math.max(rec.t || 0, p.uw.t + 30);
+      sim.emit({ type: 'samx', ph: 'held', pid: p.id, id: e.id, x: R0(e.x), y: R0(e.y), r: e.r, n: rec.w, m: vMarked(sim, p, e) ? 1 : undefined });
+      continue;
+    }
+    const n = takeStacks(sim, p, e, 'cut');
     if (!n) continue;
     total += n; hit++;
     const m = K.per * n * mul * gear;

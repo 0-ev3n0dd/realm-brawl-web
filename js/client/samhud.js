@@ -29,7 +29,7 @@ export function focusMeter(ctx, x, y, w, h, p, cls, time, sc = 1, side = false, 
   }
   txt(ctx, `${uw ? 'VOID ' : still ? 'STILL ' : ''}FOCUS ${Math.floor(p.res)}`, x + w / 2, y + h / 2 + 1, Math.round(12 * sc), '#fff', 'center', 3);
   const lx = side ? x + w + 12 * sc : x + w / 2, ly = side ? y + h / 2 + 1 : y - 12 * sc, la = side ? 'left' : 'center';
-  if (cuts > 0) txt(ctx, `✦ ${cuts} cut${cuts > 1 ? 's' : ''} → R`, lx, ly, Math.round(12 * sc), cuts >= 8 ? '#ffffff' : '#ff8cc6', la, 3);
+  if (cuts > 0) txt(ctx, uw ? `✦ ${cuts} held → One Perfect Cut` : `✦ ${cuts} cut${cuts > 1 ? 's' : ''} → R`, lx, ly, Math.round(12 * sc), cuts >= 8 ? '#ffffff' : '#ff8cc6', la, 3);
   else if (p.res >= 50) txt(ctx, `×${(1 + Math.min(1, p.res / 100) * (cls.focus.spendMax || 1)).toFixed(1)} on Petal Rain / Death`, lx, ly, Math.round(12 * sc), FOCUS_COL, la, 3);
 }
 /** Samurai skill icons. `stroke(col, lw)` strokes the current path with an ink outline. Returns true when drawn. */
