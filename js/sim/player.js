@@ -492,8 +492,7 @@ export function updatePlayer(sim, p) {
   } else if (p.bufSkill && canCancel) {
     const key = p.bufSkill;
     const sk = cls.skills[key];
-    if (key === 'SP' && cls.focusRes && p.res < 100 && p.cds.SP <= 0) { p.bufSkill = null; sim.emit({ type: 'nores', pid: p.id, key }); } // Samurai: the Special needs 100 Focus
-    else if (sk && p.cds[key] <= 0) {
+    if (sk && p.cds[key] <= 0) {
       const rc = routeCast(p, key); // Eclipse finisher route: this step's chain is forced (no Vanish-chain cap, no condition)
       const spc = rc ? null : specChain(p, key, sim.tick); // Special chains (the Special earlier in the history) beat class states
       const sc = rc || spc ? null : stateChain(p, key); // class state: this key's transformed chain
@@ -831,7 +830,7 @@ function startUlt(sim, p) {
 /** Per-tick ult bookkeeping: meter decay, rage/aura timers, the Eclipse window. */
 function updateUltState(sim, p) {
   // partial meters decay slowly out of combat; a full (ready) meter is kept until used
-  if (!sim.predicting && p.ult > 0 && p.ult < ULT.max && sim.tick - p.lastCombat > ULT.decayAfter) p.ult = Math.max(0, p.ult - ULT.decayPerSec * DT);
+  if (!sim.predicting && p.ult > 0 && p.ult < ULT.max && !CLASSES[p.cls].meter && sim.tick - p.lastCombat > ULT.decayAfter) p.ult = Math.max(0, p.ult - ULT.decayPerSec * DT);
   if (!sim.predicting) { const m = ultHitMul(p); p.ultHitBudget = Math.min(ULT.hitPerSec * m, (p.ultHitBudget || 0) + ULT.hitPerSec * m * DT); } // hit-trickle token bucket
   if (p.surge > 0) p.surge--;
   if (p.rage > 0 && !sim.predicting) ragePull(sim, p);

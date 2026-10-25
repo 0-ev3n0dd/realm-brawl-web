@@ -57,35 +57,76 @@ export function tickSamurai(sim, p) {
   tickBuffs(p);
   const S = p.sam;
   if (!isSam(p)) return;
+  S.now = sim.tick;
   const F = C().focus;
   if (S.parry > 0 && !(p.action && p.action.data && p.action.data.guard)) S.parry = 0; // (the guard ended early: cancelled / stunned)
   if (S.parry > 0) S.parry--;
   if (p.uw) p.cds.R = 0; // Blade of the Void: free sheathes
   if (sim.predicting) return;
-  // Focus comes only from chain completions (samCast): no Stillness trickle, and no out-of-combat drain (the pre-pull head start is kept)
+  if (M()) meditate(sim, p);
 }
 
 /** After a Samurai hit lands (authoritative): a little Focus per skill hit. */
 export function samOnHit() {} // (no per-hit Focus any more: Focus comes only from chain completions, see samCast)
 
 /** A skill / chain / finisher starts (player.js): the Focus spenders spend it all, the finishers scale with it; tell the clients. */
+// ---- ult meter (framework): every chain fills it, the same everywhere; kills add a little (combat.js). No hit trickle.
+const M = () => C().meter;
+function addMeter(sim, p, n, id) {
+  if (sim.predicting || !(n > 0) || p.uw || p.ult >= 100) return;
+  const b = p.ult; p.ult = Math.min(100, p.ult + n); if (p.ult > 99.999) p.ult = 100;
+  p.ultGained = (p.ultGained || 0) + (p.ult - b);
+  sim.emit({ type: 'ultGain', pid: p.id, x: p.x, y: p.y - 44, amount: R0(p.ult - b), bonus: 0, chain: id, full: p.ult >= 100 });
+}
+/** Focus tier (0..3): the cell evolves as Focus climbs (34 Keen / 67 Honed / 100 Void-ready). */
+export const samTier = (p) => { const T = C().focus.tiers; let t = 0; for (const v of T) if (p.res >= v) t++; return t; };
+const CELL = ['sheathe', 'moonlit_guard', 'moment_of_death', 'stillwater_execution', 'twin_moons', 'void_echo'];
+function nearFoe(sim, p, r) { let b = null, bd = Infinity; for (const e of targetsOf(sim)) { if (e.dead) continue; const d = Math.hypot(e.x - p.x, e.y - p.y) - e.r; if (d < r && d < bd) { bd = d; b = e; } } return b; }
+/** A free follow-up strike (no press, no GCD): `mul` ATK on the nearest foe (or around you). */
+function follow(sim, p, a, mul, fx, r = 120) {
+  const e = nearFoe(sim, p, C().cell.reach); if (!e && fx !== 'bloom') return 0;
+  return strike(sim, p, a, e && fx !== 'bloom' ? circ(p, e.r + 40, e.x, e.y) : circ(p, r), { mul, kb: 60, stagger: 8, hitstop: 3, noFm: true }, fx === 'bloom' ? 'petalring' : 'ring');
+}
+/** In-order cell bookkeeping + the per-press payoffs (authoritative sim; out of the ult window). */
+function cellStep(sim, p, a, key, id) {
+  const S = p.sam, K = C().cell, t = samTier(p);
+  const cid = id === 'counter_sheathe' ? 'sheathe' : (key === 'R' && !CELL.includes(id) ? 'sheathe' : id);
+  const want = CELL[S.cell % CELL.length];
+  S.cell = cid === want ? S.cell + 1 : (cid === 'sheathe' ? 1 : 0); // out of order: the cell breaks (no Edge, no Bloom)
+  const inOrder = S.cell > 0;
+  if (!inOrder) return;
+  if (cid === 'moonlit_guard') { S.edgeUntil = sim.tick + K.edgeDur; sim.emit({ type: 'samx', ph: 'upkeep', pid: p.id, x: R0(p.x), y: R0(p.y - 56), t: K.edgeDur }); }
+  if (cid === 'moment_of_death' && t >= 1) follow(sim, p, a, K.echo, 'echo');
+  if (cid === 'stillwater_execution' && t >= 1) for (const e of sim.enemies) if (!e.dead && Math.hypot(e.x - p.x, e.y - p.y) < K.plantR + e.r) addStacks(sim, p, e, 'cut', t);
+  if (cid === 'twin_moons' && t >= 2) follow(sim, p, a, K.moon, 'moon');
+  if (cid === 'void_echo' && S.cell === CELL.length) { follow(sim, p, a, K.bloom + K.bloomTier * t, 'bloom', K.bloomR); sim.emit({ type: 'samx', ph: 'cell', pid: p.id, x: R0(p.x), y: R0(p.y - 56), n: t }); S.cell = 0; }
+}
+/** Meditation: out of combat the Samurai settles: Focus and meter drift up to the cycle's two-thirds point (Focus 66 / meter 64)
+ *  over ~20 s of rest. You arrive rested; chained packs give no time to meditate, so there is no free ult per pack. */
+function meditate(sim, p) {
+  const S = M(), F = C().focus;
+  if (!p.sam.rested) { p.sam.rested = 1; p.res = Math.max(p.res, S.restFocus); p.ult = Math.max(p.ult, S.restMeter); return; }
+  if (p.uw || sim.tick - (p.lastCombat ?? -1e9) <= F.drainAfter) return;
+  const k = DT / S.restSecs;
+  if (p.res < S.restFocus) p.res = Math.min(S.restFocus, p.res + S.restFocus * k);
+  if (p.ult < S.restMeter) p.ult = Math.min(S.restMeter, p.ult + S.restMeter * k);
+}
+export const edgeOn = (sim, p) => !!(p.sam && p.sam.edgeUntil > sim.tick);
 export function samCast(sim, p, a, key, chain) {
   if (!isSam(p)) return;
   const F = C().focus, fin = !!(chain && chain.route), id = chain ? chain.id : a.id;
-  if (id === 'petal_rain' || id === 'moment_of_death' || fin) {
-    const k = fin ? F.finMax : F.spendMax;
-    a.data.fm = 1 + k * Math.min(1, p.res / 100);
-    // (nothing spends Focus any more: only the Special does, all 100 of it)
-  }
-  if (!sim.predicting && !p.uw && key !== 'T') { // Focus economy: Focus comes only from chain completions; the Special spends it
-    if (key === 'SP') { p.res = 0; const b = p.ult; p.ult = 100; sim.emit({ type: 'ultGain', pid: p.id, x: p.x, y: p.y - 44, amount: R0(100 - b), bonus: 0, chain: 'void_draw', full: b < 100 }); }
-    else if (id !== 'void_sheath' && !fin && (chain || key === 'R')) {
+  if (fin) { a.data.fm = 1 + F.finMax * Math.min(1, (p.sam.edge || 0) / 100); if (!sim.predicting) p.sam.edge = 0; } // ult finisher: Void Edge (the Focus the Special spent) scales it
+  if (!sim.predicting && !p.uw && key !== 'T') { // Focus (hidden payoff size) and ult meter (visible) both come only from chains
+    if (key === 'SP') { p.sam.edge = p.res; p.res = 0; } // Void Draw spends ALL Focus into Void Edge: its own hit ×(1 + Edge) and the ult finisher ×(1 + Edge); no meter
+    else if (id === 'void_sheath') addMeter(sim, p, M().seal, id); // the seal (Special → Sheathe): the last step of the burst
+    else if (!fin && (chain || key === 'R')) {
       if (key === 'R') {
-        if (sim.tick - (p.lastCombat ?? -1e9) > F.drainAfter) p.res = Math.max(p.res, F.prepull); // pre-pull: an out-of-combat Sheathe readies Focus
         for (const e of sim.enemies) if (!e.dead && Math.hypot(e.x - p.x, e.y - p.y) < C().cut.r + e.r) addStacks(sim, p, e, 'cut', F.bank); // every Sheathe banks +2 Delayed Cuts
       }
       gainFocus(sim, p, key === 'R' ? F.sheathe : F.chain, 'chain');
+      addMeter(sim, p, key === 'R' ? M().sheathe : M().chain, id);
       if (id === 'moment_of_death') a.data.fm = p.res >= 100 ? F.primed : 1; // primed at 100 Focus: a harder hit
+      cellStep(sim, p, a, key, id);
     }
   }
   if (id === 'void_sheath') voidMark(sim, p, a);
@@ -130,6 +171,7 @@ function strikeOpts(p, a, o) {
   let mul = SAM.dmg;
   if (a.chain && !a.chain.route) mul *= 1 + (p.stats.chainDmg || 0);
   if (a.data.fm && !o.noFm) mul *= a.data.fm;
+  if (p.sam && p.sam.edgeUntil > (p.sam.now || 0)) mul *= 1 + C().cell.edge; // Moonlit Edge upkeep
   return { hitstop: 4, heavy: true, ...o, dmgMul: (o.dmgMul || 1) * mul, style: o.style || 'sam', ult: o.ult || !!a.data.fin || undefined };
 }
 /** Hit a shape and tell the clients what to draw. fx: the look (client/fxsam.js). srv: server-only look ('samx': parry counters). */
@@ -175,7 +217,7 @@ export function burstCuts(sim, p, a, { mul = 1, blossom = false, r = C().cut.r, 
     const n = takeStacks(sim, p, e, 'cut');
     if (!n) continue;
     total += n; hit++;
-    const m = K.per * n * mul * gear;
+    const m = K.per * n * mul * gear * (1 + (C().focus.burstFocus || 0) * Math.min(1, p.res / 100)); // Focus deepens every Sheathe's release
     sim.emit({ type: 'samx', ph: 'burst', pid: p.id, id: e.id, x: R0(e.x), y: R0(e.y), r: e.r, n, fx, dbl: mul > 1.5 ? 1 : undefined });
     hitEnemy(sim, p, e, strikeOpts(p, a, { mul: m, stagger: 10 + n * 2, kb: 60, hitstop: 6, noPop: true, style: 'samburst', ult: ult || undefined, noFm: true, bigNum: n >= 8 || undefined }));
     if (blossom) {

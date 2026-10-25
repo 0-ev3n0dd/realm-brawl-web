@@ -219,7 +219,7 @@ const SPECIALS = {
       if (a.t !== s.charge) return;
       const still = !!(p.cst && CLASSES[p.cls].state);
       if (sim.predicting) return;
-      const n = hitEnemiesInShape(sim, p, { shape: 'line', x: p.x, y: p.y, ang: a.ang, len: s.len, w: s.w }, { mul: s.mul * classScale('samurai') * (still ? s.stillMul : 1), stack: ['cut', s.cuts + (still ? s.still : 0)], kb: 90, stagger: 30, heavy: true, hitstop: 10, style: 'sam' });
+      const n = hitEnemiesInShape(sim, p, { shape: 'line', x: p.x, y: p.y, ang: a.ang, len: s.len, w: s.w }, { mul: s.mul * classScale('samurai') * (still ? s.stillMul : 1) * (1 + Math.min(1, (p.sam?.edge ?? 0) / 100)), stack: ['cut', s.cuts + (still ? s.still : 0)], kb: 90, stagger: 30, heavy: true, hitstop: 10, style: 'sam' });
       emit(sim, p, { ph: 'impact', id: 'void_draw', x: R0(p.x), y: R0(p.y), ang: r2(a.ang), len: s.len, w: s.w, n, still: still ? 1 : undefined });
     },
   },

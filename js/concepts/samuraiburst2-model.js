@@ -181,7 +181,7 @@ export const ROUTES = {
     sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'E'], ['R', 'E', 'Q', 'SP', 'R'], ['Q', 'F', 'Q']], drop: 0.2, pause: 0.35, prepull: false, opc: 'asap', desc: 'no pre-pull, light chains, Special whenever, real ultimate cast whenever the gauge is full' } },
   edge: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0, pause: 0, desc: 'Counter Sheathe · Petal Rain · Wind Step, empowering at 5 Edge' }, sloppy: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q']], drop: 0.35, pause: 0.25, desc: 'same chains, ~35% dropped and idle gaps' } },
   flow: { good: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0, pause: 0, desc: 'short chains back to back, no gaps' }, sloppy: { loop: [['E', 'R'], ['Q', 'Q'], ['R', 'Q', 'E']], drop: 0.2, pause: 0.45, desc: 'same chains with 3 s gaps between many of them' } },
-  weave: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q'], ['R', 'E', 'Q']], drop: 0, pause: 0, desc: 'four different chains in turn (every pair weaves)' }, sloppy: { loop: [['R', 'E', 'Q']], drop: 0.25, pause: 0.2, desc: 'Moment of Death on repeat (nothing weaves) with drops' } },
+  weave: { good: { loop: [['E', 'R'], ['R', 'Q', 'E'], ['Q', 'Q'], ['R', 'E', 'Q']], drop: 0, pause: 0, desc: 'four different chains in turn (every pair weaves)' }, sloppy: { loop: [['Q', 'Q']], drop: 0.25, pause: 0.2, desc: 'Wind Step on repeat (nothing weaves, no cells) with drops' } },
 };
 
 /** one run: real Sim + arena boss + one concept layer. events: { k: 'bonus', r } / { k: 'sim', ev } */

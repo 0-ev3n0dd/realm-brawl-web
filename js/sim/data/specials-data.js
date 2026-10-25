@@ -128,11 +128,11 @@ export const SPECIAL_KIT = {
   samurai: {
     special: { id: 'void_draw', name: 'Iaijutsu: Void Draw', cd: 32.5, cost: 0, special: true,
       stats: { charge: 40, len: 900, w: 120, mul: 3.2, cuts: 4, still: 2, stillMul: 1.3, focus: 30 },
-      tip: 'Needs exactly 100 Focus. Hold still for a heartbeat (0.65 s, unstoppable) and draw one cut across the whole screen: spends ALL your Focus and fills your ult meter. It stacks 4 Delayed Cuts on everything in the line (6 in Stillness); Sheathe right after = Void Sheath, then the ult.',
-      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit. Needs 100 Focus: spends it all and fills the ult meter. 32.5 s cooldown. In Stillness: ×1.3 damage and +2 more Cuts.' },
+      tip: 'Usable at any Focus. Hold still for a heartbeat (0.65 s, unstoppable) and draw one cut across the whole screen: spends ALL your Focus as Void Edge (this cut and your next One Perfect Cut deal up to ×2 at 100 Focus). Gives no ult meter. It stacks 4 Delayed Cuts on everything in the line (6 in Stillness); Sheathe right after = Void Sheath, then the ult.',
+      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit. Spends all Focus: ×(1 + Focus/100) damage, and the same bonus carries to the ult finisher. No ult meter. 32.5 s cooldown. In Stillness: ×1.3 damage and +2 more Cuts.' },
     chains: [
       { id: 'void_echo', name: 'Void Echo', kind: 'boss', seq: ['Q', 'F', 'Q', 'E'], window: 160, four: true, pre: 'twin_moons',
-        desc: 'Void Draw → Iaido Slash: dash through the line again, the void echoing behind you (480 px, ×2.2 ATK, +2 Delayed Cuts).',
+        desc: 'Void Draw → Iaido Slash: dash through the line again, the void echoing behind you (480 px, ×2.2 ATK, +2 Delayed Cuts). Closes the cell: if the whole cell (Sheathe → Moonlit Guard → Moment of Death → Stillwater → Twin Moons → Void Echo) went in order, a Cell Bloom ring answers it (220 px, ×0.6 ATK + ×0.3 per Focus tier).',
         fx: { dur: 22, cancel: 14, dash: { dist: 220, T: 6, iframes: 12 }, steps: [{ t: 1, at: 'self', shape: 'line', len: 480, w: 100, mul: 2.2, o: { kb: 80 }, stack: ['cut', 2], look: 'void' }] } },
       { id: 'crescent_void', name: 'Crescent Void', kind: 'mob', seq: ['R', 'Q', 'E', 'SP', 'Q'], window: 220, pre: 'petal_rain',
         fin: { at: 'self', r: 280, mul: 2.8, stack: ['cut', 2], o: { kb: 220 }, txt: 'a full-moon void slash around you (+2 Delayed Cuts)' },
@@ -143,7 +143,7 @@ export const SPECIAL_KIT = {
         desc: 'Void Draw → Sheathe: the blade clicks home and your target is split open (160 px, ×2 ATK guaranteed crit), bursting every Delayed Cut on it (×0.5 ATK per Cut). Bosses: it also sets a VOID MARK on the boss for 10 s (an ink ensō).',
         fx: { dur: 26, cancel: 18, steps: [{ t: 12, at: 'tgt', range: 900, shape: 'circle', r: 160, mul: 2.0, o: { forceCrit: true, heavy: true, hitstop: 8 }, pop: { kind: 'cut', per: 0.5 }, look: 'x' }] } },
       { id: 'stillwater_execution', name: 'Stillwater Execution', kind: 'boss', seq: ['R', 'E', 'Q', 'F'], window: 150, sp: false,
-        desc: 'Moment of Death (Sheathe → Crescent Parry → Iaido Slash) → Kesa Slash: one perfect cut through your target (500 px line, ×2.52 ATK guaranteed crit, +3 Delayed Cuts).',
+        desc: 'Moment of Death (Sheathe → Crescent Parry → Iaido Slash) → Kesa Slash: one perfect cut through your target (500 px line, ×2.52 ATK guaranteed crit, +3 Delayed Cuts). In an in-order cell at Keen Focus (34+) it plants +1 extra Delayed Cut per Focus tier on everything near (220 px).',
         fx: { dur: 24, cancel: 16, steps: [{ t: 8, at: 'self', shape: 'line', len: 500, w: 70, mul: 2.52, o: { forceCrit: true, heavy: true, hitstop: 9 }, stack: ['cut', 3], look: 'void' }] } },
     ],
   },
