@@ -63,7 +63,6 @@ export function tickSamurai(sim, p) {
   if (S.parry > 0) S.parry--;
   if (p.uw) p.cds.R = 0; // Blade of the Void: free sheathes
   if (sim.predicting) return;
-  if (M()) meditate(sim, p);
 }
 
 /** After a Samurai hit lands (authoritative): a little Focus per skill hit. */
@@ -101,30 +100,36 @@ function cellStep(sim, p, a, key, id) {
   if (cid === 'twin_moons' && t >= 2) follow(sim, p, a, K.moon, 'moon');
   if (cid === 'void_echo' && S.cell === CELL.length) { follow(sim, p, a, K.bloom + K.bloomTier * t, 'bloom', K.bloomR); sim.emit({ type: 'samx', ph: 'cell', pid: p.id, x: R0(p.x), y: R0(p.y - 56), n: t }); S.cell = 0; }
 }
-/** Meditation: out of combat the Samurai settles: Focus and meter drift up to the cycle's two-thirds point (Focus 66 / meter 64)
- *  over ~20 s of rest. You arrive rested; chained packs give no time to meditate, so there is no free ult per pack. */
-function meditate(sim, p) {
-  const S = M(), F = C().focus;
-  if (!p.sam.rested) { p.sam.rested = 1; p.res = Math.max(p.res, S.restFocus); p.ult = Math.max(p.ult, S.restMeter); return; }
-  if (p.uw || sim.tick - (p.lastCombat ?? -1e9) <= F.drainAfter) return;
-  const k = DT / S.restSecs;
-  if (p.res < S.restFocus) p.res = Math.min(S.restFocus, p.res + S.restFocus * k);
-  if (p.ult < S.restMeter) p.ult = Math.min(S.restMeter, p.ult + S.restMeter * k);
+/** ULT MARKS: the ult is ready when the three finisher marks are lit (one each, capped): Moment of Death lights BLOSSOM,
+ *  Stillwater Execution lights MOON, Void Echo lights VOID (the Special's Void Sheath also lights Void). Pack chains light them too.
+ *  One Perfect Cut spends them; for ZANSHIN seconds after it the blade settles and no mark can light (so packs can't loop ults).
+ *  p.ult mirrors the marks (thirds) so the shared ult bar / bots read it. Nothing lights over time. */
+export const SAM_MARK = { moment_of_death: 'blossom', stillwater_execution: 'moon', void_echo: 'void', void_sheath: 'void', petal_rain: 'moon', blossom_burst: 'blossom', wind_step: 'moon', riposte_wave: 'void' };
+export const MARKS = ['blossom', 'moon', 'void'];
+function syncUlt(p) { const n = MARKS.filter((k) => p.sam.marks && p.sam.marks[k]).length; p.ult = n >= 3 ? 100 : Math.round(n * 100 / 3 * 100) / 100; }
+function addMark(sim, p, id) {
+  const k = SAM_MARK[id]; if (!k || sim.predicting || p.uw) return;
+  const S = p.sam; if ((S.zan || 0) > sim.tick) return;
+  S.marks = S.marks || {}; if (S.marks[k]) return;
+  S.marks[k] = 1; syncUlt(p);
+  sim.emit({ type: 'samx', ph: 'mark', pid: p.id, mark: k, n: MARKS.filter((m) => S.marks[m]).length, x: R0(p.x), y: R0(p.y - 56) });
+  sim.emit({ type: 'ultGain', pid: p.id, x: p.x, y: p.y - 44, amount: 33, bonus: 0, chain: id, full: p.ult >= 100 });
 }
 export const edgeOn = (sim, p) => !!(p.sam && p.sam.edgeUntil > sim.tick);
 export function samCast(sim, p, a, key, chain) {
   if (!isSam(p)) return;
   const F = C().focus, fin = !!(chain && chain.route), id = chain ? chain.id : a.id;
   if (fin) { a.data.fm = 1 + F.finMax * Math.min(1, (p.sam.edge || 0) / 100); if (!sim.predicting) p.sam.edge = 0; } // ult finisher: Void Edge (the Focus the Special spent) scales it
+  if (key === 'T' && !sim.predicting) { p.sam.marks = {}; p.sam.zan = sim.tick + Math.round(C().marks.zanshin * 60); } // the ult spends the marks; Zanshin
   if (!sim.predicting && !p.uw && key !== 'T') { // Focus (hidden payoff size) and ult meter (visible) both come only from chains
     if (key === 'SP') { p.sam.edge = p.res; p.res = 0; } // Void Draw spends ALL Focus into Void Edge: its own hit ×(1 + Edge) and the ult finisher ×(1 + Edge); no meter
-    else if (id === 'void_sheath') addMeter(sim, p, M().seal, id); // the seal (Special → Sheathe): the last step of the burst
+    else if (id === 'void_sheath') addMark(sim, p, id); // the seal (Special → Sheathe) lights Void (either this or Void Echo)
     else if (!fin && (chain || key === 'R')) {
       if (key === 'R') {
         for (const e of sim.enemies) if (!e.dead && Math.hypot(e.x - p.x, e.y - p.y) < C().cut.r + e.r) addStacks(sim, p, e, 'cut', F.bank); // every Sheathe banks +2 Delayed Cuts
       }
-      gainFocus(sim, p, key === 'R' ? F.sheathe : F.chain, 'chain');
-      addMeter(sim, p, key === 'R' ? M().sheathe : M().chain, id);
+      gainFocus(sim, p, chain ? F.perStep * chain.seq.length : F.sheathe, 'chain'); // longer chains build more Focus
+      if (chain) addMark(sim, p, id);
       if (id === 'moment_of_death') a.data.fm = p.res >= 100 ? F.primed : 1; // primed at 100 Focus: a harder hit
       cellStep(sim, p, a, key, id);
     }

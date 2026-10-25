@@ -369,7 +369,15 @@ export class HUD {
     if (full) { ctx.save(); ctx.globalAlpha *= 0.55 + 0.35 * Math.sin(time * 9); glowRR(ctx, x - 3, y - 3, w + 6, h + 6, h / 2 + 3, '#ffd23f', 16 + 8 * Math.sin(time * 9), 'rgb(255,210,63)'); ctx.restore(); } // (cached glow plate: client/textcache.js)
     rrect(ctx, x, y, w, h, h / 2); ctx.fillStyle = INK; ctx.fill();
     if (k > 0) { rrect(ctx, x + 2, y + 2, Math.max(h - 4, (w - 4) * k), h - 4, (h - 4) / 2); const g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, '#ff9a3c'); g.addColorStop(1, full ? '#fff1a0' : '#ffd23f'); ctx.fillStyle = g; ctx.fill(); }
-    for (let i = 1; i < 4; i++) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(x + (w * i) / 4 - 1, y + 2, 2, h - 4); }
+    const sm = cls === 'samurai' || p.cls === 'samurai', segs = sm ? 3 : 4;
+    for (let i = 1; i < segs; i++) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(x + (w * i) / segs - 1, y + 2, 2, h - 4); }
+    if (sm) { // Samurai: three finisher marks (Blossom / Moon / Void) instead of a percentage
+      const mk = p.sam && p.sam.marks, n = Math.round((p.ult || 0) * 3 / 100), on = (i, k) => (mk ? !!mk[k] : i < n);
+      const M = [['blossom', '#ff9ad5', '花'], ['moon', '#bcd8ff', '月'], ['void', '#b48cff', '空']];
+      M.forEach(([k, col], i) => circle(ctx, x + (w * (i + 0.5)) / 3, y + h / 2, Math.max(3, h / 2 - 2), on(i, k) ? col : 'rgba(255,255,255,.14)', 2));
+      if (label) txt(ctx, full ? (w < 240 ? 'ULT READY!' : `ULTIMATE READY  [${this.keyLabel('ult')}]`) : 'BLOSSOM · MOON · VOID', x + w / 2, y - 6, Math.max(9, h - 4), full ? '#fff6c8' : '#ddd', 'center', 3);
+      label = false;
+    }
     if (label) {
       txt(ctx, full ? (w < 240 ? 'ULT READY!' : `ULTIMATE READY  [${this.keyLabel('ult')}]`) : `ULT ${Math.floor(p.ult || 0)}%`, x + w / 2, y + h / 2 + 1, Math.max(10, h - 1), full ? '#fff6c8' : '#fff', 'center', 3);
     }

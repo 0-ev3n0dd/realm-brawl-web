@@ -264,14 +264,15 @@ export const CLASSES = {
   samurai: {
     id: 'samurai', name: 'Samurai', weapon: 'katana', resource: 'Focus', resColor: '#ffd6ec',
     color: '#f2a6c8',
-    blurb: 'Iaido swordsman of petals and moonlight. Every draw of the katana leaves DELAYED CUTS glowing on what it passed; R sheathes the blade and bursts them all at once, then STILLNESS (2 s) transforms your next skill. Your rotation is built from CELLS (Sheathe → Parry → Iaido → Kesa → Iaido → Parry): every chain fills the ult meter (+4, Sheathe +2, kills +1.5) and hidden Focus (+4 / +3). As Focus climbs (Keen 34, Honed 67, Void-ready 100) the cell evolves: Moment of Death gains an echo strike, Stillwater plants extra cuts, Twin Moons a third moon, and a finished cell blooms. Moonlit Guard keeps Moonlit Edge up (+12% damage, 7 s). The Special spends Focus for damage; the Sheathe after it seals the meter to 100. Out of combat you meditate back to Focus 66 / meter 64 over 20 s. E is a 0.4 s Crescent Parry: block a hit for a counter-slash (no hit: it still ends in a crescent slash).',
+    blurb: 'Iaido swordsman of petals and moonlight. Every draw of the katana leaves DELAYED CUTS glowing on what it passed; R sheathes the blade and bursts them all at once, then STILLNESS (2 s) transforms your next skill. Your rotation is built from CELLS (Sheathe → Parry → Iaido → Kesa → Iaido → Parry): every chain builds hidden Focus (longer chains build more; nothing passive). Your ULT is ready when three MARKS are lit: Moment of Death lights BLOSSOM, Stillwater Execution lights MOON, Void Echo lights VOID (the Void Sheath after your Special lights Void too; in packs Blossom Burst / Petal Rain / Riposte Wave light them). One Perfect Cut spends the marks, and for 16 s after it no mark lights. As Focus climbs (Keen 34, Honed 67, Void-ready 100) the cell evolves: Moment of Death gains an echo strike, Stillwater plants extra cuts, Twin Moons a third moon, and a finished cell blooms. Moonlit Guard keeps Moonlit Edge up (+12% damage, 7 s). The Special spends all Focus for ×1–×2 damage (any Focus), and One Perfect Cut right after it hits up to twice as hard. E is a 0.4 s Crescent Parry: block a hit for a counter-slash (no hit: it still ends in a crescent slash).',
     base: { maxHp: 205, maxRes: 100, atk: 21, def: 8, spd: 1.06, crit: 0.1, critDmg: 1.65, hpRegen: 1.8, resRegen: 0 },
     growth: { maxHp: 25, atk: 3.3, def: 1.9, crit: 0.0025, hpRegen: 0.22 },
     // Samurai (sim/samurai.js). Skills only have cooldowns. Focus (the resource) is built ONLY by chain completions (+3 per Sheathe,
-    // +4 per other chain; out of combat it meditates back up to 66 over 20 s); the Special works at any Focus and spends it all for damage (no meter).
+    // +1.7 per chain step; nothing over time); the Special works at any Focus and spends it all for damage (no meter).
     blade: true, focusRes: true, resOnHit: 0, resOnBasic: 0,
-    meter: { chain: 4, sheathe: 2, seal: 4, kill: 0.6, restFocus: 66, restMeter: 64, restSecs: 20 }, // ult meter: one cycle = 22 chains ×4 + 4 Sheathes ×2 + seal 4 = 100
-    focus: { sheathe: 3, chain: 4, tiers: [34, 67, 100], burstFocus: 0.5, bank: 2, primed: 2, drainAfter: 300, spendMax: 1.0, finMax: 1.0, ult: 50, ultMul: 2 },
+    meter: { marks: 1 }, // ult readiness = the three finisher marks (samurai.js addMark); no meter from hits, chains or kills
+    marks: { zanshin: 16 }, // s after One Perfect Cut during which no mark lights
+    focus: { sheathe: 3, perStep: 1.7, tiers: [34, 67, 100], burstFocus: 0.5, bank: 2, primed: 2, drainAfter: 300, spendMax: 1.0, finMax: 1.0, ult: 50, ultMul: 2 },
     cut: { per: 0.42, r: 720, splash: 0.25, splashR: 90 },
     cell: { reach: 320, edge: 0.12, edgeDur: 420, echo: 0.8, plantR: 220, moon: 1.2, bloom: 0.6, bloomTier: 0.3, bloomR: 220 }, // the cell's per-press payoffs (samurai.js cellStep)
     dodge: { cost: 0, cd: 12 },

@@ -145,7 +145,7 @@ export function sustainShort(cls) {
   if (c.inkRes) return `Skills are free; summons (+${c.ink.cast}), chains (+${c.ink.chain}) and basic hits (+${c.ink.basic}) write Ink; a full book = INSCRIBED: the Inscribed chains spend it all and the next summon is empowered.`;
   if (c.tempoRes) return `Skills are free; skills (+${c.tempo.cast}), chains (+${c.tempo.chain}) and basic hits (+${c.tempo.basic}) build Tempo; full = IN TUNE: songs ×${c.tempo.tune} and the In Tune chains spend it all.`;
   if (c.chiRes) return `Skills are free; every hit feeds the hit counter (tiers at ${c.combo.tiers.join(' / ')} evolve your chains) and Chi; Hundred Hands Rush and Seven Seals spend all of it (the finishers scale with it).`;
-  if (c.focusRes) return `Skills are free; finishing chains builds Focus (+${c.focus.sheathe} per Sheathe, +${c.focus.chain} per other chain); at 100 the Special spends it all and fills your ult meter.`;
+  if (c.focusRes) return `Skills are free; finishing chains builds Focus (+${c.focus.sheathe} per Sheathe, +${c.focus.perStep} per chain step); the Special spends it all and fills your ult meter.`;
   if (c.gloryRes) return `Skills are free; hits, chains and Trinities (+${c.glory.trinity}) build Glory; Warlord's Rally and Executioner's Verdict spend all of it (the finishers scale with it).`;
   if (c.rageRes) return `Skills are free; hits, hits taken and landed chains (+${c.rageRules.chain}) build Rage; at ${c.rageRules.ready}+ Rage chains become Rage versions that spend it all.`;
   if (c.pips) return `Crits refund pips (max ${c.critPips.perAction} per attack) and chains refund ${P(SUSTAIN.refund[2] * k)}% / ${P(SUSTAIN.refund[3] * k)}%; chains and Marks build Edge (+crit chance, +crit damage).`;

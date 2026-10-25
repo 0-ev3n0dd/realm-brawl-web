@@ -126,10 +126,10 @@ export const SPECIAL_KIT = {
     ],
   },
   samurai: {
-    special: { id: 'void_draw', name: 'Iaijutsu: Void Draw', cd: 32.5, cost: 0, special: true,
+    special: { id: 'void_draw', name: 'Iaijutsu: Void Draw', cd: 26.1, cost: 0, special: true,
       stats: { charge: 40, len: 900, w: 120, mul: 3.2, cuts: 4, still: 2, stillMul: 1.3, focus: 30 },
       tip: 'Usable at any Focus. Hold still for a heartbeat (0.65 s, unstoppable) and draw one cut across the whole screen: spends ALL your Focus as Void Edge (this cut and your next One Perfect Cut deal up to ×2 at 100 Focus). Gives no ult meter. It stacks 4 Delayed Cuts on everything in the line (6 in Stillness); Sheathe right after = Void Sheath, then the ult.',
-      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit. Spends all Focus: ×(1 + Focus/100) damage, and the same bonus carries to the ult finisher. No ult meter. 32.5 s cooldown. In Stillness: ×1.3 damage and +2 more Cuts.' },
+      desc: 'Charge for 0.65 s (super armor), then a screen-length draw cut: ×3.2 ATK down a 900 px line and +4 Delayed Cuts on everything hit. Spends all Focus: ×(1 + Focus/100) damage, and the same bonus carries to the ult finisher. The Sheathe after it (Void Sheath) lights the Void mark. 26.1 s cooldown. In Stillness: ×1.3 damage and +2 more Cuts.' },
     chains: [
       { id: 'void_echo', name: 'Void Echo', kind: 'boss', seq: ['Q', 'F', 'Q', 'E'], window: 160, four: true, pre: 'twin_moons',
         desc: 'Void Draw → Iaido Slash: dash through the line again, the void echoing behind you (480 px, ×2.2 ATK, +2 Delayed Cuts). Closes the cell: if the whole cell (Sheathe → Moonlit Guard → Moment of Death → Stillwater → Twin Moons → Void Echo) went in order, a Cell Bloom ring answers it (220 px, ×0.6 ATK + ×0.3 per Focus tier).',
